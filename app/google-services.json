@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "369678667831",
+    "project_id": "jobtracker-da3ea",
+    "storage_bucket": "jobtracker-da3ea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369678667831:android:92d3c642cbf526fd012fb2",
+        "android_client_info": {
+          "package_name": "com.delhomme.jobber"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "369678667831-mrufvp1g4ahuqrs6o1u12pnem0pb034h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.delhomme.jobber",
+            "certificate_hash": "926c20e9aca8bba5eb71d969708a64c9dc4fedf0"
+          }
+        },
+        {
+          "client_id": "369678667831-dh17u237upn7shm7eprnfti2g46ghhks.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNdhx5Id8z8NpaD2fb1vTOxJUXrpijPR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "369678667831-dh17u237upn7shm7eprnfti2g46ghhks.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

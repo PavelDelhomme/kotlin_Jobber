@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Jobber</string>
+    <string name="login_activity_google_signin">Google Login</string>
+    <string name="login_activity_bienvenue">Bienvenue</string>
+    <string name="login_activity_sinscrire">Créer un compte</string>
+    <string name="login_activity_sign_in_with_google">Sign in with Google</string>
+    <string name="login_activity_email_txtview">Email</string>
+    <string name="login_activity_password">Password</string>
+    <string name="login_activity_button_text">Se connecter</string>
+    <string name="login_activity_signin_button_text">S\'inscrire</string>
+    <string name="login_activity_signin_button_finaliser">Créer le compte</string>
+    <string name="login_activity_password_forgot">Mot de passe oublié ?</string>
+    <string name="login_activity_password_hint">Your password</string>
+    <string name="login_activity_email_hint">Exemple : email@provider.com</string>
+    <string name="backbutton_text">Retour</string>
+    <string name="back">Back</string>
+    <string name="calendar_button">📅</string>
+    <string name="enter_uour_name">Enter your name</string>
+    <string name="date_of_birth_dd_mm_yyyy">Date of Birth (dd/mm/yyyy)</string>
+    <string name="entreprise">Entreprise</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
