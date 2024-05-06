@@ -116,5 +116,12 @@
             android:layout_below="@id/addEducationButton"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"/>
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/submitAdditionalInfoButton"
+            android:layout_marginTop="16dp" />
+
     </RelativeLayout>
 </ScrollView>
