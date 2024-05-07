@@ -1,7 +1,6 @@
 package com.delhomme.jobber.EntreprisePacket
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,9 @@ import com.delhomme.jobber.R
 import com.google.gson.Gson
 
 class EntrepriseListFragment : Fragment() {
+    private val entreprises = mutableListOf<Entreprise>()
+    private lateinit var entrepriseAdapter: EntrepriseAdapter
+
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,28 +25,23 @@ class EntrepriseListFragment : Fragment() {
         val entrepriseRecyclerView = view.findViewById<RecyclerView>(R.id.recyclerEntreprises)
         entrepriseRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val entreprises = loadEntreprises(requireContext())
-
-        val adapter = EntrepriseAdapter(entreprises)
-        entrepriseRecyclerView.adapter = adapter
-
+        entrepriseAdapter = EntrepriseAdapter(entreprises)
+        entrepriseRecyclerView.adapter = entrepriseAdapter
+        loadEntreprises()
         return view
     }
 
-    private fun loadEntreprises(context: Context): List<Entreprise> {
-        val sharedPreferences = context.getSharedPreferences("entreprises_prefs",
-            Context.MODE_PRIVATE
-        )
+    fun loadEntreprises() {
+        val sharedPreferences = requireContext().getSharedPreferences("entreprises_prefs", 0)
         val gson = Gson()
         val allEntries = sharedPreferences.all
-        val entreprises = mutableListOf<Entreprise>()
 
+        entreprises.clear()
         for ((_, value) in allEntries) {
             val entrepriseJson = value as String
             val entreprise = gson.fromJson(entrepriseJson, Entreprise::class.java)
             entreprises.add(entreprise)
         }
-
-        return entreprises
+        entrepriseAdapter.notifyDataSetChanged()
     }
 }

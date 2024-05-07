@@ -33,7 +33,7 @@ class EntrepriseAdapter(private val entreprises: List<Entreprise>) :
 
         fun bind(entreprise: Entreprise) {
             txtNomEntreprise.text = entreprise.nom
-            txtSecteurActivite.text = entreprise.secteurActivite
+            txtSecteurActivite.text = entreprise.secteurActivite ?: "Secteur inconnu"
         }
     }
 }

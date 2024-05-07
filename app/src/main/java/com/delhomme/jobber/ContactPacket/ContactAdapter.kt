@@ -29,10 +29,12 @@ class ContactAdapter(private val contacts: List<Contact>) :
     class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val txtNom = itemView.findViewById<TextView>(R.id.txtNom)
         private val txtPrenom = itemView.findViewById<TextView>(R.id.txtPrenom)
+        private val txtEntreprise = itemView.findViewById<TextView>(R.id.txtEntreprise)
 
         fun bind(contact: Contact) {
             txtNom.text = contact.nom
             txtPrenom.text = contact.prenom
+            txtEntreprise.text = contact.entrepriseInstance.nom
         }
     }
 }
