@@ -32,8 +32,10 @@ class CandidatureAdapter(
     ) : RecyclerView.ViewHolder(itemView) {
         private val txtTitreOffre = itemView.findViewById<TextView>(R.id.txtTitreOffre)
         private val txtEntreprise = itemView.findViewById<TextView>(R.id.txtEntreprise)
+        private val txtDateCandidature = itemView.findViewById<TextView>(R.id.txtDateCandidature)
 
         fun bind(candidature: Candidature) {
+            txtDateCandidature.text = candidature.date
             txtTitreOffre.text = candidature.titreOffre
             txtEntreprise.text = candidature.entrepriseNom
 

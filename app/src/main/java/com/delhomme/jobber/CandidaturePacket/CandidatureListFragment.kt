@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
@@ -27,6 +28,12 @@ class CandidatureListFragment : Fragment() {
 
         val candidatureRecyclerView = view.findViewById<RecyclerView>(R.id.recyclerCandidatures)
         candidatureRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        val itemDecoration = androidx.recyclerview.widget.DividerItemDecoration(
+            requireContext(), DividerItemDecoration.VERTICAL
+        )
+
+        candidatureRecyclerView.addItemDecoration(itemDecoration)
 
         candidatureAdapter = CandidatureAdapter(candidatures) { candidature ->
             showCandidatureDetails(candidature)
