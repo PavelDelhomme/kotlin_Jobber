@@ -1,6 +1,7 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.CandidaturePacket
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,7 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.adapter.CandidatureAdapter
+import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Candidature
 import com.google.gson.Gson
 
@@ -27,12 +28,20 @@ class CandidatureListFragment : Fragment() {
         val candidatureRecyclerView = view.findViewById<RecyclerView>(R.id.recyclerCandidatures)
         candidatureRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        candidatureAdapter = CandidatureAdapter(candidatures)
+        candidatureAdapter = CandidatureAdapter(candidatures) { candidature ->
+            showCandidatureDetails(candidature)
+        }
         candidatureRecyclerView.adapter = candidatureAdapter
 
         loadCandidatures()
 
         return view
+    }
+
+    private fun showCandidatureDetails(candidature: Candidature) {
+        val intent = Intent(requireContext(), CandidatureDetailsActivity::class.java)
+        intent.putExtra("candidature_id", candidature.id)
+        startActivity(intent)
     }
 
     override fun onResume() {

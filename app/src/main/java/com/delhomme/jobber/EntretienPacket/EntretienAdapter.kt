@@ -1,4 +1,4 @@
-package com.delhomme.jobber.adapter
+package com.delhomme.jobber.EntretienPacket
 
 import android.view.LayoutInflater
 import android.view.View

@@ -1,4 +1,4 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.CandidaturePacket
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Candidature
 import com.delhomme.jobber.models.Entreprise
 import com.google.gson.Gson
@@ -186,7 +187,16 @@ class CandidatureAddActivity : AppCompatActivity() {
                 { _, year, month, dayOfMonth ->
                     val hour = calendar.get(Calendar.HOUR_OF_DAY)
                     val minute = calendar.get(Calendar.MINUTE)
-                    etDateCandidature.setText(String.format("%d-%02d-%02d %02d:%02d", year, month + 1, dayOfMonth, hour, minute))
+                    etDateCandidature.setText(
+                        String.format(
+                            "%d-%02d-%02d %02d:%02d",
+                            year,
+                            month + 1,
+                            dayOfMonth,
+                            hour,
+                            minute
+                        )
+                    )
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),

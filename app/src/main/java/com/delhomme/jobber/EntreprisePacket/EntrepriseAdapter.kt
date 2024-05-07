@@ -1,4 +1,4 @@
-package com.delhomme.jobber.adapter
+package com.delhomme.jobber.EntreprisePacket
 
 
 

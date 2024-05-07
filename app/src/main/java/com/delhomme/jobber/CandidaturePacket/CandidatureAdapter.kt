@@ -1,4 +1,4 @@
-package com.delhomme.jobber.adapter
+package com.delhomme.jobber.CandidaturePacket
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,13 +8,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Candidature
 
-class CandidatureAdapter(private val candidatures: List<Candidature>) :
-    RecyclerView.Adapter<CandidatureAdapter.CandidatureViewHolder>() {
+class CandidatureAdapter(
+    private val candidatures: List<Candidature>,
+    private val onItemClickListener: (Candidature) -> Unit
+) : RecyclerView.Adapter<CandidatureAdapter.CandidatureViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CandidatureViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_candidature, parent, false)
-        return CandidatureViewHolder(view)
+        return CandidatureViewHolder(view, onItemClickListener)
     }
 
     override fun onBindViewHolder(holder: CandidatureViewHolder, position: Int) {
@@ -22,18 +24,22 @@ class CandidatureAdapter(private val candidatures: List<Candidature>) :
         holder.bind(candidature)
     }
 
-    override fun getItemCount(): Int {
-        return candidatures.size
-    }
+    override fun getItemCount(): Int = candidatures.size
 
-    class CandidatureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class CandidatureViewHolder(
+        itemView: View,
+        private val onItemClickListener: (Candidature) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
         private val txtTitreOffre = itemView.findViewById<TextView>(R.id.txtTitreOffre)
         private val txtEntreprise = itemView.findViewById<TextView>(R.id.txtEntreprise)
 
         fun bind(candidature: Candidature) {
             txtTitreOffre.text = candidature.titreOffre
             txtEntreprise.text = candidature.entrepriseNom
-        }
 
+            itemView.setOnClickListener {
+                onItemClickListener(candidature)
+            }
+        }
     }
 }

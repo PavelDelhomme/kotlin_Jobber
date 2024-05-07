@@ -1,11 +1,11 @@
-// AppelAdapter.kt
-package com.delhomme.jobber
+package com.delhomme.jobber.AppelPacket
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Appel
 
 class AppelAdapter(private val appels: List<Appel>) :

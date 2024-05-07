@@ -1,29 +1,29 @@
-// EntretienListActivity.kt
-package com.delhomme.jobber
+package com.delhomme.jobber.ContactPacket
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.adapter.EntretienAdapter
-import com.delhomme.jobber.models.Entretien
+import com.delhomme.jobber.MainActivity
+import com.delhomme.jobber.R
+import com.delhomme.jobber.models.Contact
 
-class EntretienListActivity : AppCompatActivity() {
+class ContactListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_entretien_list)
+        setContentView(R.layout.activity_contact_list)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val entretienRecyclerView = findViewById<RecyclerView>(R.id.recyclerEntretiens)
-        entretienRecyclerView.layoutManager = LinearLayoutManager(this)
+        val contactRecyclerView = findViewById<RecyclerView>(R.id.recyclerContacts)
+        contactRecyclerView.layoutManager = LinearLayoutManager(this)
 
         // Remplacez par une vraie liste récupérée
-        val entretiens = listOf<Entretien>()
+        val contacts = listOf<Contact>()
 
-        val adapter = EntretienAdapter(entretiens)
-        entretienRecyclerView.adapter = adapter
+        val adapter = ContactAdapter(contacts)
+        contactRecyclerView.adapter = adapter
     }
 
     override fun onSupportNavigateUp(): Boolean {

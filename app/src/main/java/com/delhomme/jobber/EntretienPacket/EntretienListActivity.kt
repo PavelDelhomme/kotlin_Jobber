@@ -1,29 +1,29 @@
-// EntrepriseListActivity.kt
-package com.delhomme.jobber
+package com.delhomme.jobber.EntretienPacket
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.adapter.EntrepriseAdapter
-import com.delhomme.jobber.models.Entreprise
+import com.delhomme.jobber.MainActivity
+import com.delhomme.jobber.R
+import com.delhomme.jobber.models.Entretien
 
-class EntrepriseListActivity : AppCompatActivity() {
+class EntretienListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_entreprise_list)
+        setContentView(R.layout.activity_entretien_list)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val entrepriseRecyclerView = findViewById<RecyclerView>(R.id.recyclerEntreprises)
-        entrepriseRecyclerView.layoutManager = LinearLayoutManager(this)
+        val entretienRecyclerView = findViewById<RecyclerView>(R.id.recyclerEntretiens)
+        entretienRecyclerView.layoutManager = LinearLayoutManager(this)
 
         // Remplacez par une vraie liste récupérée
-        val entreprises = listOf<Entreprise>()
+        val entretiens = listOf<Entretien>()
 
-        val adapter = EntrepriseAdapter(entreprises)
-        entrepriseRecyclerView.adapter = adapter
+        val adapter = EntretienAdapter(entretiens)
+        entretienRecyclerView.adapter = adapter
     }
 
     override fun onSupportNavigateUp(): Boolean {

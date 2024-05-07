@@ -1,10 +1,12 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.AppelPacket
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.MainActivity
+import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Appel
 
 class AppelListActivity : AppCompatActivity() {

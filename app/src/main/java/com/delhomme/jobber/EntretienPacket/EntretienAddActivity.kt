@@ -1,17 +1,22 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.EntretienPacket
 
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.delhomme.jobber.R
 
-class ContactAddActivity : AppCompatActivity() {
+class EntretienAddActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_contact_add)
+        setContentView(R.layout.activity_entretien_add)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Ajouter Contact"
+        supportActionBar?.title = "Ajouter Entretien"
 
         val cancelButton = findViewById<Button>(R.id.btnCancel)
+        cancelButton.setOnClickListener {
+            finish()
+        }
     }
 }

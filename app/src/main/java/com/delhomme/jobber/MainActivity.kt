@@ -8,6 +8,11 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.delhomme.jobber.AppelPacket.AppelAddActivity
+import com.delhomme.jobber.CandidaturePacket.CandidatureAddActivity
+import com.delhomme.jobber.ContactPacket.ContactAddActivity
+import com.delhomme.jobber.EntreprisePacket.EntrepriseAddActivity
+import com.delhomme.jobber.EntretienPacket.EntretienAddActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator

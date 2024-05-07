@@ -1,4 +1,4 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.EntreprisePacket
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.adapter.EntrepriseAdapter
+import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Entreprise
 import com.google.gson.Gson
 
@@ -33,7 +33,9 @@ class EntrepriseListFragment : Fragment() {
     }
 
     private fun loadEntreprises(context: Context): List<Entreprise> {
-        val sharedPreferences = context.getSharedPreferences("entreprises_prefs", Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences("entreprises_prefs",
+            Context.MODE_PRIVATE
+        )
         val gson = Gson()
         val allEntries = sharedPreferences.all
         val entreprises = mutableListOf<Entreprise>()

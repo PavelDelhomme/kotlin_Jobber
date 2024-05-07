@@ -1,4 +1,4 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.AppelPacket
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Appel
 
 class AppelListFragment : Fragment() {

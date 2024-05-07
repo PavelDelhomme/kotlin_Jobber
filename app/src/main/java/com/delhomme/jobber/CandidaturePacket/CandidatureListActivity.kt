@@ -1,18 +1,26 @@
-package com.delhomme.jobber
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.adapter.CandidatureAdapter
+import com.delhomme.jobber.AppelPacket.AppelAddActivity
+import com.delhomme.jobber.CandidaturePacket.CandidatureAdapter
+import com.delhomme.jobber.CandidaturePacket.CandidatureAddActivity
+import com.delhomme.jobber.CandidaturePacket.CandidatureDetailsActivity
+import com.delhomme.jobber.ContactPacket.ContactAddActivity
+import com.delhomme.jobber.EntreprisePacket.EntrepriseAddActivity
+import com.delhomme.jobber.EntretienPacket.EntretienAddActivity
+import com.delhomme.jobber.MainActivity
+import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Candidature
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
+
 
 class CandidatureListActivity : AppCompatActivity() {
     private val candidatures = mutableListOf<Candidature>()
@@ -28,7 +36,9 @@ class CandidatureListActivity : AppCompatActivity() {
         val candidatureRecyclerView = findViewById<RecyclerView>(R.id.recyclerCandidatures)
         candidatureRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        candidatureAdapter = CandidatureAdapter(candidatures)
+        candidatureAdapter = CandidatureAdapter(candidatures) { candidature ->
+            showCandidatureDetails(candidature)
+        }
         candidatureRecyclerView.adapter = candidatureAdapter
 
         loadCandidatures()
@@ -37,6 +47,12 @@ class CandidatureListActivity : AppCompatActivity() {
         fabAddCandidature.setOnClickListener { view ->
             showPopupMenu(view)
         }
+    }
+
+    private fun showCandidatureDetails(candidature: Candidature) {
+        val intent = Intent(this, CandidatureDetailsActivity::class.java)
+        intent.putExtra("candidature_id", candidature.id)
+        startActivity(intent)
     }
 
     private fun showPopupMenu(view: View) {
@@ -69,6 +85,7 @@ class CandidatureListActivity : AppCompatActivity() {
         }
         popup.show()
     }
+
     override fun onSupportNavigateUp(): Boolean {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -89,7 +106,10 @@ class CandidatureListActivity : AppCompatActivity() {
                 candidatures.add(candidature)
 
                 Log.d("Activity Liste des Candidatures ", "candidature : $candidature")
-                Log.d("Activity Liste candidatures ", "candidature.offre : ${candidature.titreOffre}")
+                Log.d(
+                    "Activity Liste candidatures ",
+                    "candidature.offre : ${candidature.titreOffre}"
+                )
             }
         }
         candidatures.sortByDescending { it.date }
