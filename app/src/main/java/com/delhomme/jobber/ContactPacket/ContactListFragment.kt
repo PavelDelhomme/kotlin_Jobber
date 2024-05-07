@@ -1,6 +1,7 @@
 package com.delhomme.jobber.ContactPacket
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -25,12 +26,20 @@ class ContactListFragment : Fragment() {
         val contactRecyclerView = view.findViewById<RecyclerView>(R.id.recyclerContacts)
         contactRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        contactAdapter = ContactAdapter(contacts)
+        contactAdapter = ContactAdapter(contacts) {contact ->
+            showContactDetails(contact)
+        }
         contactRecyclerView.adapter = contactAdapter
 
         loadContacts()
 
         return view
+    }
+
+    private fun showContactDetails(contact: Contact) {
+        val intent = Intent(requireContext(), ContactDetailsActivity::class.java)
+        intent.putExtra("contact_id", contact.id)
+        startActivity(intent)
     }
 
     public fun loadContacts() {
