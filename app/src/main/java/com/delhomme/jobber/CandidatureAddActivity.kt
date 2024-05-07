@@ -2,6 +2,7 @@ package com.delhomme.jobber
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
@@ -31,26 +32,22 @@ class CandidatureAddActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_candidature_add)
 
-
         etDateCandidature = findViewById(R.id.etDateCandidature)
         etTitreOffre = findViewById(R.id.titreOffreEditText)
         etEntreprise = findViewById(R.id.entrepriseNomEditText)
+        etLieuPoste = findViewById(R.id.lieuPosteEditText)
         spTypeEmploi = findViewById(R.id.typeEmploiSpinner)
         spPlateforme = findViewById(R.id.plateformeSpinner)
-        etLieuPoste = findViewById(R.id.lieuPosteEditText)
         etNotes = findViewById(R.id.notesEditText)
         cbEstSpontannee = findViewById(R.id.cbEstSpontannee)
         submitButton = findViewById(R.id.submitButton)
 
-
         setupDatePicker()
         setupSpinners()
 
-        submitButton.setOnClickListener {
-            submitForm()
-        }
+        setTodayDateWithTime()
 
-
+        submitButton.setOnClickListener { submitForm() }
     }
 
 
@@ -71,12 +68,12 @@ class CandidatureAddActivity : AppCompatActivity() {
     private fun submitForm() {
         val titreOffre = etTitreOffre.text.toString()
         val entrepriseNom = etEntreprise.text.toString()
+        val dateCandidature = etDateCandidature.text.toString()
         val typeEmploi = spTypeEmploi.selectedItem.toString()
         val plateformeUtilisee = spPlateforme.selectedItem.toString()
         val lieuPoste = etLieuPoste.text.toString()
         val notes = etNotes.text.toString()
         val estSpontannee = cbEstSpontannee.isChecked
-        val dateCandidature = etDateCandidature.text.toString()
 
         if (titreOffre.isEmpty() || entrepriseNom.isEmpty()) {
             Toast.makeText(this, "Veuillez remplir les champs obligatoires", Toast.LENGTH_SHORT).show()
@@ -172,6 +169,9 @@ class CandidatureAddActivity : AppCompatActivity() {
         val candidatureJson = gson.toJson(candidature)
         editor.putString("candidature_${candidature.id}", candidatureJson)
         editor.apply()
+        Log.d("saveCandidature", "La candidature à été enregistrer normalement ")
+        Log.d("saveCandidature", "candidatureJson : $candidatureJson")
+        Log.d("saveCandidature", "sharedPreferences.all : ${sharedPreferences.all}")
     }
 
     private fun generateId(): String {
@@ -184,13 +184,28 @@ class CandidatureAddActivity : AppCompatActivity() {
             DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
-                    etDateCandidature.setText(String.format("%d-%02d-%02d", year, month + 1, dayOfMonth))
+                    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                    val minute = calendar.get(Calendar.MINUTE)
+                    etDateCandidature.setText(String.format("%d-%02d-%02d %02d:%02d", year, month + 1, dayOfMonth, hour, minute))
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
             ).show()
         }
+    }
+
+    private fun setTodayDateWithTime() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+
+        // Remplir automatiquement le champ "Date de candidature" avec la date d'aujourd'hui et l'heure actuelle
+        etDateCandidature.setText(String.format("%d-%02d-%02d %02d:%02d", year, month, day, hour, minute))
+
     }
 
 }

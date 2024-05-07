@@ -32,9 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/lieu_du_poste"
-        android:focusable="false"
-        android:clickable="true"
-        android:inputType="none" />
+        android:inputType="text" />
 
     <CheckBox
         android:id="@+id/cbEstSpontannee"

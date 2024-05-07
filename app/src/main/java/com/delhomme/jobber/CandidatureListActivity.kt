@@ -2,6 +2,7 @@ package com.delhomme.jobber
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
@@ -76,6 +77,7 @@ class CandidatureListActivity : AppCompatActivity() {
     }
 
     private fun loadCandidatures() {
+        Log.d("CandidatureListActivity", "loadCandidatures called")
         val sharedPreferences = getSharedPreferences("candidatures_prefs", MODE_PRIVATE)
         val gson = Gson()
 
@@ -85,6 +87,9 @@ class CandidatureListActivity : AppCompatActivity() {
                 val candidatureJson = value as String
                 val candidature = gson.fromJson(candidatureJson, Candidature::class.java)
                 candidatures.add(candidature)
+
+                Log.d("Activity Liste des Candidatures ", "candidature : $candidature")
+                Log.d("Activity Liste candidatures ", "candidature.offre : ${candidature.titreOffre}")
             }
         }
         candidatures.sortByDescending { it.date }
