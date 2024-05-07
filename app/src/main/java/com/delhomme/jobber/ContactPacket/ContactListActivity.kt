@@ -37,6 +37,7 @@ class ContactListActivity : AppCompatActivity() {
     }
 
     private fun loadContacts() {
+        Log.e("ContactListActivity loadContacts", "Loading contacts into ContactListActivity and no Fragment")
         val sharedPreferences = getSharedPreferences("contacts_prefs", MODE_PRIVATE)
         val gson = Gson()
 
