@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Candidature
 
 class CandidatureAdapter(
     private val candidatures: List<Candidature>,

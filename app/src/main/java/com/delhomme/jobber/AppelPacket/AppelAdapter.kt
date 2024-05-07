@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Appel
 
 class AppelAdapter(private val appels: List<Appel>) :
         RecyclerView.Adapter<AppelAdapter.AppelViewHolder>() {

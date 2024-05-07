@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Contact
 
 class ContactAdapter(private val contacts: List<Contact>) :
     RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {

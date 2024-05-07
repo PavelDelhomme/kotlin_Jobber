@@ -1,4 +1,8 @@
-package com.delhomme.jobber.models
+package com.delhomme.jobber.CandidaturePacket
+
+import com.delhomme.jobber.EntreprisePacket.Entreprise
+import com.delhomme.jobber.EntretienPacket.Entretien
+import com.delhomme.jobber.models.Relance
 
 data class Candidature(
     val id: String,

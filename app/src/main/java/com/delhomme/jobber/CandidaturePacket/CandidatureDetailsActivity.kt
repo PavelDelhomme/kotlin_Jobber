@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Candidature
 import com.google.gson.Gson
 
 class CandidatureDetailsActivity : AppCompatActivity() {

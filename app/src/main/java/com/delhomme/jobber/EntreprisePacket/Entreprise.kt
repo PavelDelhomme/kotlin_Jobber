@@ -1,4 +1,4 @@
-package com.delhomme.jobber.models
+package com.delhomme.jobber.EntreprisePacket
 
 data class Entreprise(
     val id: String,

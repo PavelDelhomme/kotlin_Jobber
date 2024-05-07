@@ -17,7 +17,7 @@ import com.delhomme.jobber.EntreprisePacket.EntrepriseAddActivity
 import com.delhomme.jobber.EntretienPacket.EntretienAddActivity
 import com.delhomme.jobber.MainActivity
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Candidature
+import com.delhomme.jobber.CandidaturePacket.Candidature
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 

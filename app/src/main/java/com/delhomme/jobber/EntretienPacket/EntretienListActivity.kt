@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.MainActivity
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Entretien
 
 class EntretienListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

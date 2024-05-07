@@ -1,4 +1,7 @@
-package com.delhomme.jobber.models
+package com.delhomme.jobber.EntretienPacket
+
+import com.delhomme.jobber.CandidaturePacket.Candidature
+import com.delhomme.jobber.ContactPacket.Contact
 
 data class Entretien(
     val id: String,

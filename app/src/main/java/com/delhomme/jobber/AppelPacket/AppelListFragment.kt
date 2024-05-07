@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Appel
 
 class AppelListFragment : Fragment() {
     @SuppressLint("MissingInflatedId")

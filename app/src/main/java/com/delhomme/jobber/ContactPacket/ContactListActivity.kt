@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.MainActivity
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Contact
 
 class ContactListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

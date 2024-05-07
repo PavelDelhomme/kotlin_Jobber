@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Entreprise
 
 class EntrepriseAdapter(private val entreprises: List<Entreprise>) :
     RecyclerView.Adapter<EntrepriseAdapter.EntrepriseViewHolder>() {

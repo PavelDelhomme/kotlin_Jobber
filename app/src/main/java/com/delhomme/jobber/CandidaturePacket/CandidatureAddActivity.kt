@@ -11,8 +11,7 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.R
-import com.delhomme.jobber.models.Candidature
-import com.delhomme.jobber.models.Entreprise
+import com.delhomme.jobber.EntreprisePacket.Entreprise
 import com.google.gson.Gson
 import java.util.Calendar
 import java.util.UUID
