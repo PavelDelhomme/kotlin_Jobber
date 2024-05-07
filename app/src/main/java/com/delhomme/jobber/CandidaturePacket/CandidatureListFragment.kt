@@ -56,7 +56,7 @@ class CandidatureListFragment : Fragment() {
     }
 
     private fun loadCandidatures() {
-        Log.d("CandidatureListFragment", "loadCandidatures called")
+        Log.e("CandidatureListFragment", "loadCandidatures called")
         val sharedPreferences = requireContext().getSharedPreferences("candidatures_prefs", 0)
         val gson = Gson()
 
@@ -67,8 +67,8 @@ class CandidatureListFragment : Fragment() {
                 val candidatureJson = value as String
                 val candidature = gson.fromJson(candidatureJson, Candidature::class.java)
                 candidatures.add(candidature)
-                Log.d("Listes des Candidatures ", "candidature : $candidature")
-                Log.d("Listes candidatures ", "candidature.offre : ${candidature.titreOffre}")
+                Log.e("Listes des Candidatures ", "candidature : $candidature")
+                Log.e("Listes candidatures ", "candidature.offre : ${candidature.titreOffre}")
             }
         }
         candidatures.sortByDescending { it.date }

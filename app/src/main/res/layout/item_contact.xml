@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:elevation="4dp"
+    android:padding="8dp">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/txtNom"
-        tools:ignore="MissingConstraints" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtPrenom"
-        tools:ignore="MissingConstraints" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical"
+        android:padding="16dp">
+        <TextView
+            android:id="@+id/txtNomEntreprise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:paddingBottom="4dp" />
+        <TextView
+            android:id="@+id/txtNom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingBottom="4dp" />
+        <TextView
+            android:id="@+id/txtPrenom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingBottom="4dp" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

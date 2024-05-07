@@ -2,6 +2,7 @@ package com.delhomme.jobber.ContactPacket
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +10,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
+import com.google.gson.Gson
 
 class ContactListFragment : Fragment() {
+    private val contacts = mutableListOf<Contact>()
+    private lateinit var contactAdapter: ContactAdapter
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -21,11 +25,31 @@ class ContactListFragment : Fragment() {
         val contactRecyclerView = view.findViewById<RecyclerView>(R.id.recyclerContacts)
         contactRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val contacts = listOf<Contact>()
+        contactAdapter = ContactAdapter(contacts)
+        contactRecyclerView.adapter = contactAdapter
 
-        val adapter = ContactAdapter(contacts)
-        contactRecyclerView.adapter = adapter
+        loadContacts()
 
         return view
+    }
+
+    private fun loadContacts() {
+        Log.e("ContactListFragment", "Chargement des contacts enregistrer")
+        val sharedPreferences = requireContext().getSharedPreferences("contacts_prefs", 0)
+        val gson = Gson()
+        Log.e("ContactListFragment", "Suppression de la liste des contacts du coup")
+        contacts.clear()
+
+        for ((key, value) in sharedPreferences.all) {
+            if (key.startsWith("contact_")) {
+                val contactJson = value as String
+                val contact = gson.fromJson(contactJson, Contact::class.java)
+                Log.e("ajout du contact à la liste", "contact : $contact")
+                contacts.add(contact)
+            }
+        }
+        Log.e("ContactListFragment", "les contact ont été ajouté normalement depuis le cache")
+        Log.e("ContactListFragment", "Liste de contacts : $contacts")
+        contactAdapter.notifyDataSetChanged()
     }
 }
