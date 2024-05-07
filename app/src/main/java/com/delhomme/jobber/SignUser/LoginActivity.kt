@@ -1,14 +1,14 @@
 package com.delhomme.jobber.SignUser
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.delhomme.jobber.R
+import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.MainActivity
+import com.delhomme.jobber.R
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginWithEmailAndPassword(email: String, password: String) {
+        // Cette condition doit être remplacée par la logique d'authentification réelle
         if (email == "paul@delhomme.ovh" && password == "1234") {
             saveUserData(email, password)
             Toast.makeText(this, "Connexion réussie !", Toast.LENGTH_SHORT).show()

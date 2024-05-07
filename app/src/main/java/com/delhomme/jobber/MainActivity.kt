@@ -1,37 +1,87 @@
 package com.delhomme.jobber
 
+
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import com.delhomme.jobber.SignUser.User
-import com.delhomme.jobber.SignUser.UserProfile
-import com.google.gson.Gson
+import android.view.MenuItem
+import android.view.View
+import android.widget.PopupMenu
+import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
-class MainActivity : ComponentActivity() {
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var viewPager: ViewPager2
+    private lateinit var tabLayout: TabLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        val user = getUserData()
+        tabLayout = findViewById(R.id.tabLayout)
+        viewPager = findViewById(R.id.viewPager)
 
-        if (user != null) {
-            startActivity(Intent(this, DashboardActivity::class.java))
-            finish()
-        } else {
-            startActivity(Intent(this, WelcomeActivity::class.java))
-            finish()
+        // Configuration du ViewPager avec un adapter personnalisé
+        val viewPagerAdapter = MainViewPagerAdapter(this)
+        viewPager.adapter = viewPagerAdapter
+
+        // Relier le TabLayout au ViewPager
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "Dashboard"
+                1 -> "Candidatures"
+                2 -> "Appels"
+                3 -> "Contacts"
+                4 -> "Entretiens"
+                5 -> "Entreprises"
+                else -> "Autres"
+            }
+        }.attach()
+
+        // Configuration du Floating Action Button
+        val fabMenuJobber = findViewById<FloatingActionButton>(R.id.fabMenuJobber)
+        fabMenuJobber.setOnClickListener { view ->
+            showPopupMenu(view)
         }
     }
-
-    private fun getUserData(): User? {
-        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val email = sharedPreferences.getString("email", null)
-        val password = sharedPreferences.getString("password", null)
-        val profileJson = sharedPreferences.getString("user_profile", null)
-
-        if (email != null && password != null && profileJson != null){
-            val profile = Gson().fromJson(profileJson, UserProfile::class.java)
-            return User(email, password, profile)
+    private fun showPopupMenu(view: View) {
+        val popup = PopupMenu(this, view)
+        popup.menuInflater.inflate(R.menu.menu_add_items, popup.menu)
+        popup.setOnMenuItemClickListener { item: MenuItem ->
+            when (item.itemId) {
+                R.id.menu_add_candidature -> {
+                    startActivity(Intent(this, CandidatureAddActivity::class.java))
+                    true
+                }
+                R.id.menu_add_contact -> {
+                    startActivity(Intent(this, ContactAddActivity::class.java))
+                    true
+                }
+                R.id.menu_add_entretien -> {
+                    startActivity(Intent(this, EntretienAddActivity::class.java))
+                    true
+                }
+                R.id.menu_add_appel -> {
+                    startActivity(Intent(this, AppelAddActivity::class.java))
+                    true
+                }
+                R.id.menu_add_entreprise -> {
+                    startActivity(Intent(this, EntrepriseAddActivity::class.java))
+                    true
+                }
+                else -> false
+            }
         }
-        return null
+        popup.show()
+    }
+    override fun onSupportNavigateUp(): Boolean {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+        return true
     }
 }

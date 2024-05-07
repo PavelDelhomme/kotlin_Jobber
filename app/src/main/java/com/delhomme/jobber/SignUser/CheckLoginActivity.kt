@@ -3,8 +3,8 @@ package com.delhomme.jobber.SignUser
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.DashboardActivity
-import com.delhomme.jobber.WelcomeActivity
+import com.delhomme.jobber.DashboardFragment
+import com.delhomme.jobber.MainActivity
 
 class CheckLoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,15 +13,23 @@ class CheckLoginActivity : AppCompatActivity() {
         val user = getUserData()
 
         if (user != null) {
-            startActivity(Intent(this, DashboardActivity::class.java))
+            startActivity(Intent(this, DashboardFragment::class.java))
         } else {
-            startActivity(Intent(this, WelcomeActivity::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
         }
         finish()
     }
 
     private fun getUserData(): User? {
-        // Retourner les données de l'utilisateur depuis la mémoire persistante
-        return null // Placeholder : implémentez la logique pour lire les données
+        // Récupérer les informations utilisateur depuis SharedPreferences
+        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val email = sharedPreferences.getString("email", null)
+        val password = sharedPreferences.getString("password", null)
+
+        return if (email != null && password != null) {
+            User(email, password)
+        } else {
+            null
+        }
     }
 }

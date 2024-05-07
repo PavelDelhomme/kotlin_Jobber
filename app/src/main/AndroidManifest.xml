@@ -5,45 +5,69 @@
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Jobber"
-        android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
         <activity
-            android:name=".SignUser.SkillFormActivity"
+            android:name=".EntrepriseAddActivity"
             android:exported="false"
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".AppelAddActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".EntretienAddActivity"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".SignUser.EducationFormActivity"
+            android:name=".ContactAddActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".CandidatureAddActivity"
             android:exported="false"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".SignUser.ExperienceFormActivity"
+            android:name=".CalendrierActivity"
             android:exported="false"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".ViewProfilsActivity"
+            android:name=".EntrepriseListActivity"
             android:exported="false"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".SignUser.AdditionalInfoActivity"
+            android:name=".ContactListActivity"
             android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light" />
-        <activity
-            android:name=".ProfileSetupActivity"
-            android:exported="false"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".DashboardActivity"
+            android:name=".EntretienListActivity"
             android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".AppelListActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".CandidatureListActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".WelcomeActivity"
             android:exported="false"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".SignUser.CheckLoginActivity"
@@ -61,7 +85,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Jobber">
+            android:theme="@style/Theme.AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_appel_list">
+    <activity
+        android:id="@+id/nav_appel_list"
+        android:label="@string/menu_home"
+        tools:layout="@layout/activity_appel_list" />
+    <activity
+        android:id="@+id/nav_calendrier"
+        android:label="@string/menu_home"
+        tools:layout="@layout/activity_calendrier" />
+    <activity
+        android:id="@+id/nav_candidatures_list"
+        android:label="@string/menu_home"
+        tools:layout="@layout/activity_candidature_list" />
+    <activity
+        android:id="@+id/nav_contact_list"
+        android:label="@string/menu_home"
+        tools:layout="@layout/activity_contact_list" />
+    <activity
+        android:id="@+id/nav_dashboard"
+        android:label="@string/menu_home"
+        tools:layout="@layout/activity_dashboard" />
+    <activity
+        android:id="@+id/nav_entreprise_list"
+        android:label="@string/menu_home"
+        tools:layout="@layout/activity_entreprise_list" />
+    <activity
+        android:id="@+id/nav_entretien_list"
+        android:label="@string/menu_home"
+        tools:layout="@layout/activity_entretien_list" />
+
+</navigation>

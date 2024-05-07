@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item
+    android:id="@+id/menu_add_candidature"
+    android:title="Ajouter Candidature" />
+<item
+    android:id="@+id/menu_add_contact"
+    android:title="Ajouter Contact" />
+<item
+    android:id="@+id/menu_add_entretien"
+    android:title="Ajouter Entretien" />
+<item
+    android:id="@+id/menu_add_appel"
+    android:title="Ajouter Appel" />
+<item
+    android:id="@+id/menu_add_entreprise"
+    android:title="Ajouter Entreprise" />
+
+</menu>

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Jobber</string>
     <string name="login_activity_google_signin">Google Login</string>
     <string name="login_activity_bienvenue">Bienvenue</string>
@@ -20,4 +20,55 @@
     <string name="entreprise">Entreprise</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="add_candidature">Candidature +</string>
+    <string name="enter_job_title">Titre de l\'offre</string>
+    <string name="date_candidature">Date de la candidature</string>
+    <string name="lieu_du_poste">Lieu du poste</string>
+    <string name="enter_notes">Notes sur la candidature</string>
+    <string name="enter_company_name">Nom de l\'entreprise</string>
+    <string name="enter_description">Description du poste</string>
+    <string name="submit_candidature">Ajouter la candidature</string>
+    <string name="est_spontannee">Spontannée ?</string>
+    <array name="type_emploi_options">
+        <item>Type d\'emploi</item>
+        <item>CDD</item>
+        <item>CDI</item>
+        <item>Freelance</item>
+        <item>Intérim</item>
+        <item>Alternance</item>
+    </array>
+    <array name="plateforme_options">
+        <item>Plateforme utilisée</item>
+        <item>HelloWork</item>
+        <item>LinkedIn</item>
+        <item>Indeed</item>
+        <item>Welcome To The Jungle</item>
+        <item>SpaceMonk</item>
+        <item>Jobteaser</item>
+        <item>Monster</item>
+        <item>Keljob</item>
+        <item>RegionJob</item>
+        <item>bretagne-alternance</item>
+        <item>Ouest-France Emploi</item>
+        <item>Meteojob</item>
+        <item>Jooble</item>
+        <item>APEC</item>
+        <item>Talent.io</item>
+        <item>Téléphone</item>
+        <item>Email</item>
+        <item>Sur place</item>
+        <item>WhatsApp</item>
+        <item>Autre</item>
+    </array>
 </resources>
