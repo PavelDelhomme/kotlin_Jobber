@@ -1,5 +1,6 @@
 package com.delhomme.jobber.EntreprisePacket
 
+import android.app.Activity
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ class EntrepriseAddActivity : AppCompatActivity() {
 
         val cancelButton = findViewById<Button>(R.id.btnCancel)
         cancelButton.setOnClickListener {
+            setResult(Activity.RESULT_OK)
             finish()
         }
     }

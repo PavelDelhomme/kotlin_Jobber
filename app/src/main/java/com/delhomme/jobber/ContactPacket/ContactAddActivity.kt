@@ -1,5 +1,6 @@
 package com.delhomme.jobber.ContactPacket
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
@@ -92,6 +93,7 @@ class ContactAddActivity : AppCompatActivity() {
         saveContact(contact)
 
         Toast.makeText(this, "Contact ajoutée avec succès !", Toast.LENGTH_SHORT).show()
+        setResult(Activity.RESULT_OK)
         finish()
     }
 

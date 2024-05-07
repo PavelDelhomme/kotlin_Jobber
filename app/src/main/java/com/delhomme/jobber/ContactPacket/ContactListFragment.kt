@@ -33,7 +33,7 @@ class ContactListFragment : Fragment() {
         return view
     }
 
-    private fun loadContacts() {
+    public fun loadContacts() {
         Log.e("ContactListFragment", "Chargement des contacts enregistrer")
         val sharedPreferences = requireContext().getSharedPreferences("contacts_prefs", 0)
         val gson = Gson()

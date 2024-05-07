@@ -1,5 +1,6 @@
 package com.delhomme.jobber.CandidaturePacket
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
@@ -10,8 +11,8 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.R
 import com.delhomme.jobber.EntreprisePacket.Entreprise
+import com.delhomme.jobber.R
 import com.google.gson.Gson
 import java.util.Calendar
 import java.util.UUID
@@ -117,7 +118,8 @@ class CandidatureAddActivity : AppCompatActivity() {
         // Enregistrer la candidature dans SharedPreferences
         saveCandidature(candidature)
 
-        Toast.makeText(this, "Candidature ajoutée avec succès !", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Candidature pour $titreOffre ajoutée avec succès !", Toast.LENGTH_SHORT).show()
+        setResult(Activity.RESULT_OK)
         finish()
     }
 

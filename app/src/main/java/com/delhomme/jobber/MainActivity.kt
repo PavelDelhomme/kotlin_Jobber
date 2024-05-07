@@ -1,16 +1,21 @@
 package com.delhomme.jobber
 
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.delhomme.jobber.AppelPacket.AppelAddActivity
 import com.delhomme.jobber.CandidaturePacket.CandidatureAddActivity
 import com.delhomme.jobber.ContactPacket.ContactAddActivity
+import com.delhomme.jobber.ContactPacket.ContactListFragment
 import com.delhomme.jobber.EntreprisePacket.EntrepriseAddActivity
 import com.delhomme.jobber.EntretienPacket.EntretienAddActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -22,6 +27,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
+    private lateinit var addContactLauncher: ActivityResultLauncher<Intent>
+    private lateinit var addAppelLauncher: ActivityResultLauncher<Intent>
+    private lateinit var addEntrepriseLauncher: ActivityResultLauncher<Intent>
+    private lateinit var addEntretienLauncher: ActivityResultLauncher<Intent>
+    private lateinit var addCandidatureLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +57,37 @@ class MainActivity : AppCompatActivity() {
             }
         }.attach()
 
+        // Initialize ActivityResultLauncher
+        addContactLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            Log.d("MainActivity", "Received result : $result")
+            if (result.resultCode == Activity.RESULT_OK) {
+                reloadFragment(3) // Recharger l'onglet Contacts (Index 3)
+            }
+        }
+        // Initialize ActivityResultLauncher
+        addAppelLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                reloadFragment(2) // Recharger l'onglet Contacts (Index 3)
+            }
+        }
+        // Initialize ActivityResultLauncher
+        addEntrepriseLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                reloadFragment(5) // Recharger l'onglet Contacts (Index 3)
+            }
+        }
+        // Initialize ActivityResultLauncher
+        addEntretienLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                reloadFragment(4) // Recharger l'onglet Contacts (Index 3)
+            }
+        }
+        // Initialize ActivityResultLauncher
+        addCandidatureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                reloadFragment(1) // Recharger l'onglet Contacts (Index 3)
+            }
+        }
         // Configuration du Floating Action Button
         val fabMenuJobber = findViewById<FloatingActionButton>(R.id.fabMenuJobber)
         fabMenuJobber.setOnClickListener { view ->
@@ -59,23 +100,28 @@ class MainActivity : AppCompatActivity() {
         popup.setOnMenuItemClickListener { item: MenuItem ->
             when (item.itemId) {
                 R.id.menu_add_candidature -> {
-                    startActivity(Intent(this, CandidatureAddActivity::class.java))
+                    val intent = Intent(this, CandidatureAddActivity::class.java)
+                    addCandidatureLauncher.launch(intent)
                     true
                 }
                 R.id.menu_add_contact -> {
-                    startActivity(Intent(this, ContactAddActivity::class.java))
+                    val intent = Intent(this, ContactAddActivity::class.java)
+                    addContactLauncher.launch(intent)
                     true
                 }
                 R.id.menu_add_entretien -> {
-                    startActivity(Intent(this, EntretienAddActivity::class.java))
+                    val intent = Intent(this, EntretienAddActivity::class.java)
+                    addEntretienLauncher.launch(intent)
                     true
                 }
                 R.id.menu_add_appel -> {
-                    startActivity(Intent(this, AppelAddActivity::class.java))
+                    val intent = Intent(this, AppelAddActivity::class.java)
+                    addAppelLauncher.launch(intent)
                     true
                 }
                 R.id.menu_add_entreprise -> {
-                    startActivity(Intent(this, EntrepriseAddActivity::class.java))
+                    val intent = Intent(this, EntrepriseAddActivity::class.java)
+                    addEntrepriseLauncher.launch(intent)
                     true
                 }
                 else -> false
@@ -83,6 +129,13 @@ class MainActivity : AppCompatActivity() {
         }
         popup.show()
     }
+
+    private fun reloadFragment(index: Int) {
+        // Cette méthode permet de rafraîchir le ViewPager.
+        viewPager.setCurrentItem(index, false)
+        (supportFragmentManager.findFragmentByTag("f$index") as? ContactListFragment)?.loadContacts()
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
