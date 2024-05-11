@@ -14,65 +14,6 @@
         android:theme="@style/Theme.Jobber"
         tools:targetApi="31">
         <activity
-            android:name=".ContactPacket.ContactDetailsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".CandidaturePacket.CandidatureDetailsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".EntreprisePacket.EntrepriseAddActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".AppelPacket.AppelAddActivity"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".EntretienPacket.EntretienAddActivity"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".ContactPacket.ContactAddActivity"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".CandidaturePacket.CandidatureAddActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".CandidaturePacket.CandidatureListActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".CalendrierActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".EntreprisePacket.EntrepriseListActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".ContactPacket.ContactListActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".EntretienPacket.EntretienListActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".AppelPacket.AppelListActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
             android:name=".WelcomeActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
