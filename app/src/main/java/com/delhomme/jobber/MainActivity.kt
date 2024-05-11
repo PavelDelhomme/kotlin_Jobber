@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> "Dashboard"
+                1 -> "Candidatures"
                 else -> "Autres"
             }
         }.attach()
@@ -48,6 +49,10 @@ class MainActivity : AppCompatActivity() {
         popup.menuInflater.inflate(R.menu.menu_add_items, popup.menu)
         popup.setOnMenuItemClickListener { item: MenuItem ->
             when (item.itemId) {
+                R.id.menu_add_candidature -> {
+                    startActivity(Intent(this, AddCandidatureActivity::class.java))
+                    true
+                }
                 else -> false
             }
         }

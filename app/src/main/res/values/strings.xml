@@ -40,7 +40,7 @@
     <string name="enter_description">Description du poste</string>
     <string name="submit_candidature">Ajouter la candidature</string>
     <string name="est_spontannee">Spontannée ?</string>
-    <array name="type_emploi_options">
+    <array name="type_poste_options">
         <item>Type d\'emploi</item>
         <item>CDD</item>
         <item>CDI</item>

@@ -14,13 +14,15 @@
         android:theme="@style/Theme.Jobber"
         tools:targetApi="31">
         <activity
+            android:name=".AddCandidatureActivity"
+            android:exported="true"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat"
+            />
+        <activity
             android:name=".WelcomeActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".SignUser.CheckLoginActivity"
-            android:exported="false"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".SignUser.SignInActivity"
@@ -41,7 +43,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

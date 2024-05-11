@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/editText_titre_offre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Titre du poste" />
+
+    <EditText
+        android:id="@+id/editText_nom_entreprise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom de l'entreprise" />
+
+    <EditText
+        android:id="@+id/editText_date_candidature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:hint="Date de la candidature"
+        android:drawableRight="@android:drawable/ic_menu_today" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_type_poste" />
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_plateforme" />
+
+    <Button
+        android:id="@+id/button_add_candidature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ajouter Candidature" />
+</LinearLayout>
