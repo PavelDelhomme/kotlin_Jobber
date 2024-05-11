@@ -12,3 +12,4 @@ data class Mail(
     val contactInstance: Contact,
     val entrepriseInstance: Entreprise
 )
+

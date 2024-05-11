@@ -12,3 +12,4 @@ data class Contact(
     val entrepriseInstance: Entreprise,
     //val candidatures: List<Candidature>
 )
+

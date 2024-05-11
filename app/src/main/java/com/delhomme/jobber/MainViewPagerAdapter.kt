@@ -24,3 +24,4 @@ class MainViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAd
         }
     }
 }
+

@@ -34,4 +34,5 @@ class EvenementAdapter(private val evenements: List<Evenement>) :
             txtDate.text = evenement.date
         }
     }
+
 }

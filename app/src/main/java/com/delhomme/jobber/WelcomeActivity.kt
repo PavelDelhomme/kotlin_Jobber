@@ -38,3 +38,4 @@ class WelcomeActivity : AppCompatActivity() {
         return null
     }
 }
+

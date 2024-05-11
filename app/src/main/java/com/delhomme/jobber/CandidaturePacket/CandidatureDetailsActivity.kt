@@ -51,3 +51,4 @@ class CandidatureDetailsActivity : AppCompatActivity() {
         return true
     }
 }
+

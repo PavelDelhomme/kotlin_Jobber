@@ -52,3 +52,4 @@ class LoginActivity : AppCompatActivity() {
         editor.apply()
     }
 }
+

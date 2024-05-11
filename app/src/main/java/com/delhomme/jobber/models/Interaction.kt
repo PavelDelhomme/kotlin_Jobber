@@ -11,3 +11,4 @@ data class Interaction(
     val entrepriseInstance: Entreprise? = null,
     val contactInstance: Contact? = null
 )
+

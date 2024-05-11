@@ -34,4 +34,5 @@ class AppelAdapter(private val appels: List<Appel>) :
                         txtDate.text = appel.date
                 }
         }
+
 }

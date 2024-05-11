@@ -30,4 +30,5 @@ class AppelListActivity : AppCompatActivity() {
         startActivity(intent)
         return true
     }
+
 }

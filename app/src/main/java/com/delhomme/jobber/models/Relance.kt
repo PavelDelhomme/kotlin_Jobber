@@ -14,3 +14,4 @@ data class Relance(
     val aRecuRetour: Boolean = false,
     val type: String
 )
+

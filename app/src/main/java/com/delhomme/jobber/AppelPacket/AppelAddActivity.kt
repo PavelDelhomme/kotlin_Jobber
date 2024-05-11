@@ -19,4 +19,5 @@ class AppelAddActivity : AppCompatActivity() {
             finish()
         }
     }
+
 }

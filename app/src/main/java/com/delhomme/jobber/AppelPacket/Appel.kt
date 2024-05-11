@@ -9,4 +9,5 @@ data class Appel(
     val description: String,
     val contactInstance: Contact,
     val entrepriseInstance: Entreprise
+
 )

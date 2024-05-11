@@ -5,3 +5,4 @@ data class UserProfile(
     val email: String,
     val phone: String?,
 )
+

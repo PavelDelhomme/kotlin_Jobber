@@ -28,4 +28,5 @@ class AppelListFragment : Fragment() {
 
         return view
     }
+
 }

@@ -32,3 +32,4 @@
         app:srcCompat="@drawable/ic_add"
         android:contentDescription="@string/menu_home" />
 </LinearLayout>
+

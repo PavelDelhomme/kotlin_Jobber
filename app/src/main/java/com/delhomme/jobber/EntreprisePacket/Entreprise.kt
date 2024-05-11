@@ -9,3 +9,4 @@ data class Entreprise(
     val email: String?,
     val siteEntreprise: String?
 )
+

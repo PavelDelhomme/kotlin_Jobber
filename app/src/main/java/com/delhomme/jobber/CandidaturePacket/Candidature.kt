@@ -30,3 +30,4 @@ data class Candidature(
     val relances: List<Relance> = listOf(),
     val entretiens: List<Entretien> = listOf()
 )
+

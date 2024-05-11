@@ -13,3 +13,4 @@ data class Entretien(
     val contactInstance: Contact?,
     val candidatureInstance: Candidature
 )
+

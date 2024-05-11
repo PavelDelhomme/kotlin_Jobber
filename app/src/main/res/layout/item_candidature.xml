@@ -39,3 +39,4 @@
         <!-- Ajoutez d'autres vues comme la date de candidature ou le lieu du poste -->
     </LinearLayout>
 </androidx.cardview.widget.CardView>
+
