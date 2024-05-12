@@ -36,6 +36,7 @@
     <string name="date_candidature">Date de la candidature</string>
     <string name="lieu_du_poste">Lieu du poste</string>
     <string name="enter_notes">Notes sur la candidature</string>
+    <string name="candidature_details_liste_contacts">Contacts lié à la candidature :</string>
     <string name="enter_company_name">Nom de l\'entreprise</string>
     <string name="enter_description">Description du poste</string>
     <string name="submit_candidature">Ajouter la candidature</string>

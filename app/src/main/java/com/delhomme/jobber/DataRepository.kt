@@ -2,8 +2,11 @@ package com.delhomme.jobber
 
 import android.content.Context
 import com.delhomme.jobber.models.Candidature
+import com.delhomme.jobber.models.Contact
+import com.delhomme.jobber.models.Entreprise
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.util.UUID
 
 class DataRepository(val context: Context) {
     private val sharedPreferences = context.getSharedPreferences("CandidaturesPrefs", Context.MODE_PRIVATE)
@@ -24,5 +27,93 @@ class DataRepository(val context: Context) {
         } else {
             emptyList()
         }
+    }
+
+    fun addContactToEntreprise(contact: Contact, entrepriseId: String) {
+        val entreprise = getEntrepriseById(entrepriseId)
+        entreprise?.contacts?.add(contact)
+        saveEntreprise(entreprise)
+    }
+    fun getEntrepriseById(id: String): Entreprise? {
+        val entrepriseString = sharedPreferences.getString("entreprises", "")
+        val type = object : TypeToken<List<Entreprise>>() {}.type
+        val entreprises = gson.fromJson<List<Entreprise>>(entrepriseString, type) ?: return null
+        return entreprises.find { it.id == id }
+    }
+
+    fun getCandidatureById(id: String): Candidature? {
+        val candidatureString = sharedPreferences.getString("candidatures", "")
+        val type = object : TypeToken<List<Candidature>>() {}.type
+        val candidatures = gson.fromJson<List<Candidature>>(candidatureString, type) ?: return null
+        return candidatures.find { it.id == id }
+    }
+
+    fun saveEntreprise(entreprise: Entreprise?) {
+        if (entreprise != null) {
+            val entreprises = loadEntreprises().toMutableList()
+            entreprises.removeAll { it.id == entreprise.id}
+            entreprises.add(entreprise)
+            val jsonString = gson.toJson(entreprises)
+            sharedPreferences.edit().putString("entreprises", jsonString).apply()
+        }
+    }
+
+    fun loadEntreprises(): List<Entreprise> {
+        val jsonString = sharedPreferences.getString("entreprises", null)
+        if (jsonString != null) {
+            val type = object : TypeToken<List<Entreprise>>() {}.type
+            val entreprises = gson.fromJson<List<Entreprise>>(jsonString, type) ?: return emptyList()
+            entreprises.forEach {
+                it.contacts = ArrayList(it.contacts)
+            }
+            return entreprises
+        }
+        return emptyList()
+    }
+
+    fun getOrCreateEntreprise(companyName: String): Entreprise {
+        val existing = loadEntreprises().find { it.nom == companyName }
+        if (existing != null) return existing
+
+        val newEntreprise = Entreprise(id = UUID.randomUUID().toString(), nom = companyName, contacts = mutableListOf())
+        saveEntreprise(newEntreprise)
+        return newEntreprise
+    }
+
+
+
+    fun loadContacts(): List<Contact> {
+        val contactsJson = sharedPreferences.getString("contacts", null)
+        return if (contactsJson != null) {
+            val type = object : TypeToken<List<Contact>>() {}.type
+            gson.fromJson(contactsJson, type)
+        } else {
+            emptyList()
+        }
+    }
+
+    fun saveContact(contact: Contact) {
+        val contacts = loadContacts().toMutableList()
+        contacts.add(contact)
+        val jsonString = gson.toJson(contacts)
+        sharedPreferences.edit().putString("contacts", jsonString).apply()
+    }
+
+    fun updateContact(contact: Contact) {
+        val contacts = loadContacts().toMutableList()
+        val index = contacts.indexOfFirst { it.id == contact.id }
+        if (index != -1) {
+            contacts[index] = contact
+            val jsonString = gson.toJson(contacts)
+            sharedPreferences.edit().putString("contacts", jsonString).apply()
+        }
+    }
+
+    // Méthode pour supprimer un contact, si nécessaire
+    fun deleteContact(contactId: String) {
+        val contacts = loadContacts().toMutableList()
+        contacts.removeAll { it.id == contactId }
+        val jsonString = gson.toJson(contacts)
+        sharedPreferences.edit().putString("contacts", jsonString).apply()
     }
 }

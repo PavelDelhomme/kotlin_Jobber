@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
             tab.text = when (position) {
                 0 -> "Dashboard"
                 1 -> "Candidatures"
+                2 -> "Contacts"
                 else -> "Autres"
             }
         }.attach()

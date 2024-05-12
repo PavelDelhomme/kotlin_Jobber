@@ -11,6 +11,7 @@ class MainViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAd
         return when (position) {
             0 -> DashboardFragment()
             1 -> CandidaturesFragment()
+            2 -> ContactsFragment()
             else -> Fragment()
         }
     }
