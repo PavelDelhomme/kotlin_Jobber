@@ -1,6 +1,7 @@
 package com.delhomme.jobber
 
 import android.content.Context
+import android.util.Log
 import com.delhomme.jobber.models.Candidature
 import com.delhomme.jobber.models.Contact
 import com.delhomme.jobber.models.Entreprise
@@ -31,8 +32,16 @@ class DataRepository(val context: Context) {
 
     fun addContactToEntreprise(contact: Contact, entrepriseId: String) {
         val entreprise = getEntrepriseById(entrepriseId)
-        entreprise?.contacts?.add(contact)
-        saveEntreprise(entreprise)
+        if (entreprise != null) {
+            if (entreprise.contacts == null) {
+                entreprise.contacts = mutableListOf()
+            }
+            entreprise.contacts.add(contact)
+            saveEntreprise(entreprise)
+            Log.d("DataRepository", "Updated entreprise with new contact: ${entreprise.contacts.size} contacts now")
+        } else {
+            Log.d("DataRepository", "No entreprise found with ID: $entrepriseId")
+        }
     }
     fun getEntrepriseById(id: String): Entreprise? {
         val entrepriseString = sharedPreferences.getString("entreprises", "")
@@ -51,8 +60,12 @@ class DataRepository(val context: Context) {
     fun saveEntreprise(entreprise: Entreprise?) {
         if (entreprise != null) {
             val entreprises = loadEntreprises().toMutableList()
-            entreprises.removeAll { it.id == entreprise.id}
-            entreprises.add(entreprise)
+            val index = entreprises.indexOfFirst { it.id == entreprise.id }
+            if (index != -1) {
+                entreprises[index] = entreprise
+            } else {
+                entreprises.add(entreprise)
+            }
             val jsonString = gson.toJson(entreprises)
             sharedPreferences.edit().putString("entreprises", jsonString).apply()
         }
@@ -92,6 +105,12 @@ class DataRepository(val context: Context) {
         }
     }
 
+    fun getContactById(id: String): Contact? {
+        val contactString = sharedPreferences.getString("contacts", "")
+        val type = object : TypeToken<List<Contact>>() {}.type
+        val contacts = gson.fromJson<List<Contact>>(contactString, type) ?: return null
+        return contacts.find { it.id == id }
+    }
     fun saveContact(contact: Contact) {
         val contacts = loadContacts().toMutableList()
         contacts.add(contact)

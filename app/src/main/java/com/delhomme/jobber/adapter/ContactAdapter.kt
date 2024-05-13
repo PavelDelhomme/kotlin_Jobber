@@ -1,58 +1,45 @@
 package com.delhomme.jobber.adapter
 
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.R
+import com.delhomme.jobber.ContactDetailActivity
 import com.delhomme.jobber.models.Contact
 
 
-class ContactAdapter(
-    private var contacts: List<Contact>,
-    private val listener: OnContactClickListener
-) :
-    RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
-    interface OnContactClickListener {
-        fun onContactClick(contact: Contact?)
+class ContactAdapter(private var contacts: List<Contact>, private val context: Context) : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val textView: TextView = view.findViewById(android.R.id.text1)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_contact, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contact = contacts[position]
-        holder.bind(contact, listener)
+        holder.textView.text = contacts[position].getFullName()
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, ContactDetailActivity::class.java)
+            intent.putExtra("CONTACT_ID", contacts[position].id)
+            context.startActivity(intent)
+            if (context is AppCompatActivity) {
+                context.finish()
+            }
+        }
     }
 
-    override fun getItemCount(): Int {
-        return contacts.size
-    }
-
-    fun updateList(newContacts: List<Contact>) {
+    fun updateContacts(newContacts: List<Contact>) {
         contacts = newContacts
         notifyDataSetChanged()
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val contactName: TextView
-
-        init {
-            contactName = itemView.findViewById<TextView>(R.id.contactName)
-        }
-
-        fun bind(contact: Contact, listener: OnContactClickListener) {
-            contactName.setText(contact.getFullName())
-            itemView.setOnClickListener { v: View? ->
-                listener.onContactClick(
-                    contact
-                )
-            }
-        }
-    }
+    override fun getItemCount() = contacts.size
 }

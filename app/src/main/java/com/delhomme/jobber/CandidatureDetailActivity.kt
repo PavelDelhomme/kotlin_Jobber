@@ -4,11 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.adapter.ContactAdapter
 import com.delhomme.jobber.models.Candidature
 
 class CandidatureDetailActivity : AppCompatActivity() {
@@ -16,7 +17,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
 
     private lateinit var dataRepository: DataRepository
     private lateinit var candidature: Candidature
-    private lateinit var contactsAdapter: ArrayAdapter<String>
+    private lateinit var contactsAdapter: ContactAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,14 +35,20 @@ class CandidatureDetailActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.tvCandidatureInfo).text = "Candidature for ${candidature.titre_offre} at ${candidature.entreprise.nom}"
 
-        setupListView()
         setupAddContactButton()
+        setupRecyclerView()
     }
 
-    private fun setupListView() {
-        val contactNames = ArrayList(candidature.entreprise.contacts?.map { it.nom }?.toList() ?: listOf())
-        contactsAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, contactNames)
-        findViewById<ListView>(R.id.lvContacts).adapter = contactsAdapter
+    private fun setupRecyclerView() {
+        val contacts = candidature.entreprise.contacts ?: listOf()
+        Log.d("CandidatureDetailActivity", "Les contact de l'entreprise : ${candidature.entreprise.contacts ?: listOf()}")
+        Log.d("CandidatureDetailActivity", "L'entreprise de la candidature : ${candidature.entreprise}")
+        Log.d("CandidatureDetailActivity", "Nom de l'entreprise de la candidature : ${candidature.entreprise.nom}")
+        contactsAdapter = ContactAdapter(contacts, this)  // Passez this si vous avez besoin du fragment pour quelque chose dans l'adapter
+        findViewById<RecyclerView>(R.id.recyclerViewContacts).apply {
+            layoutManager = LinearLayoutManager(this@CandidatureDetailActivity)
+            adapter = contactsAdapter
+        }
     }
 
     private fun setupAddContactButton() {
@@ -54,11 +61,22 @@ class CandidatureDetailActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val updatedContacts = ArrayList(candidature.entreprise.contacts?.map { it.nom } ?: listOf())
-        contactsAdapter.clear()
-        contactsAdapter.addAll(updatedContacts)
-        contactsAdapter.notifyDataSetChanged()
+        updateContactsList()
+        //val updatedEntreprise = dataRepository.getEntrepriseById(candidature.entreprise.id)
+        //candidature = dataRepository.getCandidatureById(candidature.id) ?: return
+        //candidature.entreprise.contacts = updatedEntreprise?.contacts ?: mutableListOf()
+        //contactsAdapter.updateContacts(candidature.entreprise.contacts)
+        //Log.d("CandidatureDetailsActivity", "Updated contacts in onResume : ${candidature.entreprise.contacts.size}")
+        //candidature.entreprise = dataRepository.getEntrepriseById(candidature.entreprise.id) ?: return
+        //val contacts = candidature.entreprise.contacts ?: listOf()
+        //contactsAdapter.updateContacts(contacts)
     }
+
+    private fun updateContactsList() {
+        val updatedContacts = dataRepository.getEntrepriseById(candidature.entreprise.id)?.contacts ?: listOf()
+        contactsAdapter.updateContacts(updatedContacts)
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {

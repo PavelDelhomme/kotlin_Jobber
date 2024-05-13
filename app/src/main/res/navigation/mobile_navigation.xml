@@ -7,7 +7,7 @@
     <activity
         android:id="@+id/nav_appel_list"
         android:label="@string/menu_home"
-        tools:layout="@layout/activity_appel_list" />
+        tools:layout="@layout/fragment_contacts" />
     <activity
         android:id="@+id/nav_calendrier"
         android:label="@string/menu_home"
@@ -15,22 +15,14 @@
     <activity
         android:id="@+id/nav_candidatures_list"
         android:label="@string/menu_home"
-        tools:layout="@layout/activity_candidature_list" />
+        tools:layout="@layout/fragment_candidatures" />
     <activity
         android:id="@+id/nav_contact_list"
         android:label="@string/menu_home"
-        tools:layout="@layout/activity_contact_list" />
+        tools:layout="@layout/fragment_contacts" />
     <activity
         android:id="@+id/nav_dashboard"
         android:label="@string/menu_home"
-        tools:layout="@layout/activity_dashboard" />
-    <activity
-        android:id="@+id/nav_entreprise_list"
-        android:label="@string/menu_home"
-        tools:layout="@layout/activity_entreprise_list" />
-    <activity
-        android:id="@+id/nav_entretien_list"
-        android:label="@string/menu_home"
-        tools:layout="@layout/activity_entretien_list" />
+        tools:layout="@layout/fragment_dashboard" />
 
 </navigation>

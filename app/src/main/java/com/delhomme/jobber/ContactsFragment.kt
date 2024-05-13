@@ -10,10 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.ContactAdapter
-import com.delhomme.jobber.adapter.ContactAdapter.OnContactClickListener
 import com.delhomme.jobber.models.Contact
 
-class ContactsFragment : Fragment(), OnContactClickListener {
+class ContactsFragment : Fragment() {
     private var adapter: ContactAdapter? = null
     private var dataRepository: DataRepository? = null
     override fun onCreateView(
@@ -29,7 +28,7 @@ class ContactsFragment : Fragment(), OnContactClickListener {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewContacts)
         dataRepository = DataRepository(requireContext())
         val contacts: List<Contact> = dataRepository!!.loadContacts()
-        adapter = ContactAdapter(contacts, this)
+        adapter = ContactAdapter(contacts, requireContext())
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
         val addButton = view.findViewById<Button>(R.id.btnAddContact)
@@ -42,12 +41,12 @@ class ContactsFragment : Fragment(), OnContactClickListener {
         }
     }
 
-    override fun onContactClick(contact: Contact?) {
-        // Gérer le clic sur un contact
-    }
 
     override fun onResume() {
         super.onResume()
-        dataRepository?.let { adapter!!.updateList(it.loadContacts()) }
+        dataRepository?.let { repo ->
+            val updatedContacts = repo.loadContacts()
+            adapter?.updateContacts(updatedContacts)
+        }
     }
 }

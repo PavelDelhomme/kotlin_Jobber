@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".AddContactActivity">
+
     <EditText
         android:id="@+id/etContactName"
         android:layout_width="match_parent"
@@ -17,7 +18,7 @@
         android:id="@+id/etContactSurname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Contact Prenom" />
+        android:hint="Contact Surname" />
 
     <EditText
         android:id="@+id/etContactEmail"
@@ -33,11 +34,12 @@
         android:inputType="phone"
         android:hint="Phone Number" />
 
-    <EditText
-        android:id="@+id/etCompanyName"
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Company Name" />
+        android:hint="Company Name"
+        android:inputType="text"/>
 
     <Button
         android:id="@+id/btnSaveContact"
