@@ -36,4 +36,13 @@
         android:textSize="14sp"
         android:textColor="#FF5722"/>
 
+    <Button
+        android:id="@+id/btnDeleteCandidature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Supprimer"
+        android:layout_gravity="end"
+        android:textColor="#FFFFFF"
+        android:background="@color/design_default_color_error"/>
+
 </LinearLayout>
