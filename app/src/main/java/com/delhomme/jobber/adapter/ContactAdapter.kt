@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.ContactDetailActivity
 import com.delhomme.jobber.models.Contact
@@ -30,9 +29,6 @@ class ContactAdapter(private var contacts: List<Contact>, private val context: C
             val intent = Intent(context, ContactDetailActivity::class.java)
             intent.putExtra("CONTACT_ID", contacts[position].id)
             context.startActivity(intent)
-            if (context is AppCompatActivity) {
-                context.finish()
-            }
         }
     }
 

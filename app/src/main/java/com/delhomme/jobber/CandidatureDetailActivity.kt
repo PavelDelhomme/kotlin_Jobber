@@ -61,20 +61,13 @@ class CandidatureDetailActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        updateContactsList()
-        //val updatedEntreprise = dataRepository.getEntrepriseById(candidature.entreprise.id)
-        //candidature = dataRepository.getCandidatureById(candidature.id) ?: return
-        //candidature.entreprise.contacts = updatedEntreprise?.contacts ?: mutableListOf()
-        //contactsAdapter.updateContacts(candidature.entreprise.contacts)
-        //Log.d("CandidatureDetailsActivity", "Updated contacts in onResume : ${candidature.entreprise.contacts.size}")
-        //candidature.entreprise = dataRepository.getEntrepriseById(candidature.entreprise.id) ?: return
-        //val contacts = candidature.entreprise.contacts ?: listOf()
-        //contactsAdapter.updateContacts(contacts)
-    }
-
-    private fun updateContactsList() {
-        val updatedContacts = dataRepository.getEntrepriseById(candidature.entreprise.id)?.contacts ?: listOf()
-        contactsAdapter.updateContacts(updatedContacts)
+        dataRepository.reloadEntreprises()
+        val updatedEntreprise = dataRepository.getEntrepriseById(candidature.entreprise.id)
+        Log.d("DEBUG", "ID de l'entreprise de la candidature : ${candidature.entreprise.id}")
+        updatedEntreprise?.let {
+            Log.d("DEBUG", "Contacts de l'entreprise mise à jour : ${it.contacts}")
+            contactsAdapter.updateContacts(it.contacts)
+        } ?: Log.d("DEBUG", "Aucune entreprise trouvée avec cet ID.")
     }
 
 

@@ -2,6 +2,8 @@ package com.delhomme.jobber
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
@@ -16,6 +18,9 @@ class AddContactActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_contact)
+        if(getSupportActionBar() != null) {
+            getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
+        }
 
         val dataRepository = DataRepository(this)
         val entreprises = dataRepository.loadEntreprises()
@@ -24,6 +29,7 @@ class AddContactActivity : AppCompatActivity() {
         autoCompleteTextView.setAdapter(adapter)
 
         var entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
+        Log.d("AddContactActivity", "ID de l'entreprise récupéré : $entrepriseId")
         var entreprise: Entreprise? = null
 
         if (entrepriseId != null) {
@@ -55,5 +61,16 @@ class AddContactActivity : AppCompatActivity() {
             Toast.makeText(this, "Contact added to ${entreprise.nom}", Toast.LENGTH_SHORT).show()
             finish()
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                // Termine l'activité et retourne à l'activité parente
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

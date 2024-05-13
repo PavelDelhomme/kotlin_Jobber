@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
                 0 -> "Dashboard"
                 1 -> "Candidatures"
                 2 -> "Contacts"
+                3 -> "Entreprises"
                 else -> "Autres"
             }
         }.attach()
