@@ -11,72 +11,87 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.ContactAdapter
 import com.delhomme.jobber.models.Candidature
+import com.delhomme.jobber.models.Contact
 
 class CandidatureDetailActivity : AppCompatActivity() {
-
 
     private lateinit var dataRepository: DataRepository
     private lateinit var candidature: Candidature
     private lateinit var contactsAdapter: ContactAdapter
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_candidature_detail)
 
-        if(getSupportActionBar() != null) {
-            getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
+        if (supportActionBar != null) {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
 
         val candidatureId = intent.getStringExtra("CANDIDATURE_ID") ?: return
-        Log.d("CANDIDATURE_ID", "ID : ${candidatureId}")
         dataRepository = DataRepository(this)
         candidature = dataRepository.getCandidatureById(candidatureId) ?: return
+        Log.d("CandidatureDetailActivity", "Loaded candidature with entreprise ID : ${candidature.entreprise.id}")
 
         findViewById<TextView>(R.id.tvCandidatureInfo).text = "Candidature for ${candidature.titre_offre} at ${candidature.entreprise.nom}"
 
-        setupAddContactButton()
         setupRecyclerView()
+        setupAddContactButton()
     }
-
+    // TODO Ici je tente d'afficher  les contacts lié à l'entreprise de la candidature
     private fun setupRecyclerView() {
-        val contacts = candidature.entreprise.contacts ?: listOf()
-        Log.d("CandidatureDetailActivity", "Les contact de l'entreprise : ${candidature.entreprise.contacts ?: listOf()}")
-        Log.d("CandidatureDetailActivity", "L'entreprise de la candidature : ${candidature.entreprise}")
-        Log.d("CandidatureDetailActivity", "Nom de l'entreprise de la candidature : ${candidature.entreprise.nom}")
-        contactsAdapter = ContactAdapter(contacts, this)  // Passez this si vous avez besoin du fragment pour quelque chose dans l'adapter
+        val contacts = dataRepository.loadContactsForEntreprise(candidature.entreprise.id)
+        contactsAdapter = ContactAdapter(contacts, this::onContactClicked, this::onDeleteContactClicked)
+
         findViewById<RecyclerView>(R.id.recyclerViewContacts).apply {
             layoutManager = LinearLayoutManager(this@CandidatureDetailActivity)
             adapter = contactsAdapter
+        }
+        updateContactList()
+    }
+
+    private fun onContactClicked(contact: Contact) {
+        val intent = Intent(this, ContactDetailActivity::class.java).apply {
+            putExtra("CONTACT_ID", contact.id)
+        }
+        startActivity(intent)
+    }
+
+    private fun onDeleteContactClicked(contactId: String) {
+        dataRepository.deleteContact(contactId)
+        contactsAdapter.updateContacts(dataRepository.loadContactsForEntreprise(candidature.entreprise.id))
+    }
+    private fun updateContactList() {
+        // TODO Mise à jour de la liste des contacts
+        val contacts = dataRepository.loadContactsForEntreprise(candidature.entreprise.id)
+        if (contacts.isNotEmpty()) {
+            Log.d("CandidatureDetailActivity", "Updating contacts list with ${contacts.size} contacts")
+            contactsAdapter.updateContacts(contacts)
+        } else {
+            Log.d("CandidatureDetailActivity", "No contacts found for this entreprise.")
         }
     }
 
     private fun setupAddContactButton() {
         findViewById<Button>(R.id.btnAddContact).setOnClickListener {
-            val intent = Intent(this, AddContactActivity::class.java)
-            intent.putExtra("ENTREPRISE_ID", candidature.entreprise.id)
+            val intent = Intent(this, AddContactActivity::class.java).apply {
+                putExtra("ENTREPRISE_ID", candidature.entreprise.id)
+            }
             startActivity(intent)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        dataRepository.reloadEntreprises()
-        val updatedEntreprise = dataRepository.getEntrepriseById(candidature.entreprise.id)
-        Log.d("DEBUG", "ID de l'entreprise de la candidature : ${candidature.entreprise.id}")
-        updatedEntreprise?.let {
-            Log.d("DEBUG", "Contacts de l'entreprise mise à jour : ${it.contacts}")
-            contactsAdapter.updateContacts(it.contacts)
-        } ?: Log.d("DEBUG", "Aucune entreprise trouvée avec cet ID.")
-    }
-
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            // Termine l'activité quand le bouton retour est cliqué
             finish()
             return true
         }
         return super.onOptionsItemSelected(item)
     }
+
+    override fun onResume() {
+        super.onResume()
+        dataRepository.reloadEntreprises()
+        updateContactList()
+    }
+
 }

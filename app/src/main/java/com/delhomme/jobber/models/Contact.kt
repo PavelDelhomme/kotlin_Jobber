@@ -8,7 +8,7 @@ data class Contact(
     val prenom: String,
     val email: String,
     val telephone: String,
-    val entreprise_id: String,
+    val entreprise: Entreprise,
 ) {
     fun getFullName(): String {
         return "$prenom $nom"

@@ -2,6 +2,7 @@ package com.delhomme.jobber
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +14,8 @@ import com.delhomme.jobber.adapter.ContactAdapter
 import com.delhomme.jobber.models.Contact
 
 class ContactsFragment : Fragment() {
-    private var adapter: ContactAdapter? = null
-    private var dataRepository: DataRepository? = null
+    private lateinit var adapter: ContactAdapter
+    private val dataRepository by lazy { DataRepository(requireContext()) }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -26,11 +27,10 @@ class ContactsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewContacts)
-        dataRepository = DataRepository(requireContext())
-        val contacts: List<Contact> = dataRepository!!.loadContacts()
-        adapter = ContactAdapter(contacts, requireContext())
+        adapter = ContactAdapter(dataRepository.loadContacts(), this::onContactClicked, this::onDeleteContactClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
+
         val addButton = view.findViewById<Button>(R.id.btnAddContact)
         addButton.setOnClickListener { v: View? ->
             val intent = Intent(
@@ -41,12 +41,20 @@ class ContactsFragment : Fragment() {
         }
     }
 
+    private fun onContactClicked(contact: Contact) {
+        val intent = Intent(activity, ContactDetailActivity::class.java).apply {
+            putExtra("CONTACT_ID", contact.id)
+            Log.d("ContactsFragment", "CONTACT_ID : ${contact.id}")
+        }
+        startActivity(intent)
+    }
+    private fun onDeleteContactClicked(contactId: String) {
+        dataRepository.deleteContact(contactId)
+        adapter.updateContacts(dataRepository.loadContacts())
+    }
 
     override fun onResume() {
         super.onResume()
-        dataRepository?.let { repo ->
-            val updatedContacts = repo.loadContacts()
-            adapter?.updateContacts(updatedContacts)
-        }
+        adapter.updateContacts(dataRepository.loadContacts())
     }
 }

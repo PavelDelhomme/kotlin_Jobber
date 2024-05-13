@@ -30,23 +30,44 @@ class DataRepository(val context: Context) {
         }
     }
 
+    fun deleteCandidature(candidatureId: String) {
+        val currentCandidature = loadCandidatures().toMutableList()
+        val filteredCandidature = currentCandidature.filter { it.id != candidatureId }
+        val jsonString = gson.toJson(filteredCandidature)
+        sharedPreferences.edit().putString("candidatures", jsonString).apply()
+    }
+    fun deleteContact(contactId: String) {
+        val currentContact = loadContacts().toMutableList()
+        val filteredContact = currentContact.filter { it.id != contactId }
+        val jsonString = gson.toJson(filteredContact)
+        sharedPreferences.edit().putString("contacts", jsonString).apply()
+    }
+
     fun addContactToEntreprise(contact: Contact, entrepriseId: String) {
         val entreprise = getEntrepriseById(entrepriseId)
         if (entreprise != null) {
             if (entreprise.contacts == null) entreprise.contacts = mutableListOf()
             entreprise.contacts.add(contact)
             saveEntreprise(entreprise)
-            Log.d("addContactToEntreprise","Liste des contacts de l'entreprise ${entreprise.nom} : ${entreprise.contacts}}")
-            Log.d("addContactToEntreprise", "Updated entreprise with new contact: ${entreprise.contacts.size} contacts now")
+            Log.d("DataRepository","addContactToEntreprise : Liste des contacts de l'entreprise ${entreprise.nom} : ${entreprise.contacts}}")
+            Log.d("DataRepository", "addContactToEntreprise : Updated entreprise with new contact: ${entreprise.contacts.size} contacts now")
         } else {
-            Log.d("addContactToEntreprise", "No entreprise found with ID: $entrepriseId")
+            Log.d("DataRepository", "addContactToEntreprise : No entreprise found with ID: $entrepriseId")
         }
     }
     fun getEntrepriseById(id: String): Entreprise? {
-        val entrepriseString = sharedPreferences.getString("entreprises", "")
-        val type = object : TypeToken<List<Entreprise>>() {}.type
-        val entreprises = gson.fromJson<List<Entreprise>>(entrepriseString, type) ?: return null
-        return entreprises.find { it.id == id }
+        Log.d("DataRepository", "id passée dans getEntrepriseById : $id")
+        val entreprises = loadEntreprises()
+        Log.d("DataRepository", "entreprises = loadEntreprises() : $entreprises")
+        val entreprise = entreprises.find { it.id == id }
+        Log.d("DataRepository", "Fetched entreprise : ${entreprise?.nom}")
+        return entreprise
+        //val entrepriseString = sharedPreferences.getString("entreprises", "")
+        //Log.d("DataRepository", "entrepriseString récupérer dans sharedPreferences : $entrepriseString")
+        //val type = object : TypeToken<List<Entreprise>>() {}.type
+        //val entreprises = gson.fromJson<List<Entreprise>>(entrepriseString, type)
+        //Log.d("DataRepository", "entreprises récupérer du gson.fromJson : ${gson.fromJson<List<Entreprise>>(entrepriseString, type)}")
+        //return entreprises.find { it.id == id }
     }
 
     fun getCandidatureById(id: String): Candidature? {
@@ -78,8 +99,10 @@ class DataRepository(val context: Context) {
             val entreprises = gson.fromJson<List<Entreprise>>(jsonString, type) ?: emptyList()
             entreprises.forEach { entreprise ->
                 entreprise.contacts = loadContactsForEntreprise(entreprise.id)
+                Log.d("DataRepository", "entreprise.contacts : ${entreprise.contacts}")
             }
         }
+        Log.d("DataRepository", "Entreprise : $jsonString")
     }
     fun loadEntreprises(): List<Entreprise> {
         reloadEntreprises()
@@ -95,18 +118,31 @@ class DataRepository(val context: Context) {
             emptyList()
         }
     }
-
+    // TODO ici je fait la récupération des contact théoriquement en filtrant par ID d'entreprise
     fun loadContactsForEntreprise(entrepriseId: String): MutableList<Contact> {
-        return loadContacts().filter { it.entreprise_id == entrepriseId }.toMutableList()
+        val allContacts = loadContacts()
+        Log.d("DataRepository", "allContacts : ${allContacts}")
+        val filteredContacts2 = allContacts.filter { contact ->
+            contact.entreprise?.id == entrepriseId
+        }.toMutableList()
+        Log.d("FilteredContact2", "Filtered2 ${filteredContacts2}")
+        val filteredContacts = allContacts.filter { it.entreprise?.id == entrepriseId }.toMutableList()
+        Log.d("DataRepository", "Filtered ${filteredContacts.size} contacts for entreprise ID: $entrepriseId")
+        return filteredContacts
     }
 
     fun getOrCreateEntreprise(companyName: String): Entreprise {
         val existing = loadEntreprises().find { it.nom == companyName }
-        if (existing != null) return existing
+        if (existing != null) {
+            Log.d("DataRepository", "Existing entreprise found: $existing")
+            return existing
+        }
 
-        val newEntreprise = Entreprise(id = UUID.randomUUID().toString(), nom = companyName, contacts = mutableListOf())
+        val newId = UUID.randomUUID().toString()
+
+        val newEntreprise = Entreprise(id = newId, nom = companyName, contacts = mutableListOf())
         saveEntreprise(newEntreprise)
-        Log.d("getOrCreateEntreprise", "Entreprise ajoutée et crée : $newEntreprise")
+        Log.d("DataRepository", "getOrCreateEntreprise : Entreprise ajoutée et crée : $newEntreprise | ID : $newId")
         return newEntreprise
     }
 
@@ -114,11 +150,16 @@ class DataRepository(val context: Context) {
 
     fun loadContacts(): List<Contact> {
         val contactsJson = sharedPreferences.getString("contacts", null)
-        return if (contactsJson != null) {
+        if (contactsJson != null) {
             val type = object : TypeToken<List<Contact>>() {}.type
-            gson.fromJson(contactsJson, type)
+            val contacts = gson.fromJson<List<Contact>>(contactsJson, type)
+            contacts.forEach { contact ->
+                Log.d("DataRepository", "Loaded contact ${contact.id} with entreprise ID : ${contact.entreprise?.id}")
+            }
+            return contacts
         } else {
-            emptyList()
+            Log.d("DataRepository", "No contacts found in storage.")
+            return emptyList()
         }
     }
 
@@ -145,11 +186,4 @@ class DataRepository(val context: Context) {
         }
     }
 
-    // Méthode pour supprimer un contact, si nécessaire
-    fun deleteContact(contactId: String) {
-        val contacts = loadContacts().toMutableList()
-        contacts.removeAll { it.id == contactId }
-        val jsonString = gson.toJson(contacts)
-        sharedPreferences.edit().putString("contacts", jsonString).apply()
-    }
 }

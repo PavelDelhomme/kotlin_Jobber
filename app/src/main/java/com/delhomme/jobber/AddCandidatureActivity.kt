@@ -1,13 +1,16 @@
 package com.delhomme.jobber
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.models.Candidature
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -65,6 +68,7 @@ class AddCandidatureActivity : AppCompatActivity() {
     }
 
     private fun addCandidature() {
+        // TODO ici le code pour ajouter une candidaure
         val titreOffre = findViewById<EditText>(R.id.editText_titre_offre).text.toString()
         val nomEntreprise = findViewById<EditText>(R.id.editText_nom_entreprise).text.toString()
         val plateformeUtilisee = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()
@@ -72,6 +76,7 @@ class AddCandidatureActivity : AppCompatActivity() {
         val dateCandidature = findViewById<EditText>(R.id.editText_date_candidature).text.toString()
 
         val entreprise = EntrepriseManager.getOrCreateEntreprise(nomEntreprise)
+        Log.d("AddCandidatureActivity", "Entreprise ID: ${entreprise.id}")
         val candidature = Candidature(
             id = UUID.randomUUID().toString(),
             titre_offre = titreOffre,
@@ -84,9 +89,12 @@ class AddCandidatureActivity : AppCompatActivity() {
 
         val dataRepository = DataRepository(applicationContext)
         dataRepository.saveCandidature(candidature)
+        Log.d("AddCandidatureActivity", "Candidature added with Entreprise ID: ${candidature.entreprise.id}")
+        dataRepository.saveEntreprise(entreprise)
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("com.delhomme.jobber.UPDATE_ENTREPRISES"))
 
         Toast.makeText(this, "Candidature ajotuée", Toast.LENGTH_SHORT).show()
-
         finish()
     }
 

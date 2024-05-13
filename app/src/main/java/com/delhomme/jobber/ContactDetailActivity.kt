@@ -18,11 +18,11 @@ class ContactDetailActivity : AppCompatActivity() {
         val contact = DataRepository(this).getContactById(contactId) ?: return
 
         val contactName = findViewById<TextView>(R.id.contactName)
-        val contactEmail = findViewById<TextView>(R.id.contactEmail)
-        val contactPhone = findViewById<TextView>(R.id.contactPhone)
+        val contactEmail = findViewById<TextView>(R.id.emailContact)
+        val contactPhone = findViewById<TextView>(R.id.telephoneContact)
         val contactEntreprise = findViewById<TextView>(R.id.contactEntreprise)
 
-        val contactEntrepriseNom = DataRepository(this).getEntrepriseById(contact.entreprise_id)
+        val contactEntrepriseNom = DataRepository(this).getEntrepriseById(contact.entreprise.id)
 
         contactName.text = contact.getFullName()
         contactEmail.text = contact.email
