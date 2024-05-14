@@ -126,7 +126,8 @@ class CandidatureDetailActivity : AppCompatActivity() {
 
 
     private fun setupAddEntretienButton() {
-        findViewById<Button>(R.id.btnAddEntretien).setOnClickListener {
+        val btnAddEntretien = findViewById<Button>(R.id.btnAddEntretien)
+        btnAddEntretien.setOnClickListener {
             val intent = Intent(this, AddEntretienActivity::class.java).apply {
                 putExtra("CANDIDATURE_ID", candidature.id)
             }
@@ -140,7 +141,8 @@ class CandidatureDetailActivity : AppCompatActivity() {
     }
 
     private fun setupAddContactButton() {
-        findViewById<Button>(R.id.btnAddContact).setOnClickListener {
+        val btnAddContact = findViewById<Button>(R.id.btnAddContact)
+        btnAddContact.setOnClickListener {
             val intent = Intent(this, AddContactActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entreprise.id)
             }
@@ -149,7 +151,8 @@ class CandidatureDetailActivity : AppCompatActivity() {
     }
 
     private fun setupAddAppelButton() {
-        findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
+        val btnAddAppel = findViewById<Button>(R.id.btnAddAppel)
+        btnAddAppel?.setOnClickListener {
             val intent = Intent(this, AddAppelActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entreprise.id)
             }

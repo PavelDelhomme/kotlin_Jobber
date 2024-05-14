@@ -6,12 +6,13 @@
     android:layout_height="match_parent"
     android:id="@+id/scrollViewDetails"
     tools:context=".CandidatureDetailActivity">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <TextView
+        <TextView
             android:id="@+id/titreoffre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -73,15 +74,14 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/tvLieuPoste"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@+id/tvTypePoste"
+            app:layout_constraintTop_toBottomOf="@id/tvTypePoste"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-
 
         <TextView
             android:id="@+id/lblContacts"
@@ -97,90 +97,81 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewContacts"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="100dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toTopOf="@id/btnAddContact"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/lblContacts"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <Button
             android:id="@+id/btnAddContact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Contact"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/recyclerViewAppels"
-            app:layout_constraintTop_toBottomOf="@id/recyclerViewAppels"
+            app:layout_constraintTop_toBottomOf="@id/recyclerViewContacts"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginBottom="16dp" />
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp" />
 
         <TextView
             android:id="@+id/lblAppels"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Liste des appels"
+            android:text="@string/candidature_details_liste_appels"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@id/btnAddContact"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/btnAddContact"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnAddContact" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewAppels"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/lblAppels"
-            app:layout_constraintBottom_toTopOf="@id/btnAddAppels"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/lblAppels" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <Button
             android:id="@+id/btnAddAppels"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ajouter un appel"
-            android:layout_marginBottom="16dp"
+            android:text="Add Appel"
             app:layout_constraintTop_toBottomOf="@id/recyclerViewAppels"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/recyclerViewAppels" />
-        />
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp" />
 
         <TextView
             android:id="@+id/lblEntretiens"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Liste des entretiens"
+            android:text="@string/candidature_details_liste_entretiens"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/btnAddAppels"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/btnAddAppels"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginBottom="8dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewEntretiens"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/lblEntretiens"
-            app:layout_constraintBottom_toTopOf="@id/btnAddEntretien"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/lblEntretiens" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <Button
             android:id="@+id/btnAddEntretien"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ajouter un entretien"
-            android:layout_marginBottom="16dp"
+            android:text="Add Entretien"
             app:layout_constraintTop_toBottomOf="@id/recyclerViewEntretiens"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/recyclerViewEntretiens" />
-        />
-
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
