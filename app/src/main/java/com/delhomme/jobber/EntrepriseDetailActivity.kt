@@ -2,7 +2,6 @@ package com.delhomme.jobber
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -33,8 +32,10 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         dataRepository = DataRepository(this)
         entreprise = dataRepository.getEntrepriseById(entrepriseId) ?: return
 
-        findViewById<TextView>(R.id.tvEntrepriseName).text = entreprise.nom
+        contactsAdapter = ContactAdapter(emptyList(), this::onContactClicked, this::onDeleteContactClicked)
+        appelsAdapter = AppelAdapter(emptyList(), this::onAppelClicked, this::onDeleteAppelClicked)
 
+        findViewById<TextView>(R.id.tvEntrepriseName).text = entreprise.nom
 
         setupRecyclerView()
         setupAddContactButton()
@@ -44,7 +45,6 @@ class EntrepriseDetailActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val contacts = dataRepository.loadContactsForEntreprise(entreprise.id)
         val contactsAdapter = ContactAdapter(contacts, this::onContactClicked, this::onDeleteContactClicked)
-
         findViewById<RecyclerView>(R.id.rvContacts).apply {
             layoutManager = LinearLayoutManager(this@EntrepriseDetailActivity)
             adapter = contactsAdapter
@@ -53,7 +53,10 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         val appels = dataRepository.loadAppelsForEntreprise(entreprise.id)
         val appelsAdapter = AppelAdapter(appels, this::onAppelClicked, this::onDeleteAppelClicked)
 
-        findViewById<RecyclerView>(R.id.rvAppels)
+        findViewById<RecyclerView>(R.id.rvAppels).apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = appelsAdapter
+        }
 
     }
 
@@ -81,12 +84,6 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         appelsAdapter.updateAppels(dataRepository.loadAppelsForEntreprise(entreprise.id))
     }
 
-    private fun onAddAppelClicked(view: View) {
-        val intent = Intent(this, AddAppelActivity::class.java).apply {
-            putExtra("ENTREPRISE_ID", entreprise.id)
-        }
-        startActivity(intent)
-    }
 
     private fun updateContactList() {
         // TODO ici je suis sensé récupérer les contacts lié à l'entreprise
@@ -117,8 +114,19 @@ class EntrepriseDetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         dataRepository.reloadEntreprises()
+        reloadAppelsAndContacts()
         if (this::contactsAdapter.isInitialized) {
             updateContactList()
+        }
+    }
+
+    private fun reloadAppelsAndContacts() {
+        if (this::contactsAdapter.isInitialized && this::appelsAdapter.isInitialized) {
+            val contacts = dataRepository.loadContactsForEntreprise(entreprise.id)
+            contactsAdapter.updateContacts(contacts)
+
+            val appels = dataRepository.loadAppelsForEntreprise(entreprise.id)
+            appelsAdapter.updateAppels(appels)
         }
     }
 }
