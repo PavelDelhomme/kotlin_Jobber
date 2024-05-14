@@ -81,20 +81,14 @@ class AddAppelActivity : AppCompatActivity() {
 
         configureSpinners(contacts, entreprises, contactId != null, entrepriseId != null)
     }
-
     private fun configureSpinners(contacts: List<Contact>, entreprises: List<Entreprise>, isContactFixed: Boolean, isEntrepriseFixed: Boolean) {
         val contactNames = contactMap.keys.toList()
         val contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contactNames)
         spContactsAppel.adapter = contactAdapter
-        if (isContactFixed) spContactsAppel.setSelection(0)
 
         val entrepriseNames = entrepriseMap.keys.toList()
         val entrepriseAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entrepriseNames)
         spEntreprisesAppel.adapter = entrepriseAdapter
-        if (isEntrepriseFixed) {
-            spEntreprisesAppel.setSelection(0)
-            spEntreprisesAppel.isEnabled = false
-        }
     }
 
     private fun addAppel(view: View) {
