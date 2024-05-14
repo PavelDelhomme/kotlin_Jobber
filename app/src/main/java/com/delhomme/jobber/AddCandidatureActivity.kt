@@ -75,7 +75,8 @@ class AddCandidatureActivity : AppCompatActivity() {
         val plateformeUtilisee = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()
         val typePoste = findViewById<Spinner>(R.id.spinner_type_poste).selectedItem.toString()
         val dateCandidature = findViewById<EditText>(R.id.editText_date_candidature).text.toString()
-
+        val notesCandidature = findViewById<EditText>(R.id.editText_notes).text.toString()
+        val lieuPoste = findViewById<EditText>(R.id.editText_lieuPoste).text.toString()
         val entreprise = EntrepriseManager.getOrCreateEntreprise(nomEntreprise)
         val candidature = Candidature(
             id = UUID.randomUUID().toString(),
@@ -84,7 +85,9 @@ class AddCandidatureActivity : AppCompatActivity() {
             date_candidature = Date(dateCandidature),
             plateforme = plateformeUtilisee,
             type_poste = typePoste,
-            etat = "Candidaté et en attente"
+            lieuPoste = lieuPoste,
+            etat = "Candidaté et en attente",
+            notes = notesCandidature
         )
 
         val dataRepository = DataRepository(applicationContext)

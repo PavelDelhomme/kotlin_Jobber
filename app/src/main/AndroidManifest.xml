@@ -14,13 +14,19 @@
         android:theme="@style/Theme.Jobber"
         tools:targetApi="31">
         <activity
+            android:name=".EntretienDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddEntretienActivity"
+            android:exported="false" />
+        <activity
             android:name=".AppelDetailActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat">
             <meta-data
-            android:name="android.support.PAREN_ACTIVITY"
-            android:value=".MainActivity" />
+                android:name="android.support.PAREN_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".AddAppelActivity"

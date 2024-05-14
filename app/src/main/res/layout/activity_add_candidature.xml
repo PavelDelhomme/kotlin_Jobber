@@ -34,6 +34,18 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner_plateforme" />
 
+    <EditText
+        android:id="@+id/editText_lieuPoste"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Lieu du poste" />
+
+    <EditText
+        android:id="@+id/editText_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom de l'entreprise" />
+
     <Button
         android:id="@+id/button_add_candidature"
         android:layout_width="wrap_content"

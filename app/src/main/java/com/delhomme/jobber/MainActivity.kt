@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
                 2 -> "Contacts"
                 3 -> "Appels"
                 4 -> "Entreprises"
+                5 -> "Entretiens"
                 else -> "Autres"
             }
         }.attach()
@@ -62,6 +63,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.menu_add_appel -> {
                     startActivity(Intent(this, AddAppelActivity::class.java))
+                    true
+                }
+                R.id.menu_add_entretien -> {
+                    startActivity(Intent(this, AddEntretienActivity::class.java))
                     true
                 }
                 else -> false

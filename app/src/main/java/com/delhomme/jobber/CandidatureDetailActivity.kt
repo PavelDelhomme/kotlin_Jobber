@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.AppelAdapter
 import com.delhomme.jobber.adapter.ContactAdapter
+import com.delhomme.jobber.adapter.EntretienAdapter
 import com.delhomme.jobber.models.Appel
 import com.delhomme.jobber.models.Candidature
 import com.delhomme.jobber.models.Contact
+import com.delhomme.jobber.models.Entretien
 
 class CandidatureDetailActivity : AppCompatActivity() {
 
@@ -22,6 +24,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
     private lateinit var candidature: Candidature
     private lateinit var contactAdapter: ContactAdapter
     private lateinit var appelAdapter: AppelAdapter
+    private lateinit var entretienAdapter: EntretienAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,15 +39,21 @@ class CandidatureDetailActivity : AppCompatActivity() {
         candidature = dataRepository.getCandidatureById(candidatureId) ?: return
 
         findViewById<TextView>(R.id.tvCandidatureInfo).text = "Candidature for ${candidature.titre_offre} at ${candidature.entreprise.nom}"
-
+        findViewById<TextView>(R.id.tvEtatCandidature).text = "Etat : ${candidature.etat.toString()}"
+        findViewById<TextView>(R.id.tvNotesCandidature).text = "Notes :\n${candidature.notes.toString()}"
+        findViewById<TextView>(R.id.tvLieuPoste).text = "Poste situé à : ${candidature.lieuPoste.toString()}"
+        findViewById<TextView>(R.id.tvTypePoste).text = "Poste de type : ${candidature.type_poste}"
+        findViewById<TextView>(R.id.tvPlateforme).text = "Candidaté sur : ${candidature.plateforme}"
         setupRecyclerView()
         setupAddContactButton()
         setupAddAppelButton()
+        setupAddEntretienButton()
     }
     // TODO Ici je tente d'afficher  les contacts lié à l'entreprise de la candidature
     private fun setupRecyclerView() {
         setupContactRecyclerView()
         setupAppelRecyclerView()
+        setupEntretienRecyclerView()
     }
 
     private fun setupContactRecyclerView() {
@@ -96,6 +105,40 @@ class CandidatureDetailActivity : AppCompatActivity() {
         appelAdapter.updateAppels(dataRepository.loadAppels())
     }
 
+    private fun setupEntretienRecyclerView() {
+        val entretiens = dataRepository.loadEntretiensForCandidature(candidature.id)
+        entretienAdapter = EntretienAdapter(entretiens, this::onEntretienClicked, this::onDeleteEntretienClicked)
+
+        findViewById<RecyclerView>(R.id.recyclerViewEntretiens).apply {
+            layoutManager = LinearLayoutManager(this@CandidatureDetailActivity)
+            adapter = entretienAdapter
+        }
+    }
+
+    private fun onEntretienClicked(entretien: Entretien) {
+        Toast.makeText(this, "Entretien sélectionné:  ${entretien.date_entretien}", Toast.LENGTH_LONG).show()
+    }
+
+    private fun onDeleteEntretienClicked(entretienId: String) {
+        dataRepository.deleteEntretien(entretienId)
+        entretienAdapter.updateEntretiens(dataRepository.loadEntretiens())
+    }
+
+
+    private fun setupAddEntretienButton() {
+        findViewById<Button>(R.id.btnAddEntretien).setOnClickListener {
+            val intent = Intent(this, AddEntretienActivity::class.java).apply {
+                putExtra("CANDIDATURE_ID", candidature.id)
+            }
+            startActivity(intent)
+        }
+    }
+
+    private fun updateEntretienList() {
+        val entretiens = dataRepository.loadEntretiensForCandidature(candidature.id)
+        entretienAdapter.updateEntretiens(entretiens)
+    }
+
     private fun setupAddContactButton() {
         findViewById<Button>(R.id.btnAddContact).setOnClickListener {
             val intent = Intent(this, AddContactActivity::class.java).apply {
@@ -125,6 +168,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         dataRepository.reloadEntreprises()
+        updateEntretienList()
         updateContactList()
     }
 

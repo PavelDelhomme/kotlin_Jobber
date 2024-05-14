@@ -6,6 +6,7 @@ import com.delhomme.jobber.models.Appel
 import com.delhomme.jobber.models.Candidature
 import com.delhomme.jobber.models.Contact
 import com.delhomme.jobber.models.Entreprise
+import com.delhomme.jobber.models.Entretien
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.UUID
@@ -50,6 +51,13 @@ class DataRepository(val context: Context) {
         sharedPreferences.edit().putString("appels", jsonString).apply()
     }
 
+    fun deleteEntretien(entretienId: String) {
+        val currentEntretien = loadEntretiens().toMutableList()
+        val filteredEntretien = currentEntretien.filter { it.id != entretienId}
+        val jsonString = gson.toJson(filteredEntretien)
+        sharedPreferences.edit().putString("entretiens", jsonString).apply()
+    }
+
     fun addContactToEntreprise(contact: Contact, entrepriseId: String) {
         val entreprise = getEntrepriseById(entrepriseId)
         if (entreprise != null) {
@@ -79,6 +87,15 @@ class DataRepository(val context: Context) {
         return candidatures.find { it.id == id }
     }
 
+    fun getEntretienById(id: String): Entretien? {
+        val entretienString = sharedPreferences.getString("entretiens", "")
+        val type = object : TypeToken<List<Entretien>>() {}.type
+        val entretiens = gson.fromJson<List<Entretien>>(entretienString, type) ?: return null
+        return entretiens.find { it.id == id }
+    }
+
+
+
     fun saveEntreprise(entreprise: Entreprise?) {
         if (entreprise != null) {
             val entreprises = loadEntreprises().toMutableList()
@@ -93,6 +110,20 @@ class DataRepository(val context: Context) {
         }
     }
 
+    fun saveEntretien(entretien: Entretien?) {
+        if (entretien != null) {
+            val entretiens = loadEntretiens().toMutableList()
+            val index = entretiens.indexOfFirst { it.id == entretien.id }
+            if (index != -1) {
+                entretiens[index] = entretien
+            } else {
+                entretiens.add(entretien)
+            }
+            val jsonString = gson.toJson(entretiens)
+            sharedPreferences.edit().putString("entretiens", jsonString).apply()
+        }
+    }
+
     fun reloadEntreprises() {
         val jsonString = sharedPreferences.getString("entreprises", null)
         if (jsonString != null) {
@@ -101,6 +132,14 @@ class DataRepository(val context: Context) {
             entreprises.forEach { entreprise ->
                 entreprise.contacts = loadContactsForEntreprise(entreprise.id)
             }
+        }
+    }
+
+    fun reloadEntretiens() {
+        val jsonString = sharedPreferences.getString("entretiens", null)
+        if (jsonString != null) {
+            val type = object : TypeToken<List<Entretien>>() {}.type
+            val entretiens = gson.fromJson<List<Entretien>>(jsonString, type) ?: emptyList()
         }
     }
     fun loadEntreprises(): List<Entreprise> {
@@ -123,6 +162,15 @@ class DataRepository(val context: Context) {
         return if (appelsJson != null) {
             val type = object : TypeToken<List<Appel>>() {}.type
             gson.fromJson(appelsJson, type)
+        } else {
+            emptyList()
+        }
+    }
+    fun loadEntretiens(): List<Entretien> {
+        val entretiensJson = sharedPreferences.getString("entretiens", null)
+        return if (entretiensJson != null) {
+            val type = object : TypeToken<List<Entretien>>() {}.type
+            gson.fromJson(entretiensJson, type)
         } else {
             emptyList()
         }
@@ -154,7 +202,13 @@ class DataRepository(val context: Context) {
         return loadAppels().filter { it.entreprise_id == entreprise_id }
     }
 
+    fun loadEntretienForEntreprise(entreprise_id: String): List<Entretien> {
+        return loadEntretiens().filter { it.entreprise_id == entreprise_id }
+    }
 
+    fun loadEntretiensForCandidature(candidatureId: String): List<Entretien> {
+        return loadEntretiens().filter { it.candidature_id == candidatureId }
+    }
     // TODO FIXED ici je fait la récupération des contact théoriquement en filtrant par ID d'entreprise
     fun loadContactsForEntreprise(entrepriseId: String): MutableList<Contact> {
         val allContacts = loadContacts()
@@ -165,12 +219,15 @@ class DataRepository(val context: Context) {
     fun getOrCreateEntreprise(companyName: String): Entreprise {
         val existing = loadEntreprises().find { it.nom == companyName }
         if (existing != null) {
+            if (existing.entretiens == null) {
+                existing.entretiens = mutableListOf()
+            }
             return existing
         }
 
         val newId = UUID.randomUUID().toString()
 
-        val newEntreprise = Entreprise(id = newId, nom = companyName, contacts = mutableListOf())
+        val newEntreprise = Entreprise(id = newId, nom = companyName, contacts = mutableListOf(), entretiens = mutableListOf())
         saveEntreprise(newEntreprise)
         return newEntreprise
     }

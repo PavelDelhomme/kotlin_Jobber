@@ -50,6 +50,15 @@
         <item>Intérim</item>
         <item>Alternance</item>
     </array>
+    <string-array name="types_entretien">
+        <item>Présentiel</item>
+        <item>Visioconférence</item>
+    </string-array>
+    <string-array name="styles_entretien">
+        <item>RH</item>
+        <item>Technique</item>
+        <item>Autres</item>
+    </string-array>
     <array name="plateforme_options">
         <item>Plateforme utilisée</item>
         <item>HelloWork</item>

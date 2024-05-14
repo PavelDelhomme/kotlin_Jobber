@@ -6,45 +6,41 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".AddContactActivity">
+    tools:context=".AddEntretienActivity">
 
     <EditText
-        android:id="@+id/etContactName"
+        android:id="@+id/dateEntretien"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Contact Name" />
-
-    <EditText
-        android:id="@+id/etContactSurname"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Contact Surname" />
-
-    <EditText
-        android:id="@+id/etContactEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:hint="Email Address" />
-
-    <EditText
-        android:id="@+id/etContactPhone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:hint="Phone Number" />
+        android:focusable="false"
+        android:hint="Date de l'entretien"
+        android:drawableRight="@android:drawable/ic_menu_today" />
 
     <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView"
+        android:id="@+id/autoCompleteTextViewEntretien"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Company Name"
         android:inputType="text"/>
-
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_type_entretien" />
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_style_entretien" />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Notes de pré entretien"
+        android:id="@+id/etNotesEntretien" />
     <Button
-        android:id="@+id/button_add_contact"
+        android:id="@+id/button_add_entretien"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ajouter contact"
+        android:text="Ajouter entretien"
         android:layout_gravity="center_horizontal" />
+
+
 </LinearLayout>

@@ -9,6 +9,9 @@ data class Candidature(
     var entreprise : Entreprise,
     val type_poste: String,
     val plateforme: String,
+    val lieuPoste: String?,
     val date_candidature: Date,
     val etat: String,
+    val notes: String,
+    val entretiens: MutableList<Entretien> = mutableListOf(),
 )
