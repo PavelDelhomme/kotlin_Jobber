@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etDateAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Date de l'appel"
+        android:focusable="false" />
+
+    <EditText
+        android:id="@+id/etObjetAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Objet de l'appel" />
+
+    <EditText
+        android:id="@+id/etNotesAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Notes sur l'appel" />
+
+    <Spinner
+        android:id="@+id/spContactsAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Sélectionnez un contact" />
+    <Spinner
+        android:id="@+id/spEntreprisesAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Sélectionnez un contact" />
+
+
+    <Button
+        android:id="@+id/btnSaveAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ajouter appel"
+        android:onClick="addAppel"
+        android:layout_gravity="center_horizontal" />
+</LinearLayout>

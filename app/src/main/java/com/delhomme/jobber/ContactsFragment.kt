@@ -2,7 +2,6 @@ package com.delhomme.jobber
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,7 +43,6 @@ class ContactsFragment : Fragment() {
     private fun onContactClicked(contact: Contact) {
         val intent = Intent(activity, ContactDetailActivity::class.java).apply {
             putExtra("CONTACT_ID", contact.id)
-            Log.d("ContactsFragment", "CONTACT_ID : ${contact.id}")
         }
         startActivity(intent)
     }

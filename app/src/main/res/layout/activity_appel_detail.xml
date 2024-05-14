@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ContactDetailActivity">
+    tools:context=".AppelDetailActivity">
+
     <TextView
-        android:id="@+id/contactName"
+        android:id="@+id/appelDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24sp"
@@ -16,53 +17,40 @@
         android:layout_marginTop="16dp" />
 
     <TextView
-        android:id="@+id/contactEmail"
+        android:id="@+id/appelContactNom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/contactName"
+        app:layout_constraintTop_toBottomOf="@id/appelDate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp" />
     <TextView
-        android:id="@+id/telephoneContact"
+        android:id="@+id/appelEntrepriseNom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/contactEmail"
+        app:layout_constraintTop_toBottomOf="@id/appelContactNom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp" />
     <TextView
-        android:id="@+id/contactEntreprise"
+        android:id="@+id/appelObjet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/telephoneContact"
+        app:layout_constraintTop_toBottomOf="@id/appelEntrepriseNom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp" />
     <TextView
-        android:id="@+id/emailContact"
+        android:id="@+id/appelNotes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/contactEntreprise"
+        app:layout_constraintTop_toBottomOf="@id/appelEntrepriseNom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp" />
-    <Button
-        android:id="@+id/btnAddAppel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ajouter Appel"
-        android:layout_marginTop="16dp"
-        android:onClick="onAddAppelClicked"
-        app:layout_constraintTop_toBottomOf="@id/emailContact"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

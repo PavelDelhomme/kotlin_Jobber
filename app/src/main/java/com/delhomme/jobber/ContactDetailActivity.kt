@@ -1,11 +1,16 @@
 package com.delhomme.jobber
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.delhomme.jobber.models.Contact
 
 class ContactDetailActivity : AppCompatActivity() {
+    private lateinit var contact: Contact
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact_detail)
@@ -15,7 +20,7 @@ class ContactDetailActivity : AppCompatActivity() {
         }
         val contactId = intent.getStringExtra("CONTACT_ID") ?: return
 
-        val contact = DataRepository(this).getContactById(contactId) ?: return
+        contact = DataRepository(this).getContactById(contactId) ?: return
 
         val contactName = findViewById<TextView>(R.id.contactName)
         val contactEmail = findViewById<TextView>(R.id.emailContact)
@@ -29,18 +34,24 @@ class ContactDetailActivity : AppCompatActivity() {
         contactPhone.text = contact.telephone
         contactEntreprise.text = contactEntrepriseNom?.nom
 
-        setTitle("Détail de ${contactName.text}")
+        setTitle("Détails de ${contactName.text}")
+    }
+
+    fun onAddAppelClicked(view: View) {
+        val intent = Intent(this, AddAppelActivity::class.java).apply {
+            putExtra("CONTACT_ID", contact.id)
+            putExtra("ENTREPRISE_ID", contact.entreprise.id)
+        }
+        startActivity(intent)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                // Termine l'activité et retourne à l'activité parente
                 finish()
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
-
 }

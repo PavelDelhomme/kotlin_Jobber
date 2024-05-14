@@ -35,7 +35,8 @@ class MainActivity : AppCompatActivity() {
                 0 -> "Dashboard"
                 1 -> "Candidatures"
                 2 -> "Contacts"
-                3 -> "Entreprises"
+                3 -> "Appels"
+                4 -> "Entreprises"
                 else -> "Autres"
             }
         }.attach()
@@ -53,6 +54,14 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.menu_add_candidature -> {
                     startActivity(Intent(this, AddCandidatureActivity::class.java))
+                    true
+                }
+                R.id.menu_add_contact -> {
+                    startActivity(Intent(this, AddContactActivity::class.java))
+                    true
+                }
+                R.id.menu_add_appel -> {
+                    startActivity(Intent(this, AddAppelActivity::class.java))
                     true
                 }
                 else -> false

@@ -3,7 +3,6 @@ package com.delhomme.jobber
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -23,7 +22,9 @@ class AddCandidatureActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_candidature)
-
+        if(getSupportActionBar() != null) {
+            getSupportActionBar()?.setDisplayHomeAsUpEnabled(true)
+        }
 
         setupSpinners()
         setupDatePicker()
@@ -76,7 +77,6 @@ class AddCandidatureActivity : AppCompatActivity() {
         val dateCandidature = findViewById<EditText>(R.id.editText_date_candidature).text.toString()
 
         val entreprise = EntrepriseManager.getOrCreateEntreprise(nomEntreprise)
-        Log.d("AddCandidatureActivity", "Entreprise ID: ${entreprise.id}")
         val candidature = Candidature(
             id = UUID.randomUUID().toString(),
             titre_offre = titreOffre,
@@ -89,7 +89,6 @@ class AddCandidatureActivity : AppCompatActivity() {
 
         val dataRepository = DataRepository(applicationContext)
         dataRepository.saveCandidature(candidature)
-        Log.d("AddCandidatureActivity", "Candidature added with Entreprise ID: ${candidature.entreprise.id}")
         dataRepository.saveEntreprise(entreprise)
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("com.delhomme.jobber.UPDATE_ENTREPRISES"))

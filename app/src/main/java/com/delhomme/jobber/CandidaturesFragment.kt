@@ -2,7 +2,6 @@ package com.delhomme.jobber
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +38,6 @@ class CandidaturesFragment : Fragment() {
     private fun onCandidatureClicked(candidature: Candidature) {
         val intent = Intent(activity, CandidatureDetailActivity::class.java).apply {
             putExtra("CANDIDATURE_ID", candidature.id)
-            Log.d("CandidaturesFragment", "CANDIDATURE_ID : ${candidature.id}")
         }
         startActivity(intent)
     }

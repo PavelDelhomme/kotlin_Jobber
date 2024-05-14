@@ -2,7 +2,6 @@ package com.delhomme.jobber
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -29,7 +28,6 @@ class AddContactActivity : AppCompatActivity() {
         autoCompleteTextView.setAdapter(adapter)
 
         var entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
-        Log.d("AddContactActivity", "ID de l'entreprise récupéré : $entrepriseId")
         var entreprise: Entreprise? = null
 
         if (entrepriseId != null) {

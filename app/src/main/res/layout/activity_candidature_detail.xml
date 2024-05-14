@@ -57,7 +57,40 @@
         android:text="Add Contact"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lblContacts"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/lblAppels"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/candidature_details_liste_appels"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/btnAddContact"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/recyclerViewAppels"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/lblAppels"
+        app:layout_constraintBottom_toTopOf="@id/btnAddAppel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btnAddAppel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Appel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="16dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
