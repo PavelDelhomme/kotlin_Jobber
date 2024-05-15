@@ -42,7 +42,7 @@ class AddContactActivity : AppCompatActivity() {
         val etCompanyName = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
         etCompanyName.setText(entreprise?.nom)
 
-        findViewById<Button>(R.id.btnAddContact).setOnClickListener {
+        findViewById<Button>(R.id.button_add_contact).setOnClickListener {
 
             val nom = etContactNom.text.toString()
             val prenom = etContactNom2.text.toString()
