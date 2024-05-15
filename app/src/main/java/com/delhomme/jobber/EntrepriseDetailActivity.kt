@@ -2,6 +2,7 @@ package com.delhomme.jobber
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -24,8 +25,8 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entreprise_detail)
 
-        if(getSupportActionBar() != null) {
-            getSupportActionBar()?.setDisplayHomeAsUpEnabled(true)
+        if(supportActionBar != null) {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
 
         val entrepriseId = intent.getStringExtra("ENTREPRISE_ID") ?: return
@@ -43,13 +44,19 @@ class EntrepriseDetailActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
+        setupContactRecyclerView()
+        setupAppelRecyclerView()
+    }
+    private fun setupContactRecyclerView() {
         val contacts = dataRepository.loadContactsForEntreprise(entreprise.id)
         val contactsAdapter = ContactAdapter(contacts, this::onContactClicked, this::onDeleteContactClicked)
         findViewById<RecyclerView>(R.id.rvContacts).apply {
             layoutManager = LinearLayoutManager(this@EntrepriseDetailActivity)
             adapter = contactsAdapter
         }
+    }
 
+    private fun setupAppelRecyclerView() {
         val appels = dataRepository.loadAppelsForEntreprise(entreprise.id)
         val appelsAdapter = AppelAdapter(appels, this::onAppelClicked, this::onDeleteAppelClicked)
 
@@ -57,7 +64,6 @@ class EntrepriseDetailActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context)
             adapter = appelsAdapter
         }
-
     }
 
     private fun onContactClicked(contact: Contact) {
@@ -80,8 +86,10 @@ class EntrepriseDetailActivity : AppCompatActivity() {
     }
 
     private fun onDeleteAppelClicked(appelId: String) {
+        Log.d("onDeleteAppelClicked", "Delete appel clicked")
         dataRepository.deleteAppel(appelId)
-        appelsAdapter.updateAppels(dataRepository.loadAppelsForEntreprise(entreprise.id))
+        val updatedAppels = dataRepository.loadAppelsForEntreprise(entreprise.id)
+        appelsAdapter.updateAppels(updatedAppels)
     }
 
 
@@ -90,6 +98,8 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         val contacts = dataRepository.loadContactsForEntreprise(entreprise.id)
         if (contacts.isNotEmpty()) {
             contactsAdapter.updateContacts(contacts)
+        } else {
+            Log.d("EntrepriseDetailActivity", "No contacts found for this entreprise.")
         }
     }
 

@@ -209,7 +209,7 @@ class DataRepository(val context: Context) {
         return loadEntretiens().filter { it.candidature_id == candidatureId }
     }
     // TODO FIXED ici je fait la récupération des contact théoriquement en filtrant par ID d'entreprise
-    fun loadContactsForEntreprise(entrepriseId: String): MutableList<Contact> {
+    fun loadContactsForEntreprise(entrepriseId: String?): MutableList<Contact> {
         val allContacts = loadContacts()
         val filteredContacts = allContacts.filter { it.entreprise?.id == entrepriseId }.toMutableList()
         return filteredContacts

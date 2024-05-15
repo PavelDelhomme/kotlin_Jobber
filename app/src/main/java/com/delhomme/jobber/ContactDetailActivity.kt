@@ -2,14 +2,21 @@ package com.delhomme.jobber
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
-import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.adapter.AppelAdapter
+import com.delhomme.jobber.models.Appel
 import com.delhomme.jobber.models.Contact
 
 class ContactDetailActivity : AppCompatActivity() {
+    private lateinit var dataRepository: DataRepository
     private lateinit var contact: Contact
+    private lateinit var appelAdapter: AppelAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,14 +27,16 @@ class ContactDetailActivity : AppCompatActivity() {
         }
         val contactId = intent.getStringExtra("CONTACT_ID") ?: return
 
-        contact = DataRepository(this).getContactById(contactId) ?: return
+        dataRepository = DataRepository(this)
+
+        contact = dataRepository.getContactById(contactId) ?: return
 
         val contactName = findViewById<TextView>(R.id.contactName)
         val contactEmail = findViewById<TextView>(R.id.emailContact)
         val contactPhone = findViewById<TextView>(R.id.telephoneContact)
         val contactEntreprise = findViewById<TextView>(R.id.contactEntreprise)
 
-        val contactEntrepriseNom = DataRepository(this).getEntrepriseById(contact.entreprise.id)
+        val contactEntrepriseNom = dataRepository.getEntrepriseById(contact.entreprise.id)
 
         contactName.text = contact.getFullName()
         contactEmail.text = contact.email
@@ -35,15 +44,37 @@ class ContactDetailActivity : AppCompatActivity() {
         contactEntreprise.text = contactEntrepriseNom?.nom
 
         setTitle("Détails de ${contactName.text}")
+
+        setupRecyclerView()
+        setupAddAppelButton()
     }
 
-    fun onAddAppelClicked(view: View) {
-        val intent = Intent(this, AddAppelActivity::class.java).apply {
-            putExtra("CONTACT_ID", contact.id)
-            putExtra("ENTREPRISE_ID", contact.entreprise.id)
+    private fun setupRecyclerView() {
+        setupAppelRecyclerView()
+    }
+    private fun setupAppelRecyclerView() {
+        val appels = dataRepository.loadAppelsForContact(contact.id)
+        appelAdapter = AppelAdapter(appels, this::onAppelClicked, this::onDeleteAppelClicked)
+
+        findViewById<RecyclerView>(R.id.recyclerViewAppels).apply {
+            layoutManager = LinearLayoutManager(this@ContactDetailActivity)
+            adapter = appelAdapter
+        }
+        updateAppelList()
+    }
+
+    private fun onAppelClicked(appel: Appel) {
+        val intent = Intent(this, AppelDetailActivity::class.java).apply {
+            putExtra("APPEL_ID", appel.id)
         }
         startActivity(intent)
     }
+
+    private fun onDeleteAppelClicked(appelId: String) {
+        dataRepository.deleteAppel(appelId)
+        updateAppelList()
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -53,5 +84,30 @@ class ContactDetailActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun updateAppelList() {
+        val appels = dataRepository.loadAppelsForContact(contact.id)
+        if (appels.isNotEmpty()) {
+            appelAdapter.updateAppels(appels)
+        } else {
+            appelAdapter.updateAppels(emptyList())
+            Log.d("ContactDetailActivity", "No appels found for this contact.")
+        }
+    }
+
+    private fun setupAddAppelButton() {
+        findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
+            val intent = Intent(this, AddAppelActivity::class.java).apply {
+                putExtra("CONTACT_ID", contact.id)
+                putExtra("ENTREPRISE_ID", contact.entreprise.id)
+            }
+            startActivity(intent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateAppelList()
     }
 }

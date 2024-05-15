@@ -91,6 +91,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
     private fun setupAppelRecyclerView() {
         val appels = dataRepository.loadAppelsForCandidature(candidature.id)
         appelAdapter = AppelAdapter(appels, this::onAppelClicked, this::onDeleteAppelClicked)
+        Log.d("CandidatureDetailActivity", "liste des appels de la candidautre : ${appels}")
 
         findViewById<RecyclerView>(R.id.recyclerViewAppels).apply {
             layoutManager = LinearLayoutManager(this@CandidatureDetailActivity)
@@ -102,7 +103,8 @@ class CandidatureDetailActivity : AppCompatActivity() {
     }
     private fun onDeleteAppelClicked(appelId: String) {
         dataRepository.deleteAppel(appelId)
-        appelAdapter.updateAppels(dataRepository.loadAppels())
+        val updatedAppels = dataRepository.loadAppelsForCandidature(candidature.id)
+        appelAdapter.updateAppels(updatedAppels)
     }
 
     private fun setupEntretienRecyclerView() {
@@ -155,6 +157,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
         btnAddAppel.setOnClickListener {
             val intent = Intent(this, AddAppelActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entreprise.id)
+                putExtra("CANDIDATURE_ID", candidature.id)
             }
             startActivity(intent)
         }

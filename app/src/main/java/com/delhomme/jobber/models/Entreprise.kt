@@ -7,6 +7,8 @@ data class Entreprise(
     val nom: String,
     var contacts: MutableList<Contact> = mutableListOf(),
     var entretiens: MutableList<Entretien> = mutableListOf()
-
-
-)
+) {
+    override fun toString(): String {
+        return nom
+    }
+}

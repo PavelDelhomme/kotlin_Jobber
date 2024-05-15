@@ -27,7 +27,6 @@ class AppelAdapter(
             textViewDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(appel.date_appel)
             textViewObjet.text = appel.objet
             textViewNotes.text = appel.notes
-
             itemView.setOnClickListener { clickListener(appel) }
             btnDelete.setOnClickListener { deleteListener(appel.id) }
         }
@@ -39,8 +38,14 @@ class AppelAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        //val appel = appels[position]
+        //holder.itemView.findViewById<Button>(R.id.btnDeleteAppel).setOnClickListener {
+        //    deleteClickListener(appel.id)
+        //}
+        //holder.bind(appel, itemClickListener, deleteClickListener)
         holder.bind(appels[position], itemClickListener, deleteClickListener)
     }
+
 
     override fun getItemCount() = appels.size
 
