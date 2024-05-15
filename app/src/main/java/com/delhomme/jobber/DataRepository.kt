@@ -71,12 +71,6 @@ class DataRepository(val context: Context) {
     fun getEntrepriseById(id: String?): Entreprise? {
         val entreprises = loadEntreprises()
         return entreprises.find { it.id == id }
-        //val entrepriseString = sharedPreferences.getString("entreprises", "")
-        //Log.d("DataRepository", "entrepriseString récupérer dans sharedPreferences : $entrepriseString")
-        //val type = object : TypeToken<List<Entreprise>>() {}.type
-        //val entreprises = gson.fromJson<List<Entreprise>>(entrepriseString, type)
-        //Log.d("DataRepository", "entreprises récupérer du gson.fromJson : ${gson.fromJson<List<Entreprise>>(entrepriseString, type)}")
-        //return entreprises.find { it.id == id }
     }
 
     fun getCandidatureById(id: String): Candidature? {

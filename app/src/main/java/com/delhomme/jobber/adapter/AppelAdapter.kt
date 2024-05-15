@@ -38,11 +38,6 @@ class AppelAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        //val appel = appels[position]
-        //holder.itemView.findViewById<Button>(R.id.btnDeleteAppel).setOnClickListener {
-        //    deleteClickListener(appel.id)
-        //}
-        //holder.bind(appel, itemClickListener, deleteClickListener)
         holder.bind(appels[position], itemClickListener, deleteClickListener)
     }
 

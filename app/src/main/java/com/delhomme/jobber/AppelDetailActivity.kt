@@ -41,7 +41,6 @@ class AppelDetailActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                // Termine l'activité et retourne à l'activité parente
                 finish()
                 return true
             }
