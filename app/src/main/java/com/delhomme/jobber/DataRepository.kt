@@ -68,10 +68,9 @@ class DataRepository(val context: Context) {
             Log.d("DataRepository", "addContactToEntreprise : No entreprise found with ID: $entrepriseId")
         }
     }
-    fun getEntrepriseById(id: String): Entreprise? {
+    fun getEntrepriseById(id: String?): Entreprise? {
         val entreprises = loadEntreprises()
-        val entreprise = entreprises.find { it.id == id }
-        return entreprise
+        return entreprises.find { it.id == id }
         //val entrepriseString = sharedPreferences.getString("entreprises", "")
         //Log.d("DataRepository", "entrepriseString récupérer dans sharedPreferences : $entrepriseString")
         //val type = object : TypeToken<List<Entreprise>>() {}.type

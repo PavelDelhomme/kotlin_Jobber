@@ -152,7 +152,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
 
     private fun setupAddAppelButton() {
         val btnAddAppel = findViewById<Button>(R.id.btnAddAppel)
-        btnAddAppel?.setOnClickListener {
+        btnAddAppel.setOnClickListener {
             val intent = Intent(this, AddAppelActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entreprise.id)
             }

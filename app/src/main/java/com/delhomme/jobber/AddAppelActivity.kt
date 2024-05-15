@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -50,8 +51,26 @@ class AddAppelActivity : AppCompatActivity() {
         etNotesAppel = findViewById(R.id.etNotesAppel)
         spContactsAppel = findViewById(R.id.spContactsAppel)
         spEntreprisesAppel = findViewById(R.id.spEntreprisesAppel)
+
+        spEntreprisesAppel.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val selectedEntreprise = parent.getItemAtPosition(position) as Entreprise
+                updateContactSpinner(selectedEntreprise.id)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Optionnellement, nettoyez le spinner des contacts si rien n'est sélectionné
+                spContactsAppel.adapter = ArrayAdapter<String>(this@AddAppelActivity, android.R.layout.simple_spinner_dropdown_item, listOf())
+            }
+        }
     }
 
+    private fun updateContactSpinner(entrepriseId: String) {
+        val dataRepository = DataRepository(this)
+        val contacts = dataRepository.loadContactsForEntreprise(entrepriseId)
+        val contactsAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contacts.map { it.getFullName() })
+        spContactsAppel.adapter = contactsAdapter
+    }
     private fun setupDatePicker() {
         etDateAppel.setOnClickListener {
             val now = Calendar.getInstance()
@@ -67,59 +86,65 @@ class AddAppelActivity : AppCompatActivity() {
 
     private fun handleIntent() {
         val dataRepository = DataRepository(this)
-        val contactId = intent.getStringExtra("CONTACT_ID")
         val entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
 
-        val contacts = contactId?.let { listOf(dataRepository.getContactById(it)!!) } ?: dataRepository.loadContacts()
-        val entreprises = entrepriseId?.let { listOf(dataRepository.getEntrepriseById(it)!!) } ?: dataRepository.loadEntreprises()
+        val entreprises: List<Entreprise> = if (entrepriseId != null) {
+            // Charge uniquement l'entreprise spécifiée
+            listOfNotNull(dataRepository.getEntrepriseById(entrepriseId))
+        } else {
+            // Charge toutes les entreprises disponibles
+            dataRepository.loadEntreprises()
+        }
 
-        Log.d("AddAppelActivity", "Loaded Contacts : $contacts")
-        Log.d("AddAppelActivity", "Loaded Entreprises : $entreprises")
+        // Charge les contacts de l'entreprise spécifiée ou tous les contacts si aucune entreprise n'est spécifiée
+        val contacts = entrepriseId?.let {
+            dataRepository.loadContactsForEntreprise(it)
+        } ?: dataRepository.loadContacts()
 
-        contactMap = contacts.associateBy { it.getFullName() }
-        entrepriseMap = entreprises.associateBy { it.nom }
-
-        configureSpinners(contacts, entreprises, contactId != null, entrepriseId != null)
+        configureSpinners(contacts, entreprises)
     }
-    private fun configureSpinners(contacts: List<Contact>, entreprises: List<Entreprise>, isContactFixed: Boolean, isEntrepriseFixed: Boolean) {
-        val contactNames = contactMap.keys.toList()
-        val contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contactNames)
+
+    private fun configureSpinners(contacts: List<Contact>, entreprises: List<Entreprise>) {
+        val contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contacts.map { it.getFullName() })
         spContactsAppel.adapter = contactAdapter
 
-        val entrepriseNames = entrepriseMap.keys.toList()
-        val entrepriseAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entrepriseNames)
+        val entrepriseAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entreprises)
         spEntreprisesAppel.adapter = entrepriseAdapter
     }
 
     private fun addAppel(view: View) {
-        val dateAppel = etDateAppel.text.toString()
-        val objet = etObjetAppel.text.toString()
-        val notes = etNotesAppel.text.toString()
+        if (::contactMap.isInitialized && ::entrepriseMap.isInitialized) {
+            val dateAppel = etDateAppel.text.toString()
+            val objet = etObjetAppel.text.toString()
+            val notes = etNotesAppel.text.toString()
 
-        val selectedContactName = spContactsAppel.selectedItem.toString()
-        val selectedEntrepriseName = spEntreprisesAppel.selectedItem.toString()
+            val selectedContactName = spContactsAppel.selectedItem.toString()
+            val selectedEntrepriseName = spEntreprisesAppel.selectedItem.toString()
 
-        val contact = contactMap[selectedContactName]
-        val entreprise = entrepriseMap[selectedEntrepriseName]
+            val contact = contactMap[selectedContactName]
+            val entreprise = entrepriseMap[selectedEntrepriseName]
 
-        if (contact != null && entreprise != null) {
-            val appel = Appel(
-                contact_id = contact.id,
-                entreprise_id = entreprise.id,
-                date_appel = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(dateAppel) ?: Date(),
-                objet = objet,
-                notes = notes
-            )
-            DataRepository(applicationContext).saveAppel(appel)
-            finish()
+            if (contact != null && entreprise != null) {
+                val appel = Appel(
+                    contact_id = contact.id,
+                    entreprise_id = entreprise.id,
+                    date_appel = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(dateAppel) ?: Date(),
+                    objet = objet,
+                    notes = notes
+                )
+                DataRepository(applicationContext).saveAppel(appel)
+                finish()
+            } else {
+                Log.d("AddAppelActivity", "Contact : ${contact}")
+                Log.d("AddAppelActivity", "ContactMap : ${contactMap}")
+                Log.d("AddAppelActivity", "selectedContactName : ${selectedContactName}")
+                Log.d("AddAppelActivity", "Entreprise : ${entreprise}")
+                Log.d("AddAppelActivity", "EntrepriseMap : ${entrepriseMap}")
+                Log.d("AddAppelActivity", "selectedEntrepriseName : ${selectedEntrepriseName}")
+                Log.e("AddAppelActivity", "Contact or enterprise not found.")
+            }
         } else {
-            Log.d("AddAppelActivity", "Contact : ${contact}")
-            Log.d("AddAppelActivity", "ContactMap : ${contactMap}")
-            Log.d("AddAppelActivity", "selectedContactName : ${selectedContactName}")
-            Log.d("AddAppelActivity", "Entreprise : ${entreprise}")
-            Log.d("AddAppelActivity", "EntrepriseMap : ${entrepriseMap}")
-            Log.d("AddAppelActivity", "selectedEntrepriseName : ${selectedEntrepriseName}")
-            Log.e("AddAppelActivity", "Contact or enterprise not found.")
+            Log.e("AddAppelActivity", "Contact map or entreprise map not initialized")
         }
     }
 
