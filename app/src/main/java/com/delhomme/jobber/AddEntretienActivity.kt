@@ -20,12 +20,10 @@ import java.util.UUID
 class AddEntretienActivity : AppCompatActivity() {
 
     private lateinit var etDateEntretien: EditText
-    private lateinit var etNomEntretien: EditText
     private lateinit var etNotesPreEntretien: EditText
     private lateinit var spinnerTypeEntretien: Spinner
-    private lateinit var spinnerStyleEntretien: Spinner
+    private lateinit var spinnerModeEntretien: Spinner
     private lateinit var autoCompleteTextViewEntreprise: AutoCompleteTextView
-    private lateinit var button_add_entretien: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_entretien)
@@ -33,17 +31,17 @@ class AddEntretienActivity : AppCompatActivity() {
         if(getSupportActionBar() != null) {
             getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
         }
-        initUI()
+        setupUI()
         setupListeners()
 
     }
 
 
-    private fun initUI() {
+    private fun setupUI() {
         etDateEntretien = findViewById(R.id.dateEntretien)
         etNotesPreEntretien = findViewById(R.id.etNotesEntretien)
         spinnerTypeEntretien = findViewById(R.id.spinner_type_entretien)
-        spinnerStyleEntretien = findViewById(R.id.spinner_style_entretien)
+        spinnerModeEntretien = findViewById(R.id.spinner_mode_entretien)
         autoCompleteTextViewEntreprise = findViewById(R.id.autoCompleteTextViewEntretien)
 
         // Setup Spinners for type and style of interviews
@@ -58,14 +56,34 @@ class AddEntretienActivity : AppCompatActivity() {
 
         ArrayAdapter.createFromResource(
             this,
-            R.array.styles_entretien, // Assume you have an array in resources
+            R.array.modes_entretien, // Assume you have an array in resources
             android.R.layout.simple_spinner_item
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinnerStyleEntretien.adapter = adapter
+            spinnerModeEntretien.adapter = adapter
         }
+        setupDatePicker()
 
-        // Setup DatePicker
+        // Pré-remplissage et verrouillage du champ entreprise
+        val entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
+        val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
+        if (entrepriseId != null || candidatureId != null) {
+            val entreprise = entrepriseId?.let { DataRepository(this).getEntrepriseById(it) }
+                ?: candidatureId?.let { DataRepository(this).getCandidatureById(it)?.let { candidature -> DataRepository(this).getEntrepriseById(candidature.entrepriseId) } }
+
+            autoCompleteTextViewEntreprise.setText(entreprise?.nom)
+            autoCompleteTextViewEntreprise.isEnabled = false
+        }
+    }
+
+    private fun setupListeners() {
+        val btnAddEntretien = findViewById<Button>(R.id.button_add_entretien)
+        btnAddEntretien?.setOnClickListener {
+            addEntretien()
+        }
+    }
+
+    private fun setupDatePicker() {
         etDateEntretien.setOnClickListener {
             val now = Calendar.getInstance()
             DatePickerDialog(this, { _, year, month, day ->
@@ -77,45 +95,45 @@ class AddEntretienActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupListeners() {
-        val btnAddEntretien = findViewById<Button>(R.id.button_add_entretien)
-        btnAddEntretien?.setOnClickListener {
-            addEntretien()
-        }
-    }
-
     private fun addEntretien() {
         val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val dataRepository = DataRepository(this)
 
         val dateEntretien = format.parse(etDateEntretien.text.toString()) ?: Date()
         val typeEntretien = spinnerTypeEntretien.selectedItem.toString()
-        val styleEntretien = spinnerStyleEntretien.selectedItem.toString()
+        val modeEntretien = spinnerModeEntretien.selectedItem.toString()
         val notesPreEntretien = etNotesPreEntretien.text.toString()
         val nomEntreprise = autoCompleteTextViewEntreprise.text.toString()
 
+        val entreprises = dataRepository.loadEntreprises()
+        autoCompleteTextViewEntreprise.setAdapter(ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entreprises.map { it.nom }))
+
         val entreprise = dataRepository.getOrCreateEntreprise(nomEntreprise)
+
+        intent.getStringExtra("ENTREPRISE_ID")?.let { entrepriseId ->
+            autoCompleteTextViewEntreprise.setText(entreprises.indexOfFirst { it.id == entrepriseId })
+            autoCompleteTextViewEntreprise.isEnabled = false
+        }
 
         val entretien = Entretien(
             id = UUID.randomUUID().toString(),
             entreprise_id = entreprise.id,
-            entrepriseNom = entreprise.nom,
             date_entretien = dateEntretien,
-            type_entretien = typeEntretien,
-            style_entretien = styleEntretien,
+            type = typeEntretien,
+            mode = modeEntretien,
             notes_pre_entretien = notesPreEntretien
         )
 
         dataRepository.saveEntretien(entretien)
 
-        entreprise.entretiens.add(entretien)
+        entreprise.entretiens.add(entretien.id)
         dataRepository.saveEntreprise(entreprise)
 
         val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
         if (candidatureId != null) {
             val candidature = dataRepository.getCandidatureById(candidatureId)
             candidature?.let {
-                it.entretiens.add(entretien)
+                it.entretiens.add(entretien.id)
                 dataRepository.saveCandidature(it)
             }
         }

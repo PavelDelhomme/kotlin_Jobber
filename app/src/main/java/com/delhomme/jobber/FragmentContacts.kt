@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.ContactAdapter
 import com.delhomme.jobber.models.Contact
 
-class ContactsFragment : Fragment() {
+class FragmentContacts : Fragment() {
     private lateinit var adapter: ContactAdapter
     private val dataRepository by lazy { DataRepository(requireContext()) }
     override fun onCreateView(
@@ -41,7 +41,7 @@ class ContactsFragment : Fragment() {
     }
 
     private fun onContactClicked(contact: Contact) {
-        val intent = Intent(activity, ContactDetailActivity::class.java).apply {
+        val intent = Intent(activity, DetailsContactActivity::class.java).apply {
             putExtra("CONTACT_ID", contact.id)
         }
         startActivity(intent)

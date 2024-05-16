@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.CandidatureAdapter
 import com.delhomme.jobber.models.Candidature
 
-class CandidaturesFragment : Fragment() {
+class FragmentCandidatures : Fragment() {
     private lateinit var adapter: CandidatureAdapter
     private val dataRepository by lazy { DataRepository(requireContext()) }
 
@@ -36,7 +36,7 @@ class CandidaturesFragment : Fragment() {
     }
 
     private fun onCandidatureClicked(candidature: Candidature) {
-        val intent = Intent(activity, CandidatureDetailActivity::class.java).apply {
+        val intent = Intent(activity, DetailsCandidatureActivity::class.java).apply {
             putExtra("CANDIDATURE_ID", candidature.id)
         }
         startActivity(intent)

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EntretiensFragment">
+    tools:context=".FragmentEntretiens">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewEntretiens"
@@ -12,7 +12,9 @@
         android:layout_above="@+id/btnAddEntretien"
         android:padding="16dp"
         android:clipToPadding="false"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        tools:listitem="@layout/item_entretien"
+        />
 
     <Button
         android:id="@+id/btnAddEntretien"

@@ -5,16 +5,17 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class MainViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
-    override fun getItemCount(): Int = 6
+    override fun getItemCount(): Int = 7
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> DashboardFragment()
-            1 -> CandidaturesFragment()
-            2 -> ContactsFragment()
-            3 -> AppelsFragment()
-            4 -> EntreprisesFragment()
-            5 -> EntretiensFragment()
+            0 -> FragmentDashboard()
+            1 -> FragmentCandidatures()
+            2 -> FragmentContacts()
+            3 -> FragmentAppels()
+            4 -> FragmentEntreprises()
+            5 -> FragmentEntretiens()
+            6 -> FragmentRelances()
             else -> Fragment()
         }
     }

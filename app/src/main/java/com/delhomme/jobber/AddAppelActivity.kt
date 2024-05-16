@@ -3,6 +3,7 @@ package com.delhomme.jobber
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.models.Appel
 import com.delhomme.jobber.models.Contact
 import com.delhomme.jobber.models.Entreprise
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -32,7 +34,10 @@ class AddAppelActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_appel)
-        setupActionBar()
+
+        if(getSupportActionBar() != null) {
+            getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
+        }
         setupUI()
         setupDatePicker()
         handleIntent()
@@ -42,9 +47,6 @@ class AddAppelActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupActionBar() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
 
     private fun setupUI() {
         etDateAppel = findViewById(R.id.etDateAppel)
@@ -85,141 +87,92 @@ class AddAppelActivity : AppCompatActivity() {
     private fun handleIntent() {
         val dataRepository = DataRepository(this)
         val entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
-        Log.d("AddAppelActivity", "handleIntent | entrepriseId : $entrepriseId")
+        val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
 
-        // Charger les entreprises
         val entreprises = dataRepository.loadEntreprises()
-        Log.d("AddAppelActivity", "handleIntent | entreprises : $entreprises")
-        //entrepriseMap = entreprises.associateBy { it.nom }
         entrepriseMap = entreprises.associateBy { it.id }
-        Log.d("AddAppelActivity", "handleIntent | entrepriseMap $entrepriseMap")
-
-        // Configurer le spinner des entreprises
         val entrepriseAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entreprises)
-        Log.d("AddAppelActivity", "handleIntent | entrepriseAdapter ${entrepriseAdapter}")
         spEntreprisesAppel.adapter = entrepriseAdapter
-        Log.d("AddAppelActivity", "handleIntent | spEntreprisesAppel : $spEntreprisesAppel")
-        Log.d("AddAppelActivity", "handleIntent | spEntreprisesAppel.adapter : ${spEntreprisesAppel.adapter}")
 
-        // Gérer la sélection initiale et la possibilité de changer d'entreprise
         if (entrepriseId != null) {
-            Log.d("AddAppelActivity", "entrepriseId != null")
             val index = entreprises.indexOfFirst { it.id == entrepriseId }
-            Log.d("AddAppelActivity", "index : $index")
             if (index != -1) {
-                Log.d("AddAppelActivity", "index != -1")
                 spEntreprisesAppel.setSelection(index)
-                Log.d("AddAppelActivity", "spEntreprisesAppel.setSelection(index) : ${spEntreprisesAppel.setSelection(index)}")
-                Log.d("AddAppelActivity", "spEntreprisesAppel.setSelection(index).toString() : ${spEntreprisesAppel.setSelection(index).toString()}")
-                spEntreprisesAppel.isEnabled = false
-                Log.d("AddAppelActivity", "spEntreprisesAppel.isEnabled : ${spEntreprisesAppel.isEnabled}")
-                updateContactSpinner(entrepriseId)
-                Log.d("AddAppelActivity", "updateContactSpinner(entrepriseId) used")
+                spEntreprisesAppel.isEnabled = candidatureId == null
             }
+            updateContactSpinner(entrepriseId)
         }
         // Charger les contacts selon l'entreprise, si spécifiée
         val contacts = entrepriseId?.let { dataRepository.loadContactsForEntreprise(it) } ?: listOf()
-        Log.d("AddAppelActivity", "entrepriseId?.let { dataRepository.loadContactsForEntreprise(it) } ?: listOf() \nNOUS DONNE\n" +
-                "${entrepriseId?.let { dataRepository.loadContactsForEntreprise(it) } ?: listOf()}")
         contactMap = contacts.associateBy { it.id }
-        Log.d("AddAppelActivity", "contactMap : $contactMap")
-        Log.d("AddAppelActivity", "contactMap.toString() : ${contactMap.toString()}")
-        // Mettre à jour le spinner des contacts
         updateContactSpinner(null) // Pour initialiser avec "--"
-        Log.d("AddAppelActivity", "updateContactSpinner(null) loaded")
     }
     private fun updateContactSpinner(entrepriseId: String?) {
-        Log.d("AddAppelActivity", "updateContactSpinner : entrepriseId : $entrepriseId")
-        val dataRepository = DataRepository(this)
-        val contacts = dataRepository.loadContactsForEntreprise(entrepriseId)
-        Log.d("AddAppelActivity", "updateContactSpinner : contacts : ${contacts}")
-        val contactNames = mutableListOf("--")
-        Log.d("AddAppelActivity", "updateContactSpinner : contactNames : ${contactNames}")
-        contactNames.addAll(contacts.map { it.getFullName() })
-        Log.d("AddAppelActivity", "updateContactSpinner : contactNames.addAll(contacts.map { it.getFullName() }) : ${contactNames.addAll(contacts.map { it.getFullName() })}")
+        val contacts = DataRepository(this).loadContactsForEntreprise(entrepriseId)
+        val contactNames = contacts.map { it.getFullName() }.toMutableList()
+        contactNames.add(0, "--")
+
         spContactsAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contactNames)
-        Log.d("AddAppelActivity", "updateContactSpinner : spContactsAppel.adapter : ${spContactsAppel.adapter}")
         contactMap = contacts.associateBy { it.getFullName() }
-        Log.d("AddAppelActivity", "updateContactSpinner : contactMap : ${contactMap}")
     }
 
     private fun addAppel(view: View) {
-        // S'assurer que les maps sont initialisées
-        Log.d("AddAppelActivity", "Into addAppel")
-        if (!::contactMap.isInitialized || !::entrepriseMap.isInitialized) {
-            Log.d("AddAppelActivity", "        if (!::contactMap.isInitialized || !::entrepriseMap.isInitialized) ")
-            Log.d("AddAppelActivity", "(!::contactMap.isInitialized || !::entrepriseMap.isInitialized) nous donne :\n" +
-                    "${(!::contactMap.isInitialized || !::entrepriseMap.isInitialized)}")
-            Toast.makeText(this, "Les données sont en cours de chargement, veuillez patienter...", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         val selectedContactName = spContactsAppel.selectedItem.toString()
-        //Log.d("AddAppelActivity", "addAppel : selectedContactName = $selectedContactName")
-        //Log.d("AddAppelActivity", "addAppel : selectedContactName.toString() = ${selectedContactName.toString()}")
-        //Log.d("AddAppelActivity", "addAppel : contactMap[selectedContactName] : ${contactMap[selectedContactName]}")
-        //Log.d("AddAppelActivity", "addAppel : contactMap[selectedContactName]?.nom : ${contactMap[selectedContactName]?.nom}")
-        //Log.d("AddAppelActivity", "addAppel : contactMap[selectedContactName]?.id : ${contactMap[selectedContactName]?.id}")
-        //Log.d("AddAppelActivity", "addAppel : contactMap[selectedContactName]!!.id : ${contactMap[selectedContactName]!!.id}")
         val contactId = if (selectedContactName != "--") contactMap[selectedContactName]?.id else null
-        //Log.d("AddAppelActivity", "AddAppel : Contact sélectionné : ${contactId}")
         val selectedEntreprise = spEntreprisesAppel.selectedItem as? Entreprise
-        //Log.d("AddAppelActivity", "AddAppel : selectedEntrepriseId : ${selectedEntreprise}")
-        val entrepriseId = entrepriseMap[selectedEntreprise?.id]?.id
-        //Log.d("AddAppelActivity", "AddAppel : Entreprise sélectionnée : ${entrepriseId}")
+        val entrepriseId = selectedEntreprise?.id
+        val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
+        /*if (contactId != null) {
+            Toast.makeText(this, "Veuillez sélectionner un contact valide.", Toast.LENGTH_SHORT).show()
+            Log.d("addAppel", "contactId != null | Veuillez sélectionner un contact valide")
+            Log.d("addAppel", "contactId : $contactId | selectedContactName : $selectedContactName")
+            return
+        }*/
+        /*if (entrepriseId == null) {
+            Toast.makeText(this, "Erreur : entreprise non sélectionnée ou non trouvée", Toast.LENGTH_SHORT).show()
+            Log.d("addAppel", "entrepriseId == null | Veuillez sélectionner une entreprise valide")
+            Log.d("addAppel", "entrepriseId : $entrepriseId | selecteEntreprise : $selectedEntreprise")
+            return
+        }*/
+
         if (entrepriseId == null) {
-            Log.d("AddAppelActivity", "addAppel : if (entrepriseId == null)")
-            Toast.makeText(this, "Erreur: entreprise non sélectionnée ou non trouvée.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Erreur: entreprise non sélectionnée ou non trouvée.", Toast.LENGTH_LONG)
+            Log.d("addAppel", "Erreur: entreprise non sélectionnée ou non trouvée.")
             return
         }
+        try {
+            val dateAppel = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(etDateAppel.text.toString()) ?: Date()
+            val objet = etObjetAppel.text.toString()
+            val notes = etNotesAppel.text.toString()
+            val appel = Appel(contact_id = contactId, entreprise_id = entrepriseId, date_appel = dateAppel, objet = objet, notes = notes, candidature_id = candidatureId)
+            DataRepository(applicationContext).saveAppel(appel)
 
-        val dateAppel = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(etDateAppel.text.toString()) ?: Date()
-        Log.d("AddAppelActivity", "AddAppel : dateAppel : $dateAppel")
-        val objet = etObjetAppel.text.toString()
-        Log.d("AddAppelActivity", "AddAppel : objet : $objet")
-        val notes = etNotesAppel.text.toString()
-        Log.d("AddAppelActivity", "AddAppel : notes : $notes")
-        val appel = Appel(
-            contact_id = contactId,
-            entreprise_id = entrepriseId,
-            date_appel = dateAppel,
-            objet = objet,
-            notes = notes,
-            candidature_id = intent.getStringExtra("CANDIDATURE_ID")
-        )
-        Log.d("AddAppelActivity", "AddAppel : appel : $appel")
-        Log.d("AddAppelActivity", "AddAppel : appel : ${appel.contact_id}")
-        Log.d("AddAppelActivity", "AddAppel : appel : ${appel.entreprise_id}")
-        Log.d("AddAppelActivity", "AddAppel : appel : ${appel.date_appel}")
-        Log.d("AddAppelActivity", "AddAppel : appel : ${appel.objet}")
-        Log.d("AddAppelActivity", "AddAppel : appel : ${appel.notes}")
-        Log.d("AddAppelActivity", "AddAppel : appel : ${appel.candidature_id}")
-        DataRepository(applicationContext).saveAppel(appel)
+            if (candidatureId != null) {
+                val candidature = DataRepository(applicationContext).getCandidatureById(candidatureId)
+                candidature?.appelsIds?.add(appel.id)
+                DataRepository(applicationContext).saveCandidature(candidature!!)
+            }
+            if (contactId != null) {
+                val contact = DataRepository(applicationContext).getContactById(contactId)
+                contact?.appelsIds?.add(appel.id)
+                DataRepository(applicationContext).saveContact(contact!!)
+            }
 
-        val candidature = DataRepository(applicationContext).getCandidatureById(appel.candidature_id!!)
-        candidature?.appelsIds?.add(appel.id)
-        DataRepository(applicationContext).saveCandidature(candidature!!)
-        Log.d("AddAppelActivity", "Appel ajouté a la candidature : ${candidature?.appelsIds}")
-        /*
-        if (contactId != null) {
-            Log.d("AddAppelActivity", "contactId != null | contact id : $contactId")
-            var contactAppel = DataRepository(applicationContext).getContactById(contactId.toString())
-            Log.d("AddAppelActivity", "contactAppel : ${contactAppel}")
-            DataRepository(applicationContext).addAppelToContact(appel, contactId)
-            Log.d("AddAppelActivity", "Appel pour ${contactAppel?.nom}")
+            finish()
+        } catch (e: ParseException) {
+            Toast.makeText(this, "Format de date invalide", Toast.LENGTH_SHORT).show()
+            Log.e("addAppel", "Erreur format de date invalide")
         }
-        Log.d("AddAppelActivity", "Appel ajouté")
-        var appelEnregistre = DataRepository(applicationContext).getAppelById(appel.id)
-        var entrepriseAppel = DataRepository(applicationContext).getEntrepriseById(entrepriseId)
-        var candidatureAppel = DataRepository(applicationContext).getCandidatureById(intent.getStringExtra("CANDIDATURE_ID").toString())
-        Log.d("AddAppelActivity", "Instance d'appel : ${appelEnregistre}")
-        Log.d("AddAppelActivity", "Entreprise de l'appel : ${entrepriseAppel?.nom}")
-        Log.d("AddAppelActivity", "Instance de l'entreprise : ${entrepriseAppel}")
-        Log.d("AddAppelActivity", "Instance de la candidature si il y a : ${candidatureAppel?.titre_offre}")*/
-        contactId?.let {
-            DataRepository(applicationContext).addAppelToContact(appel, it)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
         }
-        finish()
+        return super.onOptionsItemSelected(item)
     }
 
 }

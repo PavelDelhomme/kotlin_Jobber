@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.AppelAdapter
 import com.delhomme.jobber.models.Appel
 
-class AppelsFragment : Fragment() {
+class FragmentAppels : Fragment() {
     private lateinit var adapter: AppelAdapter
     private val dataRepository by lazy { DataRepository(requireContext()) }
 
@@ -25,7 +25,7 @@ class AppelsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewAppels)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.rvAppels)
         adapter = AppelAdapter(dataRepository.loadAppels(), this::onAppelClicked, this::onDeleteAppelClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -36,7 +36,7 @@ class AppelsFragment : Fragment() {
     }
 
     private fun onAppelClicked(appel: Appel) {
-        val intent = Intent(activity, AppelDetailActivity::class.java).apply {
+        val intent = Intent(activity, DetailsAppelActivity::class.java).apply {
             putExtra("APPEL_ID", appel.id)
         }
         startActivity(intent)

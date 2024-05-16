@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.EntretienAdapter
 import com.delhomme.jobber.models.Entretien
 
-class EntretiensFragment : Fragment() {
+class FragmentEntretiens : Fragment() {
     private lateinit var adapter: EntretienAdapter
     private val dataRepository by lazy { DataRepository(requireContext()) }
 
@@ -24,7 +24,7 @@ class EntretiensFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewEntretiens)
-        adapter = EntretienAdapter(dataRepository.loadEntretiens(), this::onEntretienClicked, this::onDeleteEntretienClicked)
+        adapter = EntretienAdapter(dataRepository.loadEntretiens(), dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -34,7 +34,7 @@ class EntretiensFragment : Fragment() {
     }
 
     private fun onEntretienClicked(entretien: Entretien) {
-        val intent = Intent(activity, EntretienDetailActivity::class.java).apply {
+        val intent = Intent(activity, DetailsEntretienActivity::class.java).apply {
             putExtra("ENTRETIEN_ID", entretien.id)
         }
         startActivity(intent)

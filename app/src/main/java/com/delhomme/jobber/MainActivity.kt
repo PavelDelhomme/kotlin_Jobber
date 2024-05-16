@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
                 3 -> "Appels"
                 4 -> "Entreprises"
                 5 -> "Entretiens"
+                6 -> "Relances"
                 else -> "Autres"
             }
         }.attach()

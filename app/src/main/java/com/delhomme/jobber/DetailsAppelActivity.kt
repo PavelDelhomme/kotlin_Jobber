@@ -7,10 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class AppelDetailActivity : AppCompatActivity() {
+class DetailsAppelActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_appel_detail)
+        setContentView(R.layout.activity_details_appel)
 
         if (getSupportActionBar() != null) {
             getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);

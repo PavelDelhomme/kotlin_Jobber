@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/dateRelance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:paddingBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/entrepriseRelance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:paddingBottom="4dp"/>
+    <TextView
+        android:id="@+id/candidatureTitre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:paddingBottom="4dp"/>
+    <TextView
+        android:id="@+id/plateformeRelance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:paddingBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/notesRelance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#FF5722"/>
+
+    <Button
+        android:id="@+id/btnDeleteRelance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Supprimer"
+        android:layout_gravity="end"
+        android:textColor="#FFFFFF"
+        android:background="@color/design_default_color_error"/>
+
+</LinearLayout>

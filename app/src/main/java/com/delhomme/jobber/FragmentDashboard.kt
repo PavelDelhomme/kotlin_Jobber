@@ -1,4 +1,4 @@
-// DashboardFragment.kt
+// FragmentDashboard.kt
 package com.delhomme.jobber
 
 import android.os.Bundle
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 
-class DashboardFragment : Fragment() {
+class FragmentDashboard : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

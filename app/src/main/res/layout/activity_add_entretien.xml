@@ -20,27 +20,36 @@
         android:id="@+id/autoCompleteTextViewEntretien"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Company Name"
+        android:hint="Nom de l'entreprise"
         android:inputType="text"/>
-    <Spinner
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewContact"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner_type_entretien" />
+        android:hint="Nom du contact"
+        android:inputType="text"/>
+
     <Spinner
+        android:id="@+id/spinner_type_entretien"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner_style_entretien" />
+        android:layout_height="wrap_content" />
+
+    <Spinner
+        android:id="@+id/spinner_mode_entretien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <EditText
+        android:id="@+id/etNotesEntretien"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Notes de pré entretien"
-        android:id="@+id/etNotesEntretien" />
+        android:hint="Notes pré-entretien" />
+
     <Button
         android:id="@+id/button_add_entretien"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ajouter entretien"
+        android:text="Ajouter Entretien"
         android:layout_gravity="center_horizontal" />
-
-
 </LinearLayout>

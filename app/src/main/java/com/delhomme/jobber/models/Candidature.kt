@@ -13,6 +13,7 @@ data class Candidature(
     val date_candidature: Date,
     val etat: String,
     val notes: String,
-    val entretiens: MutableList<Entretien> = mutableListOf(),
-    val appelsIds: MutableList<String> = mutableListOf()
+    val entretiens: MutableList<String> = mutableListOf(),
+    val appelsIds: MutableList<String> = mutableListOf(),
+    var relances: MutableList<String> = mutableListOf()
 )

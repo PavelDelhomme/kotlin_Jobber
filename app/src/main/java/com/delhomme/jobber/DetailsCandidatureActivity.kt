@@ -13,22 +13,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.AppelAdapter
 import com.delhomme.jobber.adapter.ContactAdapter
 import com.delhomme.jobber.adapter.EntretienAdapter
+import com.delhomme.jobber.adapter.RelanceAdapter
 import com.delhomme.jobber.models.Appel
 import com.delhomme.jobber.models.Candidature
 import com.delhomme.jobber.models.Contact
 import com.delhomme.jobber.models.Entretien
+import com.delhomme.jobber.models.Relance
 
-class CandidatureDetailActivity : AppCompatActivity() {
+class DetailsCandidatureActivity : AppCompatActivity() {
 
     private lateinit var dataRepository: DataRepository
     private lateinit var candidature: Candidature
     private lateinit var contactAdapter: ContactAdapter
     private lateinit var appelAdapter: AppelAdapter
     private lateinit var entretienAdapter: EntretienAdapter
+    private lateinit var relanceAdapter: RelanceAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_candidature_detail)
+        setContentView(R.layout.activity_details_candidature)
 
         if (supportActionBar != null) {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -47,16 +50,25 @@ class CandidatureDetailActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvTypePoste).text = "Poste de type : ${candidature.type_poste}"
         findViewById<TextView>(R.id.tvPlateforme).text = "Candidaté sur : ${candidature.plateforme}"
 
+        findViewById<Button>(R.id.btnEditCandidature).setOnClickListener {
+            val intent = Intent(this, EditCandidatureActivity::class.java)
+            intent.putExtra("CANDIDATURE_ID", candidature.id)
+            startActivity(intent)
+        }
+
+
         setupRecyclerView()
         setupAddContactButton()
         setupAddAppelButton()
         setupAddEntretienButton()
+        setupAddRelanceButton()
     }
     // TODO Ici je tente d'afficher  les contacts lié à l'entreprise de la candidature
     private fun setupRecyclerView() {
         setupContactRecyclerView()
         setupAppelRecyclerView()
         setupEntretienRecyclerView()
+        setupRelanceRecyclerView()
     }
 
     private fun setupContactRecyclerView() {
@@ -64,14 +76,14 @@ class CandidatureDetailActivity : AppCompatActivity() {
         contactAdapter = ContactAdapter(contacts, dataRepository, this::onContactClicked, this::onDeleteContactClicked)
 
         findViewById<RecyclerView>(R.id.recyclerViewContacts).apply {
-            layoutManager = LinearLayoutManager(this@CandidatureDetailActivity)
+            layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = contactAdapter
         }
         updateContactList()
     }
 
     private fun onContactClicked(contact: Contact) {
-        val intent = Intent(this, ContactDetailActivity::class.java).apply {
+        val intent = Intent(this, DetailsContactActivity::class.java).apply {
             putExtra("CONTACT_ID", contact.id)
         }
         startActivity(intent)
@@ -87,17 +99,49 @@ class CandidatureDetailActivity : AppCompatActivity() {
         if (contacts.isNotEmpty()) {
             contactAdapter.updateContacts(contacts)
         } else {
-            Log.d("CandidatureDetailActivity", "No contacts found for this entreprise.")
+            Log.d("DetailsCandidatureActivity", "No contacts found for this entreprise.")
+        }
+    }
+    private fun setupRelanceRecyclerView() {
+        val relances = dataRepository.loadRelancesForCandidature(candidature.id)
+        if (relances != null) {
+            relanceAdapter = RelanceAdapter(relances, dataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked)
+            findViewById<RecyclerView>(R.id.recyclerViewRelances).apply {
+                layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
+                adapter = relanceAdapter
+            }
+            updateRelanceList()
+        }
+    }
+
+    private fun onRelanceClicked(relance: Relance) {
+        val intent = Intent(this, DetailsRelanceActivity::class.java).apply {
+            putExtra("RELANCE_ID", relance.id)
+        }
+        startActivity(intent)
+    }
+
+    private fun onDeleteRelanceClicked(relanceId: String) {
+        dataRepository.deleteRelance(relanceId)
+        relanceAdapter.updateRelances(dataRepository.loadRelancesForCandidature(candidature.id))
+    }
+    private fun updateRelanceList() {
+        // TODO Mise à jour de la liste des contacts
+        val relances = dataRepository.loadRelancesForCandidature(candidature.id)
+        if (relances.isNotEmpty()) {
+            relanceAdapter.updateRelances(relances)
+        } else {
+            Log.d("DetailsCandidatureActivity", "No relances found for this candidature.")
         }
     }
 
     private fun setupAppelRecyclerView() {
         val appels = dataRepository.loadAppelsForCandidature(candidature.id)
         appelAdapter = AppelAdapter(appels, this::onAppelClicked, this::onDeleteAppelClicked)
-        Log.d("CandidatureDetailActivity", "liste des appels de la candidautre : ${appels}")
+        Log.d("DetailsCandidatureActivity", "liste des appels de la candidautre : ${appels}")
 
         findViewById<RecyclerView>(R.id.recyclerViewAppels).apply {
-            layoutManager = LinearLayoutManager(this@CandidatureDetailActivity)
+            layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = appelAdapter
         }
     }
@@ -112,16 +156,16 @@ class CandidatureDetailActivity : AppCompatActivity() {
 
     private fun updateAppelList() {
         val updatedAppels = dataRepository.loadAppelsForCandidature(candidature.id)
-        Log.d("CandidatureDetailActivity", "Appels of candidature : $updatedAppels")
+        Log.d("DetailsCandidatureActivity", "Appels of candidature : $updatedAppels")
         appelAdapter.updateAppels(updatedAppels)
     }
 
     private fun setupEntretienRecyclerView() {
         val entretiens = dataRepository.loadEntretiensForCandidature(candidature.id)
-        entretienAdapter = EntretienAdapter(entretiens, this::onEntretienClicked, this::onDeleteEntretienClicked)
+        entretienAdapter = EntretienAdapter(entretiens, dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked)
 
         findViewById<RecyclerView>(R.id.recyclerViewEntretiens).apply {
-            layoutManager = LinearLayoutManager(this@CandidatureDetailActivity)
+            layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = entretienAdapter
         }
     }
@@ -141,6 +185,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
         btnAddEntretien.setOnClickListener {
             val intent = Intent(this, AddEntretienActivity::class.java).apply {
                 putExtra("CANDIDATURE_ID", candidature.id)
+                putExtra("ENTREPRISE_ID", candidature.entrepriseId)
             }
             startActivity(intent)
         }
@@ -172,6 +217,17 @@ class CandidatureDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupAddRelanceButton() {
+        val btnAddRelance = findViewById<Button>(R.id.btnAddRelance)
+        btnAddRelance.setOnClickListener {
+            val intent = Intent(this, AddRelanceActivity::class.java).apply {
+                putExtra("ENTREPRISE_ID", candidature.entrepriseId)
+                putExtra("CANDIDATURE_ID", candidature.id)
+            }
+            startActivity(intent)
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
@@ -186,6 +242,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
         updateEntretienList()
         updateContactList()
         updateAppelList()
+        updateRelanceList()
     }
 
 }

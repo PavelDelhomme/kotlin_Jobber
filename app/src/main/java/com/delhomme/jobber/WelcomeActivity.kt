@@ -14,7 +14,7 @@ class WelcomeActivity : AppCompatActivity() {
         val user = getUserData()
 
         if (user != null) {
-            startActivity(Intent(this, DashboardFragment::class.java))
+            startActivity(Intent(this, FragmentDashboard::class.java))
         } else {
             startActivity(Intent(this, LoginActivity::class.java))
         }

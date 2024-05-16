@@ -13,14 +13,14 @@ import com.delhomme.jobber.adapter.AppelAdapter
 import com.delhomme.jobber.models.Appel
 import com.delhomme.jobber.models.Contact
 
-class ContactDetailActivity : AppCompatActivity() {
+class DetailsContactActivity : AppCompatActivity() {
     private lateinit var dataRepository: DataRepository
     private lateinit var contact: Contact
     private lateinit var appelAdapter: AppelAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_contact_detail)
+        setContentView(R.layout.activity_details_contact)
 
         if(getSupportActionBar() != null) {
             getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
@@ -57,14 +57,14 @@ class ContactDetailActivity : AppCompatActivity() {
         appelAdapter = AppelAdapter(appels, this::onAppelClicked, this::onDeleteAppelClicked)
 
         findViewById<RecyclerView>(R.id.recyclerViewAppels).apply {
-            layoutManager = LinearLayoutManager(this@ContactDetailActivity)
+            layoutManager = LinearLayoutManager(this@DetailsContactActivity)
             adapter = appelAdapter
         }
         updateAppelList()
     }
 
     private fun onAppelClicked(appel: Appel) {
-        val intent = Intent(this, AppelDetailActivity::class.java).apply {
+        val intent = Intent(this, DetailsAppelActivity::class.java).apply {
             putExtra("APPEL_ID", appel.id)
         }
         startActivity(intent)
@@ -92,7 +92,7 @@ class ContactDetailActivity : AppCompatActivity() {
             appelAdapter.updateAppels(appels)
         } else {
             appelAdapter.updateAppels(emptyList())
-            Log.d("ContactDetailActivity", "No appels found for this contact.")
+            Log.d("DetailsContactActivity", "No appels found for this contact.")
         }
     }
 

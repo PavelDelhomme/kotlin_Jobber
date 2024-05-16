@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CandidaturesFragment">
+    tools:context=".FragmentCandidatures">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -12,6 +12,7 @@
         android:layout_above="@+id/btnAddCandidature"
         android:padding="16dp"
         android:clipToPadding="false"
+        tools:listitem="@layout/item_candidature"
         android:scrollbars="vertical" />
 
     <Button

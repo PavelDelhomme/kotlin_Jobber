@@ -2,21 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    tools:context=".FragmentRelances">
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvAppels"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/btnAddAppel"
-        tools:listitem="@layout/item_appel" />
+        android:layout_above="@+id/btnAddRelance"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_relance"
+        android:scrollbars="vertical" />
 
     <Button
-        android:id="@+id/btnAddAppel"
+        android:id="@+id/btnAddRelance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="Add Appel"
+        android:text="Ajouter Relance"
         android:background="@color/design_default_color_primary"
         android:textColor="@android:color/white" />
 </RelativeLayout>

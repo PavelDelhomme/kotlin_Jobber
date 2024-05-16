@@ -54,7 +54,16 @@
         <item>Présentiel</item>
         <item>Visioconférence</item>
     </string-array>
-    <string-array name="styles_entretien">
+    <string-array name="modes_entretien">
+        <item>RH</item>
+        <item>Technique</item>
+        <item>Autres</item>
+    </string-array>
+    <string-array name="types_relance">
+        <item>Présentiel</item>
+        <item>Visioconférence</item>
+    </string-array>
+    <string-array name="modes_relance">
         <item>RH</item>
         <item>Technique</item>
         <item>Autres</item>
@@ -125,4 +134,5 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="candidature_details_liste_entretiens">Entretiens de la candidatures</string>
+    <string name="candidature_details_liste_relances">Relance liée à la candidature</string>
 </resources>

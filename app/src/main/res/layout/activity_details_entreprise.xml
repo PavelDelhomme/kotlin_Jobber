@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".EntrepriseDetailActivity">
+    tools:context=".DetailsEntrepriseActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -62,17 +62,60 @@
             android:layout_below="@id/rvAppels"/>
 
         <TextView
+            android:id="@+id/tvRelances"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Liste des relances"
+            android:layout_below="@id/btnAddAppel"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRelances"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvRelances" />
+
+        <Button
+            android:id="@+id/btnAddRelance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ajouter Relance"
+            android:layout_below="@id/rvRelances"/>
+
+
+        <TextView
+            android:id="@+id/tvEntretiens"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Liste des entretiens"
+            android:layout_below="@id/btnAddRelance"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvEntretiens"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvEntretiens" />
+
+        <Button
+            android:id="@+id/btnAddEntretien"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ajouter Entretien"
+            android:layout_below="@id/rvEntretiens"/>
+
+        <TextView
             android:id="@+id/tvCandidatures"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Liste des candidatures"
-            android:layout_below="@id/btnAddAppel"/>
+            android:layout_below="@id/btnAddEntretien"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvCandidatures"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvCandidatures"/>
+            android:layout_below="@id/tvCandidatures" />
+
+
 
     </RelativeLayout>
 </ScrollView>

@@ -57,7 +57,7 @@ class AddContactActivity : AppCompatActivity() {
                 email = email,
                 telephone = telephone,
                 entrepriseId = entreprise.id,
-                appels = mutableListOf()
+                appelsIds = mutableListOf()
             )
 
             dataRepository.addContactToEntreprise(contact.id, entreprise.id)
