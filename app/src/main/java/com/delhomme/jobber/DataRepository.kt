@@ -2,12 +2,12 @@ package com.delhomme.jobber
 
 import android.content.Context
 import android.util.Log
-import com.delhomme.jobber.models.Appel
-import com.delhomme.jobber.models.Candidature
-import com.delhomme.jobber.models.Contact
-import com.delhomme.jobber.models.Entreprise
-import com.delhomme.jobber.models.Entretien
-import com.delhomme.jobber.models.Relance
+import com.delhomme.jobber.Appel.model.Appel
+import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.Contact.model.Contact
+import com.delhomme.jobber.Entreprise.model.Entreprise
+import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.Relance.model.Relance
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.UUID

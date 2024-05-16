@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.delhomme.jobber.FragmentCandidatures"
+        android:name="com.delhomme.jobber.Candidature.FragmentCandidatures"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_candidatures">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.delhomme.jobber.FragmentContacts"
+        android:name="com.delhomme.jobber.Contact.FragmentContacts"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_contacts">
 
@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/ThirdFragment"
-        android:name="com.delhomme.jobber.FragmentEntreprises"
+        android:name="com.delhomme.jobber.Entreprise.FragmentEntreprises"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_entreprises">
 
@@ -37,7 +37,7 @@
     </fragment>
     <fragment
         android:id="@+id/FourthFragment"
-        android:name="com.delhomme.jobber.FragmentAppels"
+        android:name="com.delhomme.jobber.Appel.FragmentAppels"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_appels">
 
