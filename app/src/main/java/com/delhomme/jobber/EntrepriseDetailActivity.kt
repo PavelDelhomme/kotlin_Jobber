@@ -9,8 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.adapter.AppelAdapter
+import com.delhomme.jobber.adapter.CandidatureAdapter
 import com.delhomme.jobber.adapter.ContactAdapter
 import com.delhomme.jobber.models.Appel
+import com.delhomme.jobber.models.Candidature
 import com.delhomme.jobber.models.Contact
 import com.delhomme.jobber.models.Entreprise
 
@@ -20,6 +22,7 @@ class EntrepriseDetailActivity : AppCompatActivity() {
     private lateinit var entreprise: Entreprise
     private lateinit var contactsAdapter: ContactAdapter
     private lateinit var appelsAdapter: AppelAdapter
+    private lateinit var candidaturesAdapter: CandidatureAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +36,7 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         dataRepository = DataRepository(this)
         entreprise = dataRepository.getEntrepriseById(entrepriseId) ?: return
 
-        contactsAdapter = ContactAdapter(emptyList(), this::onContactClicked, this::onDeleteContactClicked)
+        contactsAdapter = ContactAdapter(emptyList(), dataRepository, this::onContactClicked, this::onDeleteContactClicked)
         appelsAdapter = AppelAdapter(emptyList(), this::onAppelClicked, this::onDeleteAppelClicked)
 
         findViewById<TextView>(R.id.tvEntrepriseName).text = entreprise.nom
@@ -46,10 +49,11 @@ class EntrepriseDetailActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         setupContactRecyclerView()
         setupAppelRecyclerView()
+        setupCandidatureRecyclerView()
     }
     private fun setupContactRecyclerView() {
         val contacts = dataRepository.loadContactsForEntreprise(entreprise.id)
-        val contactsAdapter = ContactAdapter(contacts, this::onContactClicked, this::onDeleteContactClicked)
+        val contactsAdapter = ContactAdapter(contacts, dataRepository, this::onContactClicked, this::onDeleteContactClicked)
         findViewById<RecyclerView>(R.id.rvContacts).apply {
             layoutManager = LinearLayoutManager(this@EntrepriseDetailActivity)
             adapter = contactsAdapter
@@ -66,6 +70,15 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupCandidatureRecyclerView() {
+        val candidatures = dataRepository.loadCandidaturesForEntreprise(entreprise.id)
+        val candidaturesAdapter = CandidatureAdapter(candidatures, dataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked)
+
+        findViewById<RecyclerView>(R.id.rvCandidatures).apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = candidaturesAdapter
+        }
+    }
     private fun onContactClicked(contact: Contact) {
         val intent = Intent(this, ContactDetailActivity::class.java).apply {
             putExtra("CONTACT_ID", contact.id)
@@ -80,9 +93,20 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun onCandidatureClicked(candidature: Candidature) {
+        val intent = Intent(this, CandidatureDetailActivity::class.java).apply {
+            putExtra("CANDIDATURE_ID", candidature.id)
+        }
+        startActivity(intent)
+    }
+
     private fun onDeleteContactClicked(contactId: String) {
         dataRepository.deleteContact(contactId)
+        Log.d("EntrepriseDetailActivity", "onDeleteContactClicked")
+        Log.d("EntrepriseDetailActivity", "contactId : $contactId")
         contactsAdapter.updateContacts(dataRepository.loadContactsForEntreprise(entreprise.id))
+        dataRepository.loadEntreprises()
+        Log.d("EntrepriseDetailActivity", "contactsAdapter updated")
     }
 
     private fun onDeleteAppelClicked(appelId: String) {
@@ -90,6 +114,11 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         dataRepository.deleteAppel(appelId)
         val updatedAppels = dataRepository.loadAppelsForEntreprise(entreprise.id)
         appelsAdapter.updateAppels(updatedAppels)
+    }
+
+    private fun onDeleteCandidatureClicked(candidatureId: String) {
+        dataRepository.deleteCandidature(candidatureId)
+        updateCandidaturesList()
     }
 
 
@@ -100,6 +129,15 @@ class EntrepriseDetailActivity : AppCompatActivity() {
             contactsAdapter.updateContacts(contacts)
         } else {
             Log.d("EntrepriseDetailActivity", "No contacts found for this entreprise.")
+        }
+    }
+
+    private fun updateCandidaturesList() {
+        val candidatures = dataRepository.loadCandidaturesForEntreprise(entreprise.id)
+        if (candidatures.isNotEmpty()) {
+            candidaturesAdapter.updateCandidatures(candidatures)
+        } else {
+            Log.d("EntrepriseDetailActivity", "No candidature found for this entreprise.")
         }
     }
 
@@ -127,6 +165,9 @@ class EntrepriseDetailActivity : AppCompatActivity() {
         reloadAppelsAndContacts()
         if (this::contactsAdapter.isInitialized) {
             updateContactList()
+        }
+        if (this::candidaturesAdapter.isInitialized) {
+            updateCandidaturesList()
         }
     }
 

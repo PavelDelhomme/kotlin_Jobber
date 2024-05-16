@@ -3,6 +3,7 @@ package com.delhomme.jobber
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -69,6 +70,7 @@ class AddCandidatureActivity : AppCompatActivity() {
     }
 
     private fun addCandidature() {
+        Log.d("AddCandidatureActivity", "Attempting to add a new candidature")
         // TODO ici le code pour ajouter une candidaure
         val titreOffre = findViewById<EditText>(R.id.editText_titre_offre).text.toString()
         val nomEntreprise = findViewById<EditText>(R.id.editText_nom_entreprise).text.toString()
@@ -77,11 +79,21 @@ class AddCandidatureActivity : AppCompatActivity() {
         val dateCandidature = findViewById<EditText>(R.id.editText_date_candidature).text.toString()
         val notesCandidature = findViewById<EditText>(R.id.editText_notes).text.toString()
         val lieuPoste = findViewById<EditText>(R.id.editText_lieuPoste).text.toString()
-        val entreprise = EntrepriseManager.getOrCreateEntreprise(nomEntreprise)
+
+        val entreprise = DataRepository(this).getOrCreateEntreprise(nomEntreprise)
+
+        val existingCandidatures = DataRepository(this).loadCandidatures()
+
+        val existing = existingCandidatures.find { it.titre_offre == titreOffre && it.entrepriseId == entreprise.id }
+        if (existing != null) {
+            Toast.makeText(this, "Candidature already exists!", Toast.LENGTH_SHORT).show()
+            Log.d("AddCandidatureActivity", "Candidature already exists: $existing")
+            return
+        }
         val candidature = Candidature(
             id = UUID.randomUUID().toString(),
             titre_offre = titreOffre,
-            entreprise = entreprise,
+            entrepriseId = entreprise.id,
             date_candidature = Date(dateCandidature),
             plateforme = plateformeUtilisee,
             type_poste = typePoste,
@@ -91,7 +103,8 @@ class AddCandidatureActivity : AppCompatActivity() {
         )
 
         val dataRepository = DataRepository(applicationContext)
-        dataRepository.saveCandidature(candidature)
+        DataRepository(this).saveCandidature(candidature)
+        Log.d("AddCandidatureActivity", "Candidature added: $candidature")
         dataRepository.saveEntreprise(entreprise)
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("com.delhomme.jobber.UPDATE_ENTREPRISES"))

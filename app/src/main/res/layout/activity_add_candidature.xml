@@ -44,7 +44,7 @@
         android:id="@+id/editText_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nom de l'entreprise" />
+        android:hint="Notes de la candidature" />
 
     <Button
         android:id="@+id/button_add_candidature"

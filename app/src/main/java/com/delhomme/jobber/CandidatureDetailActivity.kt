@@ -38,12 +38,15 @@ class CandidatureDetailActivity : AppCompatActivity() {
         dataRepository = DataRepository(this)
         candidature = dataRepository.getCandidatureById(candidatureId) ?: return
 
-        findViewById<TextView>(R.id.tvCandidatureInfo).text = "Candidature for ${candidature.titre_offre} at ${candidature.entreprise.nom}"
+        val entrepriseNom = dataRepository.getEntrepriseById(candidature.entrepriseId)?.nom ?: "Unknown"
+
+        findViewById<TextView>(R.id.tvCandidatureInfo).text = "Candidature for ${candidature.titre_offre} at $entrepriseNom"
         findViewById<TextView>(R.id.tvEtatCandidature).text = "Etat : ${candidature.etat.toString()}"
         findViewById<TextView>(R.id.tvNotesCandidature).text = "Notes :\n${candidature.notes.toString()}"
         findViewById<TextView>(R.id.tvLieuPoste).text = "Poste situé à : ${candidature.lieuPoste.toString()}"
         findViewById<TextView>(R.id.tvTypePoste).text = "Poste de type : ${candidature.type_poste}"
         findViewById<TextView>(R.id.tvPlateforme).text = "Candidaté sur : ${candidature.plateforme}"
+
         setupRecyclerView()
         setupAddContactButton()
         setupAddAppelButton()
@@ -57,8 +60,8 @@ class CandidatureDetailActivity : AppCompatActivity() {
     }
 
     private fun setupContactRecyclerView() {
-        val contacts = dataRepository.loadContactsForEntreprise(candidature.entreprise.id)
-        contactAdapter = ContactAdapter(contacts, this::onContactClicked, this::onDeleteContactClicked)
+        val contacts = dataRepository.loadContactsForEntreprise(candidature.entrepriseId)
+        contactAdapter = ContactAdapter(contacts, dataRepository, this::onContactClicked, this::onDeleteContactClicked)
 
         findViewById<RecyclerView>(R.id.recyclerViewContacts).apply {
             layoutManager = LinearLayoutManager(this@CandidatureDetailActivity)
@@ -76,11 +79,11 @@ class CandidatureDetailActivity : AppCompatActivity() {
 
     private fun onDeleteContactClicked(contactId: String) {
         dataRepository.deleteContact(contactId)
-        contactAdapter.updateContacts(dataRepository.loadContactsForEntreprise(candidature.entreprise.id))
+        contactAdapter.updateContacts(dataRepository.loadContactsForEntreprise(candidature.entrepriseId))
     }
     private fun updateContactList() {
         // TODO Mise à jour de la liste des contacts
-        val contacts = dataRepository.loadContactsForEntreprise(candidature.entreprise.id)
+        val contacts = dataRepository.loadContactsForEntreprise(candidature.entrepriseId)
         if (contacts.isNotEmpty()) {
             contactAdapter.updateContacts(contacts)
         } else {
@@ -100,10 +103,16 @@ class CandidatureDetailActivity : AppCompatActivity() {
     }
     private fun onAppelClicked(appel: Appel) {
         Toast.makeText(this, "Appel sélectionné: ${appel.objet}", Toast.LENGTH_LONG).show()
+        updateAppelList()
     }
     private fun onDeleteAppelClicked(appelId: String) {
         dataRepository.deleteAppel(appelId)
+        updateAppelList()
+    }
+
+    private fun updateAppelList() {
         val updatedAppels = dataRepository.loadAppelsForCandidature(candidature.id)
+        Log.d("CandidatureDetailActivity", "Appels of candidature : $updatedAppels")
         appelAdapter.updateAppels(updatedAppels)
     }
 
@@ -146,7 +155,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
         val btnAddContact = findViewById<Button>(R.id.btnAddContact)
         btnAddContact.setOnClickListener {
             val intent = Intent(this, AddContactActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", candidature.entreprise.id)
+                putExtra("ENTREPRISE_ID", candidature.entrepriseId)
             }
             startActivity(intent)
         }
@@ -156,7 +165,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
         val btnAddAppel = findViewById<Button>(R.id.btnAddAppel)
         btnAddAppel.setOnClickListener {
             val intent = Intent(this, AddAppelActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", candidature.entreprise.id)
+                putExtra("ENTREPRISE_ID", candidature.entrepriseId)
                 putExtra("CANDIDATURE_ID", candidature.id)
             }
             startActivity(intent)
@@ -176,6 +185,7 @@ class CandidatureDetailActivity : AppCompatActivity() {
         dataRepository.reloadEntreprises()
         updateEntretienList()
         updateContactList()
+        updateAppelList()
     }
 
 }

@@ -7,7 +7,7 @@ object EntrepriseManager {
 
     fun getOrCreateEntreprise(nom: String): Entreprise {
         return entreprises.find { it.nom == nom } ?: run {
-            val newEntreprise = Entreprise(nom = nom, contacts = mutableListOf())
+            val newEntreprise = Entreprise(nom = nom, contactIds = mutableListOf())
             entreprises.add(newEntreprise)
             newEntreprise
         }

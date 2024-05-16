@@ -8,9 +8,13 @@ data class Contact(
     val prenom: String,
     val email: String,
     val telephone: String,
-    val entreprise: Entreprise,
+    val entrepriseId: String,
+    val appels: MutableList<Appel>? = mutableListOf(),
+    val candidature: MutableList<String>? = mutableListOf(),
 ) {
-    fun getFullName(): String {
-        return "$prenom $nom"
+    fun getFullName(): String = "$prenom $nom"
+    fun getFullNameEntreprise(entreprises: List<Entreprise>): String {
+        val entrepriseNom = entreprises.find { it.id == this.entrepriseId }?.nom ?: "Entreprise inconnue"
+        return "$prenom $nom $entrepriseNom"
     }
 }

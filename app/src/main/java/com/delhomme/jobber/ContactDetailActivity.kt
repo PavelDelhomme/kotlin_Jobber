@@ -36,12 +36,12 @@ class ContactDetailActivity : AppCompatActivity() {
         val contactPhone = findViewById<TextView>(R.id.telephoneContact)
         val contactEntreprise = findViewById<TextView>(R.id.contactEntreprise)
 
-        val contactEntrepriseNom = dataRepository.getEntrepriseById(contact.entreprise.id)
+        val entreprise = contact.entrepriseId?.let { dataRepository.getEntrepriseById(it)}
 
         contactName.text = contact.getFullName()
         contactEmail.text = contact.email
         contactPhone.text = contact.telephone
-        contactEntreprise.text = contactEntrepriseNom?.nom
+        contactEntreprise.text = entreprise?.nom ?: "Unknown"
 
         setTitle("Détails de ${contactName.text}")
 
@@ -100,7 +100,7 @@ class ContactDetailActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
             val intent = Intent(this, AddAppelActivity::class.java).apply {
                 putExtra("CONTACT_ID", contact.id)
-                putExtra("ENTREPRISE_ID", contact.entreprise.id)
+                putExtra("ENTREPRISE_ID", contact.entrepriseId)
             }
             startActivity(intent)
         }

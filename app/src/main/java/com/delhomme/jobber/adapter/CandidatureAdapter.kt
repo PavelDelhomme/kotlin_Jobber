@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import com.delhomme.jobber.models.Candidature
 import java.text.SimpleDateFormat
@@ -13,6 +14,7 @@ import java.util.Locale
 
 class CandidatureAdapter(
     private var candidatures: List<Candidature>,
+    private var dataRepository: DataRepository,
     private val itemClickListener: (Candidature) -> Unit,
     private val deleteClickListener: (String) -> Unit
     ) : RecyclerView.Adapter<CandidatureAdapter.ViewHolder>() {
@@ -25,9 +27,10 @@ class CandidatureAdapter(
         private val etat: TextView = view.findViewById(R.id.etat)
         private val btnDelete: Button = view.findViewById(R.id.btnDeleteCandidature)
 
-        fun bind(candidature: Candidature, clickListener: (Candidature) -> Unit, deleteListener: (String) -> Unit) {
+        fun bind(candidature: Candidature, dataRepository: DataRepository, clickListener: (Candidature) -> Unit, deleteListener: (String) -> Unit) {
+            val entrepriseNom = dataRepository.getEntrepriseById(candidature.entrepriseId)?.nom ?: "Unknown Entreprise"
             nomPoste.text = candidature.titre_offre
-            entreprise.text = candidature.entreprise.nom
+            entreprise.text = entrepriseNom
             date.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(candidature.date_candidature)
             etat.text = candidature.etat
             itemView.setOnClickListener { clickListener(candidature) }
@@ -40,12 +43,12 @@ class CandidatureAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(candidatures[position], itemClickListener, deleteClickListener)
+        holder.bind(candidatures[position],dataRepository, itemClickListener, deleteClickListener)
     }
 
     override fun getItemCount(): Int = candidatures.size
 
-    fun updateList(newList: List<Candidature>) {
+    fun updateCandidatures(newList: List<Candidature>) {
         candidatures = newList
         notifyDataSetChanged()
     }

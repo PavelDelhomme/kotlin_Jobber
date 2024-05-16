@@ -16,7 +16,6 @@ class AppelDetailActivity : AppCompatActivity() {
             getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
         }
         val appelId = intent.getStringExtra("APPEL_ID") ?: return
-
         val dataRepository = DataRepository(this)
         val appel = dataRepository.getAppelById(appelId) ?: return
 
@@ -26,11 +25,11 @@ class AppelDetailActivity : AppCompatActivity() {
         val appelObjet = findViewById<TextView>(R.id.appelObjet)
         val appelNotes = findViewById<TextView>(R.id.appelNotes)
 
-        val appelContactNom = appel.contact_id?.let { dataRepository.getContactById(it) }
-        val appelEntrepriseNom = dataRepository.getEntrepriseById(appel.entreprise_id)
+        val appelContact = appel.contact_id?.let { dataRepository.getContactById(it) }
+        val entreprise = appelContact?.entrepriseId?.let { dataRepository.getEntrepriseById(it)}
 
-        appelNomContact.text = appelContactNom?.getFullName() ?: "No Contact"
-        appelNomEntreprise.text = appelEntrepriseNom?.nom ?: "No Entreprise"
+        appelNomContact.text = appelContact?.getFullName() ?: "No Contact"
+        appelNomEntreprise.text = entreprise?.nom ?: "No Entreprise"
         appelDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(appel.date_appel)
         appelObjet.text = appel.objet
         appelNotes.text = appel.notes

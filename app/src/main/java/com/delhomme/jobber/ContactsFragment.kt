@@ -26,7 +26,7 @@ class ContactsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewContacts)
-        adapter = ContactAdapter(dataRepository.loadContacts(), this::onContactClicked, this::onDeleteContactClicked)
+        adapter = ContactAdapter(dataRepository.loadContacts(), dataRepository, this::onContactClicked, this::onDeleteContactClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 

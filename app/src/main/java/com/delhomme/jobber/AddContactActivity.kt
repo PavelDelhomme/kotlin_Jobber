@@ -51,9 +51,17 @@ class AddContactActivity : AppCompatActivity() {
             val entrepriseNom = autoCompleteTextView.text.toString()
 
             val entreprise = entreprise ?: dataRepository.getOrCreateEntreprise(entrepriseNom)
-            val contact = Contact(nom = nom, prenom = prenom, email = email, telephone = telephone, entreprise = entreprise)
+            val contact = Contact(
+                nom = nom,
+                prenom = prenom,
+                email = email,
+                telephone = telephone,
+                entrepriseId = entreprise.id,
+                appels = mutableListOf()
+            )
 
-            dataRepository.addContactToEntreprise(contact, entreprise.id)
+            dataRepository.addContactToEntreprise(contact.id, entreprise.id)
+            dataRepository.saveEntreprise(entreprise)
             dataRepository.saveContact(contact)
 
             Toast.makeText(this, "Contact added to ${entreprise.nom}", Toast.LENGTH_SHORT).show()

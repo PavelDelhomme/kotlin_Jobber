@@ -26,7 +26,7 @@ class CandidaturesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        adapter = CandidatureAdapter(dataRepository.loadCandidatures(), this::onCandidatureClicked, this::onDeleteCandidatureClicked)
+        adapter = CandidatureAdapter(dataRepository.loadCandidatures(),dataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -44,11 +44,11 @@ class CandidaturesFragment : Fragment() {
 
     private fun onDeleteCandidatureClicked(candidatureId: String) {
         dataRepository.deleteCandidature(candidatureId)
-        adapter.updateList(dataRepository.loadCandidatures())
+        adapter.updateCandidatures(dataRepository.loadCandidatures())
     }
     override fun onResume() {
         super.onResume()
-        adapter.updateList(dataRepository.loadCandidatures())
+        adapter.updateCandidatures(dataRepository.loadCandidatures())
     }
 
 }
