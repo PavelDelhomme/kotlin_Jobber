@@ -1,5 +1,6 @@
 package com.delhomme.jobber.Candidature.model
 
+import com.delhomme.jobber.CandidatureState
 import java.util.Date
 import java.util.UUID
 
@@ -15,5 +16,7 @@ data class Candidature(
     val notes: String,
     val entretiens: MutableList<String> = mutableListOf(),
     val appels: MutableList<String> = mutableListOf(),
-    var relances: MutableList<String> = mutableListOf()
+    var relances: MutableList<String> = mutableListOf(),
+    var state: CandidatureState,
+    val retourPostEntretien: Boolean = false,
 )

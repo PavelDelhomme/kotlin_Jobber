@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.CandidatureState
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
@@ -87,7 +88,8 @@ class AddCandidatureActivity : AppCompatActivity() {
             type_poste = typePoste,
             lieuPoste = lieuPoste,
             etat = "Candidaté et en attente",
-            notes = notesCandidature
+            notes = notesCandidature,
+            state = CandidatureState.CANDIDATEE_ET_EN_ATTENTE
         )
 
         dataRepository.saveCandidature(newCandidature)

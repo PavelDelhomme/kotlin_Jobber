@@ -10,6 +10,7 @@ import com.delhomme.jobber.Entretien.model.Entretien
 import com.delhomme.jobber.Relance.model.Relance
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.util.Calendar
 import java.util.Date
 
 class DataRepository(val context: Context) {
@@ -601,6 +602,47 @@ class DataRepository(val context: Context) {
             putString("entretiens", gson.toJson(entretiens))
             putString("relances", gson.toJson(relances))
         }.apply()
+    }
+
+    fun updateCandidatureState(candidature: Candidature) {
+        val today = Calendar.getInstance().time
+        val candidatedDate = candidature.date_candidature
+        val daysSinceCandidated = (today.time - candidatedDate.time) / (1000 * 60 * 60 * 24)
+
+        // Check si aucun entretiens, appels, ou relances associée avec cette candidature
+        val entretiens = loadEntretiensForCandidature(candidature.id)
+        val appels = loadAppelsForCandidature(candidature.id)
+        val relances = loadRelancesForCandidature(candidature.id)
+
+        val sevenDaysAfterCandidature = Date(candidatedDate.time + 7 * (1000 * 60 * 60 * 24))
+
+        val newState = when {
+            // Candidature est dans les 7 jours suivant la candidature
+            daysSinceCandidated <= 7 -> CandidatureState.CANDIDATEE_ET_EN_ATTENTE
+
+            // Aucun entretien, appel, interaction ou relance dans les 7 derniers jours suivant la candidature
+            entretiens.isEmpty() && appels.isEmpty() && relances.none { it.date_relance <= sevenDaysAfterCandidature } -> CandidatureState.A_RELANCEE
+
+            // Relance ajoutée avant ou après les 7 jours suivant la candidature
+            relances.any { it.date_relance > sevenDaysAfterCandidature } -> CandidatureState.RELANCEE_ET_EN_ATTENTE
+
+            // En attente après entretien si retour post-entretien effectué
+            entretiens.isNotEmpty() && candidature.retourPostEntretien && daysSinceCandidated <= 14 -> CandidatureState.EN_ATTENTE_APRES_ENTRETIEN
+
+            // Aucune réponse après relance
+            relances.isNotEmpty() && daysSinceCandidated > 14 -> CandidatureState.AUCUNE_REPONSE
+
+            // Par défaut
+            else -> CandidatureState.ERREUR
+        }
+
+        candidature.state = newState
+        saveCandidature(candidature)
+    }
+
+    fun checkAndUpdateCandidatureStates() {
+        val candidatures = getCandidatures()
+        candidatures.forEach { updateCandidatureState(it) }
     }
 
 
