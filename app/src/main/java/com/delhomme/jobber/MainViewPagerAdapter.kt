@@ -19,11 +19,10 @@ class MainViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAd
             1 -> FragmentCandidatures()
             2 -> FragmentContacts()
             3 -> FragmentAppels()
-            4 -> FragmentEntreprises()
-            5 -> FragmentEntretiens()
+            4 -> FragmentEntretiens()
+            5 -> FragmentEntreprises()
             6 -> FragmentRelances()
             else -> Fragment()
         }
     }
 }
-

@@ -13,17 +13,21 @@
         android:label="@string/menu_home"
         tools:layout="@layout/activity_calendrier" />
     <activity
-        android:id="@+id/nav_candidatures_list"
+        android:id="@+id/nav_candidatures"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_candidatures" />
     <activity
-        android:id="@+id/nav_contact_list"
+        android:id="@+id/nav_contacts"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_contacts" />
     <activity
-        android:id="@+id/nav_entreprises_list"
+        android:id="@+id/nav_entreprises"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_entreprises" />
+    <activity
+        android:id="@+id/nav_entretiens"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_entretiens" />
     <activity
         android:id="@+id/nav_dashboard"
         android:label="@string/menu_home"

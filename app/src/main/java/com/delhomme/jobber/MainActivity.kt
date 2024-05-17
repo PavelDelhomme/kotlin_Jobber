@@ -12,25 +12,34 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.viewpager2.widget.ViewPager2
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import com.delhomme.jobber.Appel.AddAppelActivity
+import com.delhomme.jobber.Appel.FragmentAppels
 import com.delhomme.jobber.Candidature.AddCandidatureActivity
+import com.delhomme.jobber.Candidature.FragmentCandidatures
 import com.delhomme.jobber.Contact.AddContactActivity
+import com.delhomme.jobber.Contact.FragmentContacts
+import com.delhomme.jobber.Entreprise.FragmentEntreprises
 import com.delhomme.jobber.Entretien.AddEntretienActivity
+import com.delhomme.jobber.Entretien.FragmentEntretiens
+import com.delhomme.jobber.Relance.FragmentRelances
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.navigation.NavigationView
 import java.util.Calendar
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val REQUEST_NOTIFICATION_PERMISSION = 1001
 
-    private lateinit var viewPager: ViewPager2
-    private lateinit var tabLayout: TabLayout
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navView: NavigationView
+    private lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,26 +52,26 @@ class MainActivity : AppCompatActivity() {
             configureNotificationAlarm()
         }
 
-        tabLayout = findViewById(R.id.tabLayout)
-        viewPager = findViewById(R.id.viewPager)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-        // Configuration du ViewPager avec un adapter personnalisé
-        val viewPagerAdapter = MainViewPagerAdapter(this)
-        viewPager.adapter = viewPagerAdapter
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navView = findViewById(R.id.nav_view)
+        navView.setNavigationItemSelectedListener(this)
 
-        // Relier le TabLayout au ViewPager
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = when (position) {
-                0 -> "Dashboard"
-                1 -> "Candidatures"
-                2 -> "Contacts"
-                3 -> "Appels"
-                4 -> "Entreprises"
-                5 -> "Entretiens"
-                6 -> "Relances"
-                else -> "Autres"
-            }
-        }.attach()
+        toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+
+        // Chargez le fragment initial (par exemple, le Dashboard)
+        if (savedInstanceState == null) {
+            replaceFragment(FragmentDashboard())
+        }
 
         // Configuration du Floating Action Button
         val fabMenuJobber = findViewById<FloatingActionButton>(R.id.fabMenuJobber)
@@ -134,22 +143,46 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 configureNotificationAlarm()
-            } else {
-                // Permission denied, handle accordingly
             }
         }
     }
 
-    private fun reloadFragment(index: Int) {
-        // Cette méthode permet de rafraîchir le ViewPager.
-        viewPager.setCurrentItem(index, false)
-        // (supportFragmentManager.findFragmentByTag("f$index") as? ContactListFragment)?.loadContacts()
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_dashboard -> {
+                replaceFragment(FragmentDashboard())
+            }
+            R.id.nav_candidatures -> {
+                replaceFragment(FragmentCandidatures())
+            }
+            R.id.nav_contact_list -> {
+                replaceFragment(FragmentContacts())
+            }
+            R.id.nav_appel_list -> {
+                replaceFragment(FragmentAppels())
+            }
+            R.id.nav_relances -> {
+                replaceFragment(FragmentRelances())
+            }
+            R.id.nav_entretiens -> {
+                replaceFragment(FragmentEntretiens())
+            }
+            R.id.nav_entreprises -> {
+                replaceFragment(FragmentEntreprises())
+            }
+        }
+        drawerLayout.closeDrawer(navView)
+        return true
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
+        drawerLayout.openDrawer(navView)
         return true
     }
 }
