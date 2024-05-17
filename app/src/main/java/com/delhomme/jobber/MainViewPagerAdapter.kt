@@ -11,7 +11,7 @@ import com.delhomme.jobber.Entretien.FragmentEntretiens
 import com.delhomme.jobber.Relance.FragmentRelances
 
 class MainViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
-    override fun getItemCount(): Int = 7
+    override fun getItemCount(): Int = 8
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
@@ -22,6 +22,7 @@ class MainViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAd
             4 -> FragmentEntretiens()
             5 -> FragmentEntreprises()
             6 -> FragmentRelances()
+            7 -> FragmentCalendrier()
             else -> Fragment()
         }
     }

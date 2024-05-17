@@ -32,5 +32,9 @@
         android:id="@+id/nav_dashboard"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_dashboard" />
+    <activity
+        android:id="@+id/nav_calendrier"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_calendrier" />
 
 </navigation>

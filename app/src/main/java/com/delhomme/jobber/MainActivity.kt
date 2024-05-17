@@ -170,6 +170,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_entreprises -> {
                 replaceFragment(FragmentEntreprises())
             }
+            R.id.nav_calendrier -> {
+                replaceFragment(FragmentCalendrier())
+            }
         }
         drawerLayout.closeDrawer(navView)
         return true
