@@ -151,7 +151,7 @@ class AddAppelActivity : AppCompatActivity() {
 
             if (candidatureId != null) {
                 val candidature = DataRepository(applicationContext).getCandidatureById(candidatureId)
-                candidature?.appelsIds?.add(appel.id)
+                candidature?.appels?.add(appel.id)
                 DataRepository(applicationContext).saveCandidature(candidature!!)
             }
             if (contactId != null) {

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="8dp">
 
@@ -35,14 +36,17 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="#FF5722"/>
-
-    <Button
+    <ImageButton
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:layout_gravity="end" />
+    <ImageButton
         android:id="@+id/btnDeleteCandidature"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Supprimer"
-        android:layout_gravity="end"
-        android:textColor="#FFFFFF"
-        android:background="@color/design_default_color_error"/>
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="@color/design_default_color_error"
+        android:layout_gravity="end" />
 
 </LinearLayout>

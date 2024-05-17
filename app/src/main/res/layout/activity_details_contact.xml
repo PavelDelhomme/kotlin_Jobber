@@ -59,6 +59,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="8dp" />
 
+        <ImageButton
+            android:id="@+id/btnEditContact"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewAppels"
             android:layout_width="0dp"
@@ -78,15 +88,5 @@
             app:layout_constraintTop_toBottomOf="@id/recyclerViewAppels"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
-
-        <Button
-            android:id="@+id/btnEditContact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Modifier Contact"
-            app:layout_constraintTop_toBottomOf="@id/btnAddAppel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

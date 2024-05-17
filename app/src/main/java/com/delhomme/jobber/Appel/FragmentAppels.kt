@@ -9,10 +9,10 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.R
 import com.delhomme.jobber.Appel.adapter.AppelAdapter
 import com.delhomme.jobber.Appel.model.Appel
+import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.R
 
 class FragmentAppels : Fragment() {
     private lateinit var adapter: AppelAdapter
@@ -28,7 +28,7 @@ class FragmentAppels : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvAppels)
-        adapter = AppelAdapter(dataRepository.loadAppels(), this::onAppelClicked, this::onDeleteAppelClicked)
+        adapter = AppelAdapter(dataRepository.loadAppels(),dataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -47,6 +47,13 @@ class FragmentAppels : Fragment() {
     private fun onDeleteAppelClicked(appelId: String) {
         dataRepository.deleteAppel(appelId)
         adapter.updateAppels(dataRepository.loadAppels())
+    }
+
+    private fun onEditAppelClicked(appelId: String) {
+        val intent = Intent(activity, EditAppelActivity::class.java).apply {
+            putExtra("APPEL_ID", appelId)
+        }
+        startActivity(intent)
     }
 
     override fun onResume() {

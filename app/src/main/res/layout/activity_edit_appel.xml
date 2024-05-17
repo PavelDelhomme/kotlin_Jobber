@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".Appel.EditAppelActivity">
+
+    <EditText
+        android:id="@+id/editTextDateAppelEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Date de l'appel"
+        android:focusable="false"
+        android:drawableRight="@android:drawable/ic_menu_today"
+        android:inputType="date" />
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewEntrepriseAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Entreprise"
+        android:inputType="text"
+        android:enabled="false" />
+
+    <Spinner
+        android:id="@+id/spinnerContactAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/editTextObjetAppelEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Objet de l'appel" />
+
+    <EditText
+        android:id="@+id/editTextNotesAppelEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Notes sur l'appel" />
+
+    <Button
+        android:id="@+id/btnSaveAppelEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sauvegarder les modifications" />
+</LinearLayout>

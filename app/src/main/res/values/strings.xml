@@ -135,4 +135,7 @@
     </string>
     <string name="candidature_details_liste_entretiens">Entretiens de la candidatures</string>
     <string name="candidature_details_liste_relances">Relance liée à la candidature</string>
+    <string name="plateforme_prompt">Plateforme utilisée</string>
+    <string name="contact_prompt">Contact de la relance</string>
+    <string name="entreprise_prompt">Entreprise de la relance</string>
 </resources>

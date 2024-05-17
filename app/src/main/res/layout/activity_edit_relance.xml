@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Relance.EditRelanceActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/etDateRelance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date de la relance"
+            android:focusable="false"
+            android:drawableRight="@android:drawable/ic_menu_today"
+            android:onClick="showDatePickerDialog"
+            android:inputType="date" />
+
+        <Spinner
+            android:id="@+id/spinner_plateforme_relance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/plateforme_prompt" />
+
+        <Spinner
+            android:id="@+id/spinner_contact_relance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/contact_prompt" />
+
+        <AutoCompleteTextView
+            android:id="@+id/actvEntrepriseRelance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/entreprise_prompt"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/editText_notes_relance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Notes sur la relance"
+            android:inputType="textMultiLine"
+            android:minHeight="100dp" />
+
+        <Button
+            android:id="@+id/button_save_relance_changes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enregistrer les modifications" />
+
+    </LinearLayout>
+</ScrollView>

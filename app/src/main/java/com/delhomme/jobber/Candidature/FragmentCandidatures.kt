@@ -9,10 +9,10 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.R
 import com.delhomme.jobber.Candidature.adapter.CandidatureAdapter
 import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.R
 
 class FragmentCandidatures : Fragment() {
     private lateinit var adapter: CandidatureAdapter
@@ -28,7 +28,7 @@ class FragmentCandidatures : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        adapter = CandidatureAdapter(dataRepository.loadCandidatures(),dataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked)
+        adapter = CandidatureAdapter(dataRepository.loadCandidatures(),dataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked, this::onEditCandidatureClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -47,6 +47,13 @@ class FragmentCandidatures : Fragment() {
     private fun onDeleteCandidatureClicked(candidatureId: String) {
         dataRepository.deleteCandidature(candidatureId)
         adapter.updateCandidatures(dataRepository.loadCandidatures())
+    }
+
+    private fun onEditCandidatureClicked(candidatureId: String) {
+        val intent = Intent(activity, EditCandidatureActivity::class.java).apply {
+            putExtra("CANDIDATURE_ID", candidatureId)
+        }
+        startActivity(intent)
     }
     override fun onResume() {
         super.onResume()

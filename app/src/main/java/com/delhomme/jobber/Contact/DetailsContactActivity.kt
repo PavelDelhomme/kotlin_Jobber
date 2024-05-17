@@ -11,11 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Appel.AddAppelActivity
 import com.delhomme.jobber.Appel.DetailsAppelActivity
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.R
+import com.delhomme.jobber.Appel.EditAppelActivity
 import com.delhomme.jobber.Appel.adapter.AppelAdapter
 import com.delhomme.jobber.Appel.model.Appel
 import com.delhomme.jobber.Contact.model.Contact
+import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.R
 
 class DetailsContactActivity : AppCompatActivity() {
     private lateinit var dataRepository: DataRepository
@@ -58,7 +59,7 @@ class DetailsContactActivity : AppCompatActivity() {
     }
     private fun setupAppelRecyclerView() {
         val appels = dataRepository.loadAppelsForContact(contact.id)
-        appelAdapter = AppelAdapter(appels, this::onAppelClicked, this::onDeleteAppelClicked)
+        appelAdapter = AppelAdapter(appels, dataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
 
         findViewById<RecyclerView>(R.id.recyclerViewAppels).apply {
             layoutManager = LinearLayoutManager(this@DetailsContactActivity)
@@ -76,6 +77,16 @@ class DetailsContactActivity : AppCompatActivity() {
 
     private fun onDeleteAppelClicked(appelId: String) {
         dataRepository.deleteAppel(appelId)
+        updateAppelList()
+    }
+
+    private fun onEditAppelClicked(appelId: String) {
+        val intent = Intent(this, EditAppelActivity::class.java).apply {
+            putExtra("APPEL_ID", appelId)
+            putExtra("ENTREPRISE_ID", contact.entrepriseId)
+            putExtra("CONTACT_ID", contact.id)
+        }
+        startActivity(intent)
         updateAppelList()
     }
 

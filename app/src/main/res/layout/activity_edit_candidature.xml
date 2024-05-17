@@ -16,6 +16,21 @@
             android:layout_height="wrap_content"
             android:hint="Titre de l'offre"
             android:inputType="text"/>
+        <EditText
+            android:id="@+id/etDateCandidature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date de candidature"
+            android:focusable="false"
+            android:drawableRight="@android:drawable/ic_menu_today"
+            />
+
+        <AutoCompleteTextView
+            android:id="@+id/actvNomEntreprise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nom de l'entreprise"
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/etEtat"
@@ -31,19 +46,14 @@
             android:hint="Notes"
             android:inputType="textMultiLine"/>
 
-        <EditText
-            android:id="@+id/etPlateforme"
+        <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Plateforme de candidature"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/etTypePoste"
+            android:id="@+id/spinner_type_poste" />
+        <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Type de poste"
-            android:inputType="text"/>
+            android:id="@+id/spinner_plateforme" />
 
         <EditText
             android:id="@+id/etLieuPoste"

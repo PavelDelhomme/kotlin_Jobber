@@ -9,10 +9,11 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.R
 import com.delhomme.jobber.Contact.adapter.ContactAdapter
 import com.delhomme.jobber.Contact.model.Contact
+import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.R
+import com.delhomme.jobber.contact.EditContactActivity
 
 class FragmentContacts : Fragment() {
     private lateinit var adapter: ContactAdapter
@@ -28,7 +29,7 @@ class FragmentContacts : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewContacts)
-        adapter = ContactAdapter(dataRepository.loadContacts(), dataRepository, this::onContactClicked, this::onDeleteContactClicked)
+        adapter = ContactAdapter(dataRepository.loadContacts(), dataRepository, this::onContactClicked, this::onDeleteContactClicked, this::onEditContactClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -51,6 +52,13 @@ class FragmentContacts : Fragment() {
     private fun onDeleteContactClicked(contactId: String) {
         dataRepository.deleteContact(contactId)
         adapter.updateContacts(dataRepository.loadContacts())
+    }
+
+    private fun onEditContactClicked(contactId: String) {
+        val intent = Intent(activity, EditContactActivity::class.java).apply {
+            putExtra("CONTACT_ID", contactId)
+        }
+        startActivity(intent)
     }
 
     override fun onResume() {

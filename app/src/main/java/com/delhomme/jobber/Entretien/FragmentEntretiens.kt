@@ -10,9 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.R
 import com.delhomme.jobber.Entretien.adapter.EntretienAdapter
 import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.R
 
 class FragmentEntretiens : Fragment() {
     private lateinit var adapter: EntretienAdapter
@@ -26,7 +26,7 @@ class FragmentEntretiens : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewEntretiens)
-        adapter = EntretienAdapter(dataRepository.loadEntretiens(), dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked)
+        adapter = EntretienAdapter(dataRepository.loadEntretiens(), dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -45,6 +45,13 @@ class FragmentEntretiens : Fragment() {
     private fun onDeleteEntretienClicked(entretienId: String) {
         dataRepository.deleteEntretien(entretienId)
         adapter.updateEntretiens(dataRepository.loadEntretiens())
+    }
+
+    private fun onEditEntretienClicked(entretienId: String) {
+        val intent = Intent(activity, EditEntretienActivity::class.java).apply {
+            putExtra("ENTRETIEN_ID", entretienId)
+        }
+        startActivity(intent)
     }
 
     override fun onResume() {

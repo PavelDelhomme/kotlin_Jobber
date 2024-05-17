@@ -7,15 +7,16 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Contact.model.Contact
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
-import com.delhomme.jobber.Contact.model.Contact
 
 
 class ContactAdapter(private var contacts: List<Contact>,
                      private val dataRepository: DataRepository,
                      private val itemClickListener: (Contact) -> Unit,
-                     private val deleteClickListener: (String) -> Unit
+                     private val deleteClickListener: (String) -> Unit,
+                     private val editClickListener: (String) -> Unit
                      ) : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -24,13 +25,16 @@ class ContactAdapter(private var contacts: List<Contact>,
         val telephone: TextView = view.findViewById(R.id.telephoneContact)
         val email: TextView = view.findViewById(R.id.emailContact)
         val btnDelete: Button = view.findViewById(R.id.btnDeleteContact)
-        fun bind(contact: Contact, dataRepository: DataRepository, clickListener: (Contact) -> Unit, deleteListener: (String) -> Unit) {
+        val btnEdit: Button = view.findViewById(R.id.btnEditContact)
+
+        fun bind(contact: Contact, dataRepository: DataRepository, clickListener: (Contact) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
             val entrepriseName = dataRepository.getEntrepriseById(contact.entrepriseId)?.nom ?: "Entreprise inconnue"
             fullNameContact.text = contact.getFullName()
             entreprise.text = entrepriseName
             telephone.text = contact.telephone
             email.text = contact.email
             itemView.setOnClickListener { clickListener(contact) }
+            btnEdit.setOnClickListener { editListener(contact.id) }
             btnDelete.setOnClickListener { deleteListener(contact.id) }
         }
     }
@@ -42,7 +46,7 @@ class ContactAdapter(private var contacts: List<Contact>,
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(contacts[position], dataRepository, itemClickListener, deleteClickListener)
+        holder.bind(contacts[position], dataRepository, itemClickListener, deleteClickListener, editClickListener)
     }
 
     override fun getItemCount() = contacts.size
