@@ -18,19 +18,21 @@ class AppelAdapter(
     private val itemClickListener: (Appel) -> Unit,
     private val deleteClickListener: (String) -> Unit,
     private val editClickListener: (String) -> Unit
-    ) : RecyclerView.Adapter<AppelAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<AppelAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val textViewDate: TextView = view.findViewById(R.id.tvDateAppel)
         private val textViewObjet: TextView = view.findViewById(R.id.tvObjetAppel)
+        private val textViewContact: TextView = view.findViewById(R.id.tvContactAppel)
         private val textViewNotes: TextView = view.findViewById(R.id.tvNotesAppels)
         private val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteAppel)
         private val btnEdit: ImageButton = view.findViewById(R.id.btnEditAppel)
 
         fun bind(appel: Appel, dataRepository: DataRepository, clickListener: (Appel) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
-            val entrepriseName = dataRepository.getEntrepriseById(appel.entreprise_id)?.nom ?: "Entreprise inconnue"
+            val contactName = appel.contact_id?.let { dataRepository.getContactById(it)?.getFullName() } ?: "No Contact"
             textViewDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(appel.date_appel)
             textViewObjet.text = appel.objet
+            textViewContact.text = contactName
             textViewNotes.text = appel.notes
             itemView.setOnClickListener { clickListener(appel) }
             btnEdit.setOnClickListener { editListener(appel.id) }
@@ -46,7 +48,6 @@ class AppelAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(appels[position], dataRepository, itemClickListener, deleteClickListener, editClickListener)
     }
-
 
     override fun getItemCount() = appels.size
 

@@ -29,7 +29,7 @@ class RelanceAdapter(
         private val btnEdit: ImageButton = view.findViewById(R.id.btnEditRelance)
 
         fun bind(relance: Relance, dataRepository: DataRepository, clickListener: (Relance) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
-            val entrepriseName = dataRepository.getEntrepriseById(relance.entrepriseId)?.nom ?: "Entreprise inconnue"
+            val entrepriseName = dataRepository.getEntrepriseByNom(relance.entrepriseNom)?.nom ?: "Entreprise inconnue"
             val candidature = dataRepository.getCandidatureById(relance.candidatureId)?.titre_offre ?: "Offre inconnue"
             dateRelance.text = SimpleDateFormat("dd/MM/yyyyy", Locale.getDefault()).format(relance.date_relance)
             entreprise.text = entrepriseName

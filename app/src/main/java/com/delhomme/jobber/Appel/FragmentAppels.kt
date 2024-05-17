@@ -28,7 +28,7 @@ class FragmentAppels : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvAppels)
-        adapter = AppelAdapter(dataRepository.loadAppels(),dataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
+        adapter = AppelAdapter(dataRepository.getAppels(),dataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -46,7 +46,7 @@ class FragmentAppels : Fragment() {
 
     private fun onDeleteAppelClicked(appelId: String) {
         dataRepository.deleteAppel(appelId)
-        adapter.updateAppels(dataRepository.loadAppels())
+        adapter.updateAppels(dataRepository.getAppels())
     }
 
     private fun onEditAppelClicked(appelId: String) {
@@ -58,6 +58,6 @@ class FragmentAppels : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        adapter.updateAppels(dataRepository.loadAppels())
+        adapter.updateAppels(dataRepository.getAppels())
     }
 }

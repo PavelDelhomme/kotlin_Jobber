@@ -6,17 +6,17 @@
     android:padding="16dp">
 
     <EditText
-        android:id="@+id/etContactFirstName"
+        android:id="@+id/etContactPrenom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="First Name"
+        android:hint="Prénom"
         android:inputType="textPersonName" />
 
     <EditText
-        android:id="@+id/etContactLastName"
+        android:id="@+id/etContactNom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Last Name"
+        android:hint="Nom"
         android:inputType="textPersonName" />
 
     <EditText
@@ -30,8 +30,15 @@
         android:id="@+id/etContactPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Phone"
+        android:hint="Téléphone"
         android:inputType="phone" />
+
+    <AutoCompleteTextView
+        android:id="@+id/actvNomEntreprise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom de l'entreprise"
+        android:inputType="text" />
 
     <Button
         android:id="@+id/btnSaveContactChanges"

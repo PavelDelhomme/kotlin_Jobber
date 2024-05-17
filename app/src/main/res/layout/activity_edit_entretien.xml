@@ -1,9 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".Entretien.EditEntretienActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <EditText
+        android:id="@+id/dateEntretien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:hint="Date de l'entretien"
+        android:drawableRight="@android:drawable/ic_menu_today" />
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewEntretien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom de l'entreprise"
+        android:inputType="text"/>
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewContact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom du contact"
+        android:inputType="text"/>
+
+    <Spinner
+        android:id="@+id/spinner_type_entretien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Spinner
+        android:id="@+id/spinner_mode_entretien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/etNotesEntretien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Notes pré-entretien" />
+
+    <Button
+        android:id="@+id/button_save_entretien_changes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sauvegarder"
+        android:layout_gravity="center_horizontal" />
+</LinearLayout>

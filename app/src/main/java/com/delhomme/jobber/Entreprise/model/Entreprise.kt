@@ -1,9 +1,6 @@
 package com.delhomme.jobber.Entreprise.model
 
-import java.util.UUID
-
 data class Entreprise(
-    val id: String = UUID.randomUUID().toString(),
     val nom: String,
     var contactIds: MutableList<String> = mutableListOf(),
     var relanceIds: MutableList<String> = mutableListOf(),

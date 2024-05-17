@@ -3,9 +3,7 @@ package com.delhomme.jobber.Candidature.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.ImageButton
-import android.widget.Spinner
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Candidature.model.Candidature
@@ -28,29 +26,23 @@ class CandidatureAdapter(
         private val entreprise: TextView = view.findViewById(R.id.entreprise)
         private val date: TextView = view.findViewById(R.id.date)
         private val etat: TextView = view.findViewById(R.id.etat)
-        private val spinnertypePoste: Spinner = view.findViewById(R.id.spinner_type_poste)
-        private val spinnerplateforme: Spinner = view.findViewById(R.id.spinner_plateforme)
+        private val typePoste: TextView = view.findViewById(R.id.typePoste)
+        private val plateforme: TextView = view.findViewById(R.id.plateforme)
         private val notes: TextView = view.findViewById(R.id.tvNotesCandidature)
         private val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteCandidature)
         private val btnEdit: ImageButton = view.findViewById(R.id.btnEditCandidature)
 
         fun bind(candidature: Candidature, dataRepository: DataRepository, clickListener: (Candidature) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
-            val entrepriseNom = dataRepository.getEntrepriseById(candidature.entrepriseId)?.nom ?: "Unknown Entreprise"
-
-            val context = itemView.context
-            val typePosteAdapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, dataRepository.getTypePosteOptions())
-            spinnertypePoste.adapter = typePosteAdapter
-            spinnertypePoste.setSelection(typePosteAdapter.getPosition(candidature.type_poste))
-
-            val plateformeAdapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, dataRepository.getPlateformeOptions())
-            spinnerplateforme.adapter = plateformeAdapter
-            spinnertypePoste.setSelection(plateformeAdapter.getPosition(candidature.plateforme))
+            val entrepriseNom = dataRepository.getEntrepriseByNom(candidature.entrepriseNom)?.nom ?: "Unknown Entreprise"
 
             nomPoste.text = candidature.titre_offre
             entreprise.text = entrepriseNom
             date.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(candidature.date_candidature)
             etat.text = candidature.etat
-            //notes.text = candidature.notes
+            typePoste.text = candidature.type_poste
+            plateforme.text = candidature.plateforme
+            notes.text = candidature.notes
+
             itemView.setOnClickListener { clickListener(candidature) }
             btnEdit.setOnClickListener { editListener(candidature.id) }
             btnDelete.setOnClickListener { deleteListener(candidature.id) }

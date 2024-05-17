@@ -1,6 +1,8 @@
 package com.delhomme.jobber.Candidature
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
@@ -9,6 +11,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
@@ -19,12 +22,15 @@ import java.util.UUID
 
 class AddCandidatureActivity : AppCompatActivity() {
     private lateinit var dataRepository: DataRepository
+    private lateinit var etDateCandidature: EditText
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_candidature)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         dataRepository = DataRepository(applicationContext)
+        etDateCandidature = findViewById(R.id.editText_date_candidature)
         setupSpinners()
         setupDatePicker()
 
@@ -34,22 +40,6 @@ class AddCandidatureActivity : AppCompatActivity() {
     }
 
     private fun setupSpinners() {
-        /*
-        val typePosteAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.type_poste_options,
-            android.R.layout.simple_spinner_item
-        )
-        typePosteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        findViewById<Spinner>(R.id.spinner_type_poste).adapter = typePosteAdapter
-
-        val plateformeAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.plateforme_options,
-            android.R.layout.simple_spinner_item
-        )
-        plateformeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        findViewById<Spinner>(R.id.spinner_plateforme).adapter = plateformeAdapter*/
         val typePosteAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, dataRepository.getTypePosteOptions())
         findViewById<Spinner>(R.id.spinner_type_poste).adapter = typePosteAdapter
 
@@ -58,43 +48,40 @@ class AddCandidatureActivity : AppCompatActivity() {
     }
 
     private fun setupDatePicker() {
-        val editTextDate = findViewById<EditText>(R.id.editText_date_candidature)
-        editTextDate.setOnClickListener {
+        etDateCandidature.setOnClickListener {
             val now = Calendar.getInstance()
-            val datePicker = DatePickerDialog(this, { _, year, month, day ->
-                val selectedDate = Calendar.getInstance()
-                selectedDate.set(year, month, day)
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                editTextDate.setText(dateFormat.format(selectedDate.time))
-            }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
-
-            datePicker.show()
+            DatePickerDialog(this, { _, year, month, day ->
+                TimePickerDialog(this, { _, hour, minute ->
+                    val selectedDate = Calendar.getInstance()
+                    selectedDate.set(year, month, day, hour, minute)
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    etDateCandidature.setText(dateFormat.format(selectedDate.time))
+                }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
+            }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
         }
     }
 
     private fun addCandidature() {
         Log.d("AddCandidatureActivity", "Attempting to add a new candidature")
-        // TODO ici le code pour ajouter une candidaure
         val titreOffre = findViewById<EditText>(R.id.editText_titre_offre).text.toString()
         val nomEntreprise = findViewById<EditText>(R.id.editText_nom_entreprise).text.toString()
         val plateformeUtilisee = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()
         val typePoste = findViewById<Spinner>(R.id.spinner_type_poste).selectedItem.toString()
-        val dateCandidature = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(findViewById<EditText>(R.id.editText_date_candidature).text.toString())!!
+        val dateCandidature = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).parse(etDateCandidature.text.toString())!!
         val notesCandidature = findViewById<EditText>(R.id.editText_notes).text.toString()
         val lieuPoste = findViewById<EditText>(R.id.editText_lieuPoste).text.toString()
 
         val entreprise = DataRepository(this).getOrCreateEntreprise(nomEntreprise)
 
-        // Vérification de l'existence de la candidature
-        if (dataRepository.getCandidatures().any { it.titre_offre == titreOffre && it.entrepriseId == entreprise.id }) {
+        if (dataRepository.getCandidatures().any { it.titre_offre == titreOffre && it.entrepriseNom == entreprise.nom }) {
             Toast.makeText(this, "Cette candidature existe déjà !", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val newcandidature = Candidature(
+        val newCandidature = Candidature(
             id = UUID.randomUUID().toString(),
             titre_offre = titreOffre,
-            entrepriseId = entreprise.id,
+            entrepriseNom = entreprise.nom,
             date_candidature = dateCandidature,
             plateforme = plateformeUtilisee,
             type_poste = typePoste,
@@ -103,9 +90,15 @@ class AddCandidatureActivity : AppCompatActivity() {
             notes = notesCandidature
         )
 
-        dataRepository.saveCandidature(newcandidature)
-        //LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("com.delhomme.jobber.UPDATE_ENTREPRISES"))
+        dataRepository.saveCandidature(newCandidature)
         Toast.makeText(this, "Candidature ajoutée avec succès", Toast.LENGTH_SHORT).show()
+
+        notifyCandidatureListUpdated()
         finish()
+    }
+
+    private fun notifyCandidatureListUpdated() {
+        val intent = Intent("com.delhomme.jobber.CANDIDATURE_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 }

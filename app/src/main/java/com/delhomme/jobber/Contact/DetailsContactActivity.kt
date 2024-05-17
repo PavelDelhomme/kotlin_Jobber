@@ -36,19 +36,19 @@ class DetailsContactActivity : AppCompatActivity() {
 
         contact = dataRepository.getContactById(contactId) ?: return
 
-        val contactName = findViewById<TextView>(R.id.contactName)
+        val contactNomComplet = findViewById<TextView>(R.id.contactNomComplet)
         val contactEmail = findViewById<TextView>(R.id.emailContact)
         val contactPhone = findViewById<TextView>(R.id.telephoneContact)
         val contactEntreprise = findViewById<TextView>(R.id.contactEntreprise)
 
-        val entreprise = contact.entrepriseId?.let { dataRepository.getEntrepriseById(it)}
+        val entreprise = contact.entrepriseNom?.let { dataRepository.getEntrepriseByNom(it)}
 
-        contactName.text = contact.getFullName()
+        contactNomComplet.text = contact.getFullName()
         contactEmail.text = contact.email
         contactPhone.text = contact.telephone
         contactEntreprise.text = entreprise?.nom ?: "Unknown"
 
-        setTitle("Détails de ${contactName.text}")
+        setTitle("Détails de ${contactNomComplet.text}")
 
         setupRecyclerView()
         setupAddAppelButton()
@@ -83,7 +83,7 @@ class DetailsContactActivity : AppCompatActivity() {
     private fun onEditAppelClicked(appelId: String) {
         val intent = Intent(this, EditAppelActivity::class.java).apply {
             putExtra("APPEL_ID", appelId)
-            putExtra("ENTREPRISE_ID", contact.entrepriseId)
+            putExtra("ENTREPRISE_ID", contact.entrepriseNom)
             putExtra("CONTACT_ID", contact.id)
         }
         startActivity(intent)
@@ -115,7 +115,7 @@ class DetailsContactActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
             val intent = Intent(this, AddAppelActivity::class.java).apply {
                 putExtra("CONTACT_ID", contact.id)
-                putExtra("ENTREPRISE_ID", contact.entrepriseId)
+                putExtra("ENTREPRISE_ID", contact.entrepriseNom)
             }
             startActivity(intent)
         }

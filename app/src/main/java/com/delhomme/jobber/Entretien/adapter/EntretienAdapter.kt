@@ -31,8 +31,8 @@ class EntretienAdapter(
         private val btnEdit: ImageButton = view.findViewById(R.id.btnEditAppel)
 
         fun bind(entretien: Entretien, dataRepository: DataRepository, clickListener: (Entretien) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
-            val entrepriseName = dataRepository.getEntrepriseById(entretien.entreprise_id)?.nom ?: "Entreprise inconnue"
-            val candidature = dataRepository.getCandidatureById(entretien.entreprise_id)?.titre_offre ?: "Offre inconnue"
+            val entrepriseName = dataRepository.getEntrepriseByNom(entretien.entrepriseNom)?.nom ?: "Entreprise inconnue"
+            val candidature = dataRepository.getCandidatureById(entretien.candidature_id)?.titre_offre ?: "Offre inconnue"
             val contact = dataRepository.getContactById(entretien.contact_id)?.getFullName() ?: "Aucun contact pour cet entretien"
             dateEntretien.text = SimpleDateFormat("dd/MM/yyyyy", Locale.getDefault()).format(entretien.date_entretien)
             typeEntretien.text = entretien.type

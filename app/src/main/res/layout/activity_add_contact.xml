@@ -9,16 +9,16 @@
     tools:context=".Contact.AddContactActivity">
 
     <EditText
-        android:id="@+id/etContactName"
+        android:id="@+id/etContactPrenom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Contact Name" />
+        android:hint="Prénom" />
 
     <EditText
-        android:id="@+id/etContactSurname"
+        android:id="@+id/etContactNom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Contact Surname" />
+        android:hint="Nom de famille" />
 
     <EditText
         android:id="@+id/etContactEmail"

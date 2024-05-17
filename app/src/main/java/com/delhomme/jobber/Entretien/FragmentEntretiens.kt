@@ -1,12 +1,16 @@
 package com.delhomme.jobber.Entretien
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.DataRepository
@@ -17,7 +21,7 @@ import com.delhomme.jobber.R
 class FragmentEntretiens : Fragment() {
     private lateinit var adapter: EntretienAdapter
     private val dataRepository by lazy { DataRepository(requireContext()) }
-
+    private lateinit var broadcastReceiver: BroadcastReceiver
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_entretiens, container, false)
@@ -26,13 +30,22 @@ class FragmentEntretiens : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewEntretiens)
-        adapter = EntretienAdapter(dataRepository.loadEntretiens(), dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
+        adapter = EntretienAdapter(dataRepository.getEntretiens(), dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         view.findViewById<Button>(R.id.btnAddEntretien).setOnClickListener {
             startActivity(Intent(activity, AddEntretienActivity::class.java))
         }
+
+        broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                adapter.updateEntretiens(dataRepository.getEntretiens())
+            }
+        }
+
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(broadcastReceiver, IntentFilter("ENTRETIENS_UPDATED"))
     }
 
     private fun onEntretienClicked(entretien: Entretien) {
@@ -44,7 +57,8 @@ class FragmentEntretiens : Fragment() {
 
     private fun onDeleteEntretienClicked(entretienId: String) {
         dataRepository.deleteEntretien(entretienId)
-        adapter.updateEntretiens(dataRepository.loadEntretiens())
+        LocalBroadcastManager.getInstance(requireContext())
+            .sendBroadcast(Intent("ENTRETIENS_UPDATED"))
     }
 
     private fun onEditEntretienClicked(entretienId: String) {
@@ -56,6 +70,12 @@ class FragmentEntretiens : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        adapter.updateEntretiens(dataRepository.loadEntretiens())
+        adapter.updateEntretiens(dataRepository.getEntretiens())
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        LocalBroadcastManager.getInstance(requireContext())
+            .unregisterReceiver(broadcastReceiver)
     }
 }

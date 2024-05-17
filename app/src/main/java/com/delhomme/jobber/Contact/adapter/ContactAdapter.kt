@@ -1,10 +1,11 @@
 package com.delhomme.jobber.Contact.adapter
 
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Contact.model.Contact
@@ -24,11 +25,15 @@ class ContactAdapter(private var contacts: List<Contact>,
         val entreprise: TextView = view.findViewById(R.id.entreprise)
         val telephone: TextView = view.findViewById(R.id.telephoneContact)
         val email: TextView = view.findViewById(R.id.emailContact)
-        val btnDelete: Button = view.findViewById(R.id.btnDeleteContact)
-        val btnEdit: Button = view.findViewById(R.id.btnEditContact)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteContact)
+        val btnEdit: ImageButton = view.findViewById(R.id.btnEditContact)
 
         fun bind(contact: Contact, dataRepository: DataRepository, clickListener: (Contact) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
-            val entrepriseName = dataRepository.getEntrepriseById(contact.entrepriseId)?.nom ?: "Entreprise inconnue"
+            val testEntreprise = dataRepository.getEntrepriseByNom(contact.entrepriseNom)
+            Log.d("ContactAdapter", "Nom de l'entreprise grace a dataRepository.getEntrepriseByNom(contact.entrepriseNom)")
+            Log.d("ContactAdapter", "${dataRepository.getEntrepriseByNom(contact.entrepriseNom)}")
+            Log.d("ContactAdapter", "${testEntreprise?.nom}")
+            val entrepriseName = dataRepository.getEntrepriseByNom(contact.entrepriseNom)?.nom ?: "Entreprise inconnue"
             fullNameContact.text = contact.getFullName()
             entreprise.text = entrepriseName
             telephone.text = contact.telephone

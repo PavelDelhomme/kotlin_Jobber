@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".Relance.AddRelanceActivity">
 
     <EditText
         android:id="@+id/etDateRelance"
@@ -11,39 +14,36 @@
         android:layout_height="wrap_content"
         android:focusable="false"
         android:hint="Date de la relance"
-        android:drawableRight="@android:drawable/ic_menu_today"
-        android:inputType="date" />
+        android:drawableRight="@android:drawable/ic_menu_today" />
 
     <Spinner
         android:id="@+id/spinner_plateforme_relance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
     <Spinner
         android:id="@+id/spinner_contact_relance"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Sélectionnez un contact (facultatif)" />
-
-
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextViewRelanceEntreprise"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Sélectionnez un contact (facultatif)"
-        android:inputType="text" />
+        android:layout_height="wrap_content" />
 
     <EditText
         android:id="@+id/editText_notes_relance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Notes de la relance"
         android:inputType="textMultiLine"
-        android:gravity="top"
-        android:minHeight="100dp" />
+        android:hint="Notes" />
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewRelanceEntreprise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom de l'entreprise"
+        android:inputType="text" />
 
     <Button
         android:id="@+id/button_add_relance"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ajouter Relance" />
+        android:text="Ajouter Relance"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

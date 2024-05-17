@@ -19,7 +19,6 @@ import java.util.Locale
 class EditCandidatureActivity : AppCompatActivity() {
     private lateinit var dataRepository: DataRepository
     private var candidatureId: String? = null
-    private lateinit var autoCompleteEntreprise: AutoCompleteTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +31,13 @@ class EditCandidatureActivity : AppCompatActivity() {
         dataRepository = DataRepository(applicationContext)
         candidatureId = intent.getStringExtra("CANDIDATURE_ID")
 
+        setupSpinners()
         setupEntrepriseAutoComplete()
 
         setupFields()
+        findViewById<Button>(R.id.btnSaveCandidatureChanges).setOnClickListener {
+            saveChanges()
+        }
     }
 
     private fun setupEntrepriseAutoComplete() {
@@ -42,28 +45,6 @@ class EditCandidatureActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, entreprises)
         findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).apply {
             setAdapter(adapter)
-        }
-    }
-
-    private fun setupFields() {
-        candidatureId?.let {
-            val candidature = dataRepository.getCandidatureById(it)
-            candidature?.let { cand ->
-                findViewById<EditText>(R.id.etTitreOffre).setText(cand.titre_offre)
-                findViewById<EditText>(R.id.etEtat).setText(cand.etat)
-                findViewById<EditText>(R.id.etNotes).setText(cand.notes)
-                setupDatePicker(cand.date_candidature)
-                findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).setText(dataRepository.getEntrepriseById(cand.entrepriseId)?.nom)
-                findViewById<Spinner>(R.id.spinner_plateforme).setSelection(dataRepository.getPlateformeOptions().indexOf(cand.plateforme))
-                findViewById<Spinner>(R.id.spinner_type_poste).setSelection(dataRepository.getTypePosteOptions().indexOf(cand.type_poste))
-                findViewById<EditText>(R.id.etLieuPoste).setText(cand.lieuPoste)
-                findViewById<EditText>(R.id.etNotes).setText(cand.notes)
-
-            }
-        }
-
-        findViewById<Button>(R.id.btnSaveCandidatureChanges).setOnClickListener {
-            saveChanges()
         }
     }
 
@@ -80,10 +61,36 @@ class EditCandidatureActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupSpinners() {
+        val typePosteAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, dataRepository.getTypePosteOptions())
+        findViewById<Spinner>(R.id.spinner_type_poste).adapter = typePosteAdapter
+
+        val plateformeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, dataRepository.getPlateformeOptions())
+        findViewById<Spinner>(R.id.spinner_plateforme).adapter = plateformeAdapter
+    }
+
+    private fun setupFields() {
+        candidatureId?.let {
+            val candidature = dataRepository.getCandidatureById(it)
+            candidature?.let { cand ->
+                findViewById<EditText>(R.id.etTitreOffre).setText(cand.titre_offre)
+                findViewById<EditText>(R.id.etEtat).setText(cand.etat)
+                findViewById<EditText>(R.id.etNotes).setText(cand.notes)
+                setupDatePicker(cand.date_candidature)
+                findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).setText(dataRepository.getEntrepriseByNom(cand.entrepriseNom)?.nom)
+                findViewById<Spinner>(R.id.spinner_plateforme).setSelection(dataRepository.getPlateformeOptions().indexOf(cand.plateforme))
+                findViewById<Spinner>(R.id.spinner_type_poste).setSelection(dataRepository.getTypePosteOptions().indexOf(cand.type_poste))
+                findViewById<EditText>(R.id.etLieuPoste).setText(cand.lieuPoste)
+                findViewById<EditText>(R.id.etNotes).setText(cand.notes)
+
+            }
+        }
+    }
+
     private fun saveChanges() {
         val titre = findViewById<EditText>(R.id.etTitreOffre).text.toString()
         val entrepriseNom = findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).text.toString()
-        val entrepriseId = dataRepository.getOrCreateEntreprise(entrepriseNom).id
+        val entrepriseId = dataRepository.getOrCreateEntreprise(entrepriseNom).nom
         val etat = findViewById<EditText>(R.id.etEtat).text.toString()
         val notes = findViewById<EditText>(R.id.etNotes).text.toString()
         val plateforme = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()

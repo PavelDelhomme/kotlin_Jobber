@@ -12,23 +12,9 @@
         android:id="@+id/editTextDateAppelEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Date de l'appel"
         android:focusable="false"
-        android:drawableRight="@android:drawable/ic_menu_today"
-        android:inputType="date" />
-
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextViewEntrepriseAppel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Entreprise"
-        android:inputType="text"
-        android:enabled="false" />
-
-    <Spinner
-        android:id="@+id/spinnerContactAppel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:hint="Date de l'appel"
+        android:drawableRight="@android:drawable/ic_menu_today" />
 
     <EditText
         android:id="@+id/editTextObjetAppelEdit"
@@ -40,11 +26,24 @@
         android:id="@+id/editTextNotesAppelEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Notes sur l'appel" />
+        android:hint="Notes" />
+
+    <Spinner
+        android:id="@+id/spinnerContactAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewEntrepriseAppel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nom de l'entreprise"
+        android:inputType="text" />
 
     <Button
         android:id="@+id/btnSaveAppelEdit"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sauvegarder les modifications" />
+        android:text="Enregistrer"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

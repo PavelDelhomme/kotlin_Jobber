@@ -28,7 +28,7 @@ class FragmentRelances : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        adapter = RelanceAdapter(dataRepository.loadRelances(),dataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked, this::onEditRelanceClicked)
+        adapter = RelanceAdapter(dataRepository.getRelances(), dataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked, this::onEditRelanceClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -46,7 +46,7 @@ class FragmentRelances : Fragment() {
 
     private fun onDeleteRelanceClicked(relanceId: String) {
         dataRepository.deleteRelance(relanceId)
-        adapter.updateRelances(dataRepository.loadRelances())
+        adapter.updateRelances(dataRepository.getRelances())
     }
 
     private fun onEditRelanceClicked(relanceId: String) {
@@ -57,6 +57,6 @@ class FragmentRelances : Fragment() {
     }
     override fun onResume() {
         super.onResume()
-        adapter.updateRelances(dataRepository.loadRelances())
+        adapter.updateRelances(dataRepository.getRelances())
     }
 }

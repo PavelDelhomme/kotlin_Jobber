@@ -24,14 +24,30 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/tvEntrepriseCandidature"
+            app:layout_constraintTop_toBottomOf="@id/titreoffre"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/tvDateCandidature"
+            app:layout_constraintTop_toBottomOf="@id/tvEntrepriseCandidature"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
             android:id="@+id/tvCandidatureInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@id/titreoffre"
+            app:layout_constraintTop_toBottomOf="@id/tvDateCandidature"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
 
         <TextView
             android:id="@+id/tvEtatCandidature"

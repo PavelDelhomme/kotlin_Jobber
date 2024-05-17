@@ -22,7 +22,7 @@ class DetailsEntretienActivity : AppCompatActivity() {
         val entretienId = intent.getStringExtra("ENTRETIEN_ID") ?: return
         val dataRepository = DataRepository(this)
         val entretien = dataRepository.getEntretienById(entretienId) ?: return
-        val entrepriseNom = dataRepository.getEntrepriseById(entretien.entreprise_id)
+        val entrepriseNom = dataRepository.getEntrepriseByNom(entretien.entrepriseNom)
         val candidatureOffre = dataRepository.getCandidatureById(entretien.candidature_id!!)
 
         findViewById<TextView>(R.id.tvEntretienDate).text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(entretien.date_entretien)

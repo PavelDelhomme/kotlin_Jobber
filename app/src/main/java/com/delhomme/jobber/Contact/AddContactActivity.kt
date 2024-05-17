@@ -9,10 +9,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.R
 import com.delhomme.jobber.Contact.model.Contact
+import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entreprise.model.Entreprise
+import com.delhomme.jobber.R
 
 class AddContactActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -24,7 +24,7 @@ class AddContactActivity : AppCompatActivity() {
         }
 
         val dataRepository = DataRepository(this)
-        val entreprises = dataRepository.loadEntreprises()
+        val entreprises = dataRepository.getEntreprises()
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, entreprises.map { it.nom })
         val autoCompleteTextView = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
         autoCompleteTextView.setAdapter(adapter)
@@ -33,11 +33,11 @@ class AddContactActivity : AppCompatActivity() {
         var entreprise: Entreprise? = null
 
         if (entrepriseId != null) {
-            entreprise = dataRepository.getEntrepriseById(entrepriseId)
+            entreprise = dataRepository.getEntrepriseByNom(entrepriseId)
         }
 
-        val etContactNom = findViewById<EditText>(R.id.etContactName)
-        val etContactNom2 = findViewById<EditText>(R.id.etContactSurname)
+        val etContactPrenom = findViewById<EditText>(R.id.etContactPrenom)
+        val etContactNom = findViewById<EditText>(R.id.etContactNom)
         val etContactEmail = findViewById<EditText>(R.id.etContactEmail)
         val etContactTelephone = findViewById<EditText>(R.id.etContactPhone)
 
@@ -47,7 +47,7 @@ class AddContactActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_add_contact).setOnClickListener {
 
             val nom = etContactNom.text.toString()
-            val prenom = etContactNom2.text.toString()
+            val prenom = etContactPrenom.text.toString()
             val email = etContactEmail.text.toString()
             val telephone = etContactTelephone.text.toString()
             val entrepriseNom = autoCompleteTextView.text.toString()
@@ -58,11 +58,11 @@ class AddContactActivity : AppCompatActivity() {
                 prenom = prenom,
                 email = email,
                 telephone = telephone,
-                entrepriseId = entreprise.id,
+                entrepriseNom = entreprise.nom,
                 appelsIds = mutableListOf()
             )
 
-            dataRepository.addContactToEntreprise(contact.id, entreprise.id)
+            dataRepository.addContactToEntreprise(contact.id, entreprise.nom)
             dataRepository.saveEntreprise(entreprise)
             dataRepository.saveContact(contact)
 

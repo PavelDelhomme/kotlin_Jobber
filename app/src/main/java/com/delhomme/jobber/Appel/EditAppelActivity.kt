@@ -1,6 +1,7 @@
 package com.delhomme.jobber.Appel
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
@@ -11,7 +12,6 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.Appel.model.Appel
-import com.delhomme.jobber.Contact.model.Contact
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
@@ -27,7 +27,7 @@ class EditAppelActivity : AppCompatActivity() {
     private lateinit var autoCompleteTextViewEntreprise: AutoCompleteTextView
     private lateinit var dataRepository: DataRepository
     private var appelId: String? = null
-    private var entrepriseId: String? = null
+    private var entrepriseNom: String? = null
     private var contactId: String? = null
     private var candidatureId: String? = null
 
@@ -39,7 +39,7 @@ class EditAppelActivity : AppCompatActivity() {
         dataRepository = DataRepository(this)
         appelId = intent.getStringExtra("APPEL_ID")
         candidatureId = intent.getStringExtra("CANDIDATURE_ID")
-        entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
+        entrepriseNom = intent.getStringExtra("ENTREPRISE_ID")
         contactId = intent.getStringExtra("CONTACT_ID")
 
         setupUI()
@@ -66,26 +66,33 @@ class EditAppelActivity : AppCompatActivity() {
         etDateAppel.setOnClickListener {
             val now = Calendar.getInstance()
             DatePickerDialog(this, { _, year, month, day ->
-                val selectedDate = Calendar.getInstance()
-                selectedDate.set(year, month, day)
-                etDateAppel.setText(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate.time))
+                TimePickerDialog(this, { _, hour, minute ->
+                    val selectedDate = Calendar.getInstance()
+                    selectedDate.set(year, month, day, hour, minute)
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    etDateAppel.setText(dateFormat.format(selectedDate.time))
+                }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
         }
     }
 
     private fun setupContactSpinner() {
-        val contacts = entrepriseId?.let { dataRepository.loadContactsForEntreprise(it) } ?: dataRepository.loadContacts()
-        val contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, contacts.map { it.getFullName() })
+        val contacts = entrepriseNom?.let { dataRepository.loadContactsForEntreprise(it) } ?: dataRepository.getContacts()
+        val contactNames = contacts.map { it.getFullName() }.toMutableList()
+        contactNames.add(0, "--") // Option par défaut pour aucun contact sélectionné
+
+        val contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, contactNames)
+        contactAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spContact.adapter = contactAdapter
         contactId?.let {
             val position = contacts.indexOfFirst { it.id == contactId }
-            spContact.setSelection(if (position != -1) position else 0)
+            spContact.setSelection(if (position != -1) position + 1 else 0)
         }
     }
 
     private fun setupEntrepriseField() {
-        if (entrepriseId != null) {
-            val entreprise = dataRepository.getEntrepriseById(entrepriseId)
+        if (entrepriseNom != null) {
+            val entreprise = dataRepository.getEntrepriseByNom(entrepriseNom)
             autoCompleteTextViewEntreprise.setText(entreprise?.nom)
         } else {
             autoCompleteTextViewEntreprise.isEnabled = true
@@ -96,7 +103,8 @@ class EditAppelActivity : AppCompatActivity() {
         appelId?.let {
             val appel = dataRepository.getAppelById(it)
             appel?.let {
-                etDateAppel.setText(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(appel.date_appel))
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                etDateAppel.setText(dateFormat.format(appel.date_appel))
                 etObjetAppel.setText(appel.objet)
                 etNotesAppel.setText(appel.notes)
             }
@@ -104,24 +112,32 @@ class EditAppelActivity : AppCompatActivity() {
     }
 
     private fun saveAppelChanges() {
-        val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(etDateAppel.text.toString()) ?: Date()
-        val objet = etObjetAppel.text.toString()
-        val notes = etNotesAppel.text.toString()
-        val contact = spContact.selectedItem as Contact
+        try {
+            val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).parse(etDateAppel.text.toString()) ?: Date()
+            val objet = etObjetAppel.text.toString()
+            val notes = etNotesAppel.text.toString()
 
-        appelId?.let {
-            val updatedAppel = Appel(
-                it,
-                candidature_id = candidatureId,
-                contact_id = contact.id,
-                entreprise_id = contact.entrepriseId,
-                date_appel = date,
-                objet = objet,
-                notes = notes
-            )
-            dataRepository.saveAppel(updatedAppel)
-            Toast.makeText(this, "Appel mis à jour avec succès.", Toast.LENGTH_SHORT).show()
-            finish()
+            val selectedContactName = spContact.selectedItem.toString()
+            val contactId = if (selectedContactName != "--") {
+                dataRepository.getContacts().find { it.getFullName() == selectedContactName }?.id
+            } else null
+
+            appelId?.let {
+                val updatedAppel = Appel(
+                    it,
+                    candidature_id = candidatureId,
+                    contact_id = contactId,
+                    entrepriseNom = entrepriseNom,
+                    date_appel = date,
+                    objet = objet,
+                    notes = notes
+                )
+                dataRepository.saveAppel(updatedAppel)
+                Toast.makeText(this, "Appel mis à jour avec succès.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Erreur lors de la mise à jour de l'appel: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

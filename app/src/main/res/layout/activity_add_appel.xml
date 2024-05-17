@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".Appel.AddAppelActivity">
 
     <EditText
         android:id="@+id/etDateAppel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="false"
         android:hint="Date de l'appel"
-        android:focusable="false" />
+        android:drawableRight="@android:drawable/ic_menu_today" />
 
     <EditText
         android:id="@+id/etObjetAppel"
@@ -22,25 +26,22 @@
         android:id="@+id/etNotesAppel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Notes sur l'appel" />
+        android:hint="Notes" />
 
     <Spinner
         android:id="@+id/spContactsAppel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Sélectionnez un contact" />
+        android:layout_height="wrap_content" />
+
     <Spinner
         android:id="@+id/spEntreprisesAppel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Sélectionnez un contact" />
-
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/btnSaveAppel"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ajouter appel"
-        android:onClick="addAppel"
+        android:text="Ajouter Appel"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>

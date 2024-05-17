@@ -6,7 +6,7 @@ import java.util.UUID
 data class Candidature(
     val id : String = UUID.randomUUID().toString(),
     val titre_offre : String,
-    var entrepriseId : String,
+    var entrepriseNom : String,
     val type_poste: String,
     val plateforme: String,
     val lieuPoste: String?,

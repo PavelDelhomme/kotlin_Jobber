@@ -11,7 +11,6 @@ import com.delhomme.jobber.Relance.model.Relance
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Date
-import java.util.UUID
 
 class DataRepository(val context: Context) {
     private val sharedPreferences = context.getSharedPreferences("CandidaturesPrefs", Context.MODE_PRIVATE)
@@ -52,13 +51,13 @@ class DataRepository(val context: Context) {
             mutableCandidature[index] = candidature // Mise à jour
         } else {
             mutableCandidature.add(candidature) // Ajout
-            val entreprise = entreprises?.find { it.id == candidature.entrepriseId }
+            val entreprise = entreprises?.find { it.nom == candidature.entrepriseNom }
             if (entreprise != null) {
                 if (!entreprise.candidatureIds.contains(candidature.id)) {
                     entreprise.candidatureIds.add(candidature.id)
                 }
             } else {
-                val newEntreprise = Entreprise(id = UUID.randomUUID().toString(), nom = "New Entreprise", candidatureIds = mutableListOf(candidature.id))
+                val newEntreprise = Entreprise(nom = candidature.entrepriseNom, candidatureIds = mutableListOf(candidature.id))
                 saveEntreprise(newEntreprise)
             }
         }
@@ -70,7 +69,7 @@ class DataRepository(val context: Context) {
 
     fun saveEntreprise(entreprise: Entreprise) {
         val mutableEntreprises = entreprises?.toMutableList() ?: mutableListOf()
-        val index = mutableEntreprises.indexOfFirst { it.id == entreprise.id }
+        val index = mutableEntreprises.indexOfFirst { it.nom == entreprise.nom }
         if (index != -1) {
             mutableEntreprises[index] = entreprise
         } else {
@@ -88,7 +87,7 @@ class DataRepository(val context: Context) {
             relances[index] = relance
         } else {
             relances.add(relance)
-            val entreprise = getEntrepriseById(relance.entrepriseId)
+            val entreprise = getEntrepriseByNom(relance.entrepriseNom)
             entreprise?.let {
                 if (it.relanceIds == null) {
                     it.relanceIds = mutableListOf()
@@ -146,7 +145,7 @@ class DataRepository(val context: Context) {
         val candidatures = loadCandidatures().toMutableList()
         val candidature = candidatures.find { it.id == candidatureId }
         candidatures.remove(candidature)
-        val entreprise = getEntrepriseById(candidature?.entrepriseId)
+        val entreprise = getEntrepriseByNom(candidature?.entrepriseNom)
         entreprise?.candidatureIds?.remove(candidatureId)
         saveEntreprise(entreprise!!)
         val jsonString = gson.toJson(candidatures)
@@ -165,9 +164,9 @@ class DataRepository(val context: Context) {
         sharedPreferences.edit().putString("appels", jsonString).apply()
     }
 
-    fun deleteEntreprise(entrepriseId: String) {
+    fun deleteEntreprise(entrepriseNom: String) {
         val currentEntreprise = loadEntreprises().toMutableList()
-        val filteredEntreprise = currentEntreprise.filter { it.id != entrepriseId }
+        val filteredEntreprise = currentEntreprise.filter { it.nom != entrepriseNom }
         val jsonString = gson.toJson(filteredEntreprise)
         sharedPreferences.edit().putString("entreprises", jsonString).apply()
     }
@@ -185,20 +184,22 @@ class DataRepository(val context: Context) {
         sharedPreferences.edit().putString("entretiens", jsonString).apply()
     }
 
-    fun addContactToEntreprise(contactId: String, entrepriseId: String) {
-        val entreprise = getEntrepriseById(entrepriseId)
+    fun addContactToEntreprise(contactId: String, entrepriseNom: String) {
+        val entreprise = getEntrepriseByNom(entrepriseNom)
         if (entreprise != null) {
             if (!entreprise.contactIds.contains(contactId)) {
                 entreprise.contactIds.add(contactId)
                 saveEntreprise(entreprise)
             }
         } else {
-            Log.d("DataRepository", "addContactToEntreprise : No entreprise found with ID: $entrepriseId")
+            Log.d("DataRepository", "addContactToEntreprise : No entreprise found with Nom: $entrepriseNom")
         }
     }
-    fun getEntrepriseById(id: String?): Entreprise? {
-        val entreprises = loadEntreprises()
-        return entreprises.find { it.id == id }
+    fun getEntrepriseByNom(nom: String?): Entreprise? {
+        Log.d("DataRepository", "Recherche de l'entreprise avec le nom : $nom")
+        val result = entreprises?.find { it.nom == nom }
+        Log.d("DataRepository", "Résultat de la recherche : $result")
+        return result
     }
 
     fun getCandidatureById(id: String): Candidature? {
@@ -225,7 +226,6 @@ class DataRepository(val context: Context) {
     fun getRelanceById(id: String): Relance? {
         return loadRelances().find { it.id == id }
     }
-
 
     fun getContactById(id: String?): Contact? {
         val contactString = sharedPreferences.getString("contacts", "")
@@ -258,6 +258,32 @@ class DataRepository(val context: Context) {
         }
     }
 
+    fun reloadAppels() {
+        val jsonString = sharedPreferences.getString("appels", null)
+        if (jsonString != null) {
+            val type = object : TypeToken<List<Relance>>() {}.type
+            gson.fromJson<List<Appel>>(jsonString, type) ?: emptyList()
+        }
+    }
+
+
+    fun reloadContacts() {
+        val jsonString = sharedPreferences.getString("contacts", null)
+        if (jsonString != null) {
+            val type = object : TypeToken<List<Contact>>() {}.type
+            gson.fromJson<List<Contact>>(jsonString, type) ?: emptyList()
+        }
+    }
+
+
+    fun reloadCandidatures() {
+        val jsonString = sharedPreferences.getString("candidatures", null)
+        if (jsonString != null) {
+            val type = object : TypeToken<List<Candidature>>() {}.type
+            gson.fromJson<List<Candidature>>(jsonString, type) ?: emptyList()
+        }
+    }
+
 
     private fun loadCandidatures(): List<Candidature>{
         val jsonString = sharedPreferences.getString("candidatures", null)
@@ -281,12 +307,14 @@ class DataRepository(val context: Context) {
 
     private fun loadEntreprises(): List<Entreprise> {
         val jsonString = sharedPreferences.getString("entreprises", null)
-        return if (jsonString != null) {
+        val entreprises = if (jsonString != null) {
             val type = object : TypeToken<List<Entreprise>>() {}.type
-            gson.fromJson<List<Entreprise>>(jsonString, type) ?: emptyList()
+            gson.fromJson<List<Entreprise>>(jsonString, type)
         } else {
             emptyList()
         }
+        Log.d("DataRepository", "Entreprises chargées : $entreprises")
+        return entreprises
     }
 
     private fun loadAppels(): List<Appel> {
@@ -314,7 +342,7 @@ class DataRepository(val context: Context) {
             val type = object : TypeToken<List<Contact>>() {}.type
             val contacts = gson.fromJson<List<Contact>>(contactsJson, type)
             contacts.forEach { contact ->
-                Log.d("DataRepository", "Loaded contact ${contact.id} with entreprise ID : ${contact.entrepriseId}")
+                Log.d("DataRepository", "Loaded contact ${contact.id} with entreprise ID : ${contact.entrepriseNom}")
             }
             return contacts
         } else {
@@ -327,32 +355,32 @@ class DataRepository(val context: Context) {
         return loadAppels().filter { it.contact_id == contact_id }
     }
 
-    fun loadAppelsForEntreprise(entreprise_id: String): List<Appel> {
-        return loadAppels().filter { it.entreprise_id == entreprise_id }
+    fun loadAppelsForEntreprise(entrepriseNom: String): List<Appel> {
+        return loadAppels().filter { it.entrepriseNom == entrepriseNom }
     }
 
     fun loadAppelsForCandidature(candidature_id: String): List<Appel> {
         return loadAppels().filter { it.candidature_id == candidature_id }
     }
 
-    fun loadCandidaturesForEntreprise(entreprise_id: String): List<Candidature> {
-        return loadCandidatures().filter { it.entrepriseId == entreprise_id }
+    fun loadCandidaturesForEntreprise(entrepriseNom: String): List<Candidature> {
+        return loadCandidatures().filter { it.entrepriseNom == entrepriseNom }
     }
 
-    fun loadEntretiensForEntreprise(entreprise_id: String): List<Entretien> {
-        return loadEntretiens().filter { it.entreprise_id == entreprise_id }
+    fun loadEntretiensForEntreprise(entrepriseNom: String): List<Entretien> {
+        return loadEntretiens().filter { it.entrepriseNom == entrepriseNom }
     }
 
     fun loadEntretiensForCandidature(candidatureId: String): List<Entretien> {
         return loadEntretiens().filter { it.candidature_id == candidatureId }
     }
     // TODO FIXED ici je fait la récupération des contact théoriquement en filtrant par ID d'entreprise
-    fun loadContactsForEntreprise(entrepriseId: String?): List<Contact> {
-        return loadContacts().filter { it.entrepriseId == entrepriseId }
+    fun loadContactsForEntreprise(entrepriseNom: String?): List<Contact> {
+        return loadContacts().filter { it.entrepriseNom == entrepriseNom }
     }
 
     fun loadRelancesForEntreprise(entrepriseId: String?): List<Relance> {
-        return loadRelances().filter { it.entrepriseId == entrepriseId }
+        return loadRelances().filter { it.entrepriseNom == entrepriseId }
     }
 
     fun loadRelancesForCandidature(candidatureId: String): List<Relance> {
@@ -367,13 +395,12 @@ class DataRepository(val context: Context) {
             return existing
         }
 
-        val newId = UUID.randomUUID().toString()
-        val newEntreprise = Entreprise(id = newId, nom = companyName, contactIds = mutableListOf(), entretiens = mutableListOf())
+        val newEntreprise = Entreprise(nom = companyName, contactIds = mutableListOf(), entretiens = mutableListOf())
         saveEntreprise(newEntreprise)
         return newEntreprise
     }
 
-    fun editCandidature(candidatureId: String, newTitre: String, newEtat: String, newNotes: String, newPlateforme: String, newTypePoste: String, newLieuPoste: String, newEntrepriseId: String, newDate: Date, newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>, newRelances: MutableList<String>) {
+    fun editCandidature(candidatureId: String, newTitre: String, newEtat: String, newNotes: String, newPlateforme: String, newTypePoste: String, newLieuPoste: String, newEntrepriseNom: String, newDate: Date, newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>, newRelances: MutableList<String>) {
         val candidatures = loadCandidatures().toMutableList()
         val index = candidatures.indexOfFirst { it.id == candidatureId }
         if (index != -1) {
@@ -385,7 +412,7 @@ class DataRepository(val context: Context) {
                 plateforme = newPlateforme,
                 type_poste = newTypePoste,
                 lieuPoste = newLieuPoste,
-                entrepriseId = newEntrepriseId,
+                entrepriseNom = newEntrepriseNom,
                 date_candidature = newDate,
                 entretiens = newEntretiens,
                 appels = newAppelsIds,
@@ -397,9 +424,9 @@ class DataRepository(val context: Context) {
         }
     }
 
-    fun editEntreprise(entrepriseId: String, newName: String, newContactIds: MutableList<String>, newRelancesIds: MutableList<String>, newEntretiensIds: MutableList<String>, newCandidaturesIds: MutableList<String>) {
+    fun editEntreprise(entrepriseNom: String, newName: String, newContactIds: MutableList<String>, newRelancesIds: MutableList<String>, newEntretiensIds: MutableList<String>, newCandidaturesIds: MutableList<String>) {
         val entreprises = loadEntreprises().toMutableList()
-        val index = entreprises.indexOfFirst { it.id == entrepriseId }
+        val index = entreprises.indexOfFirst { it.nom == entrepriseNom }
         if (index != -1) {
             val oldEntreprise = entreprises[index]
             val updatedEntreprise = oldEntreprise.copy(
@@ -413,10 +440,10 @@ class DataRepository(val context: Context) {
             val jsonString = gson.toJson(entreprises)
             sharedPreferences.edit().putString("entreprises", jsonString).apply()
         }
-
     }
 
-    fun editRelance(relanceId: String, newDate: Date, newPlateformeUtilise: String, newEntrepriseId: String, newContactId: String?, newCandidatureId: String, newNotes: String?) {
+
+    fun editRelance(relanceId: String, newDate: Date, newPlateformeUtilise: String, newEntrepriseNom: String, newContactId: String?, newCandidatureId: String, newNotes: String?) {
         val relances = loadRelances().toMutableList()
         val index = relances.indexOfFirst { it.id == relanceId }
         if (index != -1) {
@@ -424,7 +451,7 @@ class DataRepository(val context: Context) {
             val updatedRelance = oldRelance.copy(
                 date_relance = newDate,
                 plateformeUtilisee = newPlateformeUtilise,
-                entrepriseId = newEntrepriseId,
+                entrepriseNom = newEntrepriseNom,
                 contactId = newContactId,
                 candidatureId = newCandidatureId,
                 notes = newNotes
@@ -436,7 +463,7 @@ class DataRepository(val context: Context) {
 
     }
 
-    fun editAppel(appelId: String, newCandidatureId: String, newContactId: String?, newEntrepriseId: String, newDateAppel: Date, newObjet: String, newNotes: String) {
+    fun editAppel(appelId: String, newCandidatureId: String, newContactId: String?, newEntrepriseNom: String, newDateAppel: Date, newObjet: String, newNotes: String) {
         val appels = loadAppels().toMutableList()
         val index = appels.indexOfFirst { it.id == appelId }
         if (index != -1) {
@@ -444,7 +471,7 @@ class DataRepository(val context: Context) {
             val updatedAppel = oldAppel.copy(
                 candidature_id = newCandidatureId,
                 contact_id = newContactId,
-                entreprise_id = newEntrepriseId,
+                entrepriseNom = newEntrepriseNom,
                 date_appel = newDateAppel,
                 objet = newObjet,
                 notes = newNotes,
@@ -455,8 +482,7 @@ class DataRepository(val context: Context) {
         }
 
     }
-
-    fun editContact(contactId: String, newNom: String, newPrenom: String, newEmail: String, newTelephone: String, newEntrepriseId: String, newAppelsIds: MutableList<String>, newCandidatureIds: MutableList<String>) {
+    fun editContact(contactId: String, newNom: String, newPrenom: String, newEmail: String, newTelephone: String, newEntrepriseNom: String, newAppelsIds: MutableList<String>, newCandidatureIds: MutableList<String>) {
         val contacts = loadContacts().toMutableList()
         val index = contacts.indexOfFirst { it.id == contactId }
         if (index != -1) {
@@ -466,7 +492,7 @@ class DataRepository(val context: Context) {
                 prenom = newPrenom,
                 email = newEmail,
                 telephone = newTelephone,
-                entrepriseId = newEntrepriseId,
+                entrepriseNom = newEntrepriseNom,
                 appelsIds = newAppelsIds,
                 candidatureIds = newCandidatureIds,
             )
@@ -476,13 +502,14 @@ class DataRepository(val context: Context) {
         }
     }
 
-    fun editEntretien(entretienId: String, newEntrepriseId: String, newContactId: String?, newCandidatureId: String?, newDateEntretien: Date, newType: String, newMode: String, newNotesPreEntretien: String?, newNotesPostEntretien: String?) {
+
+    fun editEntretien(entretienId: String, newEntrepriseNom: String, newContactId: String?, newCandidatureId: String, newDateEntretien: Date, newType: String, newMode: String, newNotesPreEntretien: String?, newNotesPostEntretien: String?) {
         val entretiens = loadEntretiens().toMutableList()
         val index = entretiens.indexOfFirst { it.id == entretienId }
         if (index != -1) {
             val oldEntretien = entretiens[index]
             val updatedEntretien = oldEntretien.copy(
-                entreprise_id = newEntrepriseId,
+                entrepriseNom = newEntrepriseNom,
                 contact_id = newContactId,
                 candidature_id = newCandidatureId,
                 date_entretien = newDateEntretien,
@@ -496,21 +523,85 @@ class DataRepository(val context: Context) {
             sharedPreferences.edit().putString("entretiens", jsonString).apply()
         }
     }
-
     fun getTypePosteOptions(): List<String> {
-        return listOf("Type d'emploi", "CDD", "CDI", "Freelance", "Intérim", "Alternance")
+        return listOf("---", "CDD", "CDI", "Freelance", "Intérim", "Alternance")
     }
+
     fun getPlateformeOptions(): List<String> {
-        return listOf("Plateforme utilisée", "HelloWork", "LinkedIn", "Indeed", "Welcome To The Jungle", "SpaceMonk", "Jobteaser", "Monster", "Keljob", "RegioJob", "bretagne-alternance", "Ouest-France Emploi", "Meteojob", "Jooble", "APEC", "Talent.io", "Téléphone", "Email", "Sur place", "WhatsApp", "Autre")
+        return listOf("---", "HelloWork", "LinkedIn", "Indeed", "Welcome To The Jungle", "SpaceMonk", "Jobteaser", "Monster", "Keljob", "RegioJob", "bretagne-alternance", "Ouest-France Emploi", "Meteojob", "Jooble", "APEC", "Talent.io", "Téléphone", "Email", "Sur place", "WhatsApp", "Autre")
     }
+
     fun getTypeEntretienOptions(): List<String> {
-        return listOf("Présentiel", "Visio-conférence")
+        return listOf("---", "Présentiel", "Visio-conférence")
     }
+
     fun getTypesRelanceOptions(): List<String> {
-        return listOf("Présentiel", "Visioconférence")
+        return listOf("---", "Présentiel", "Visioconférence")
     }
 
     fun getTypeEvenementOptions(): List<String> {
-        return listOf("Candidature", "Relance", "Entretien", "Appel")
+        return listOf("---", "Candidature", "Relance", "Entretien", "Appel")
     }
+
+    fun updateEntrepriseName(oldName: String, newName: String) {
+        // Mettre à jour le nom dans les candidatures
+        candidatures = candidatures?.map { candidature ->
+            if (candidature.entrepriseNom == oldName) {
+                candidature.copy(entrepriseNom = newName)
+            } else {
+                candidature
+            }
+        }
+
+        // Mettre à jour le nom dans les contacts
+        contacts = contacts?.map { contact ->
+            if (contact.entrepriseNom == oldName) {
+                contact.copy(entrepriseNom = newName)
+            } else {
+                contact
+            }
+        }
+
+        // Mettre à jour le nom dans les appels
+        appels = appels?.map { appel ->
+            if (appel.entrepriseNom == oldName) {
+                appel.copy(entrepriseNom = newName)
+            } else {
+                appel
+            }
+        }
+
+        // Mettre à jour le nom dans les entretiens
+        entretiens = entretiens?.map { entretien ->
+            if (entretien.entrepriseNom == oldName) {
+                entretien.copy(entrepriseNom = newName)
+            } else {
+                entretien
+            }
+        }
+
+        // Mettre à jour le nom dans les relances
+        relances = relances?.map { relance ->
+            if (relance.entrepriseNom == oldName) {
+                relance.copy(entrepriseNom = newName)
+            } else {
+                relance
+            }
+        }
+
+        // Sauvegarder les données mises à jour
+        saveAllData()
+    }
+
+    private fun saveAllData() {
+        sharedPreferences.edit().apply {
+            putString("candidatures", gson.toJson(candidatures))
+            putString("contacts", gson.toJson(contacts))
+            putString("appels", gson.toJson(appels))
+            putString("entretiens", gson.toJson(entretiens))
+            putString("relances", gson.toJson(relances))
+        }.apply()
+    }
+
+
 }

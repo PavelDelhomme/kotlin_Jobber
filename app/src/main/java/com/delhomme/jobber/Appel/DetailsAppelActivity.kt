@@ -28,7 +28,7 @@ class DetailsAppelActivity : AppCompatActivity() {
         val appelNotes = findViewById<TextView>(R.id.appelNotes)
 
         val appelContact = appel.contact_id?.let { dataRepository.getContactById(it) }
-        val entreprise = appelContact?.entrepriseId?.let { dataRepository.getEntrepriseById(it)}
+        val entreprise = appelContact?.entrepriseNom?.let { dataRepository.getEntrepriseByNom(it)}
 
         appelNomContact.text = appelContact?.getFullName() ?: "No Contact"
         appelNomEntreprise.text = entreprise?.nom ?: "No Entreprise"
