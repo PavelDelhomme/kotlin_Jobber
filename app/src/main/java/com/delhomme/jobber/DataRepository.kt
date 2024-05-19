@@ -10,12 +10,16 @@ import com.delhomme.jobber.Entretien.model.Entretien
 import com.delhomme.jobber.Relance.model.Relance
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import org.json.JSONArray
+import org.json.JSONObject
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 
 class DataRepository(val context: Context) {
-    private val sharedPreferences = context.getSharedPreferences("CandidaturesPrefs", Context.MODE_PRIVATE)
+    private val sharedPreferences =
+        context.getSharedPreferences("CandidaturesPrefs", Context.MODE_PRIVATE)
     private val gson = Gson()
 
     // Cache en mémoire
@@ -28,6 +32,7 @@ class DataRepository(val context: Context) {
 
     init {
         loadInitialData()
+        checkAndUpdateCandidatureStates()
     }
 
     private fun loadInitialData() {
@@ -59,7 +64,10 @@ class DataRepository(val context: Context) {
                     entreprise.candidatureIds.add(candidature.id)
                 }
             } else {
-                val newEntreprise = Entreprise(nom = candidature.entrepriseNom, candidatureIds = mutableListOf(candidature.id))
+                val newEntreprise = Entreprise(
+                    nom = candidature.entrepriseNom,
+                    candidatureIds = mutableListOf(candidature.id)
+                )
                 saveEntreprise(newEntreprise)
             }
         }
@@ -163,6 +171,7 @@ class DataRepository(val context: Context) {
         val jsonString = gson.toJson(appels)
         sharedPreferences.edit().putString("appels", jsonString).apply()
     }
+
     fun deleteCandidature(candidatureId: String) {
         val candidatures = loadCandidatures().toMutableList()
         val candidature = candidatures.find { it.id == candidatureId }
@@ -173,12 +182,14 @@ class DataRepository(val context: Context) {
         val jsonString = gson.toJson(candidatures)
         sharedPreferences.edit().putString("candidatures", jsonString).apply()
     }
+
     fun deleteContact(contactId: String) {
         val currentContact = loadContacts().toMutableList()
         val filteredContact = currentContact.filter { it.id != contactId }
         val jsonString = gson.toJson(filteredContact)
         sharedPreferences.edit().putString("contacts", jsonString).apply()
     }
+
     fun deleteAppel(appelId: String) {
         val currentAppel = loadAppels().toMutableList()
         val filteredAppel = currentAppel.filter { it.id != appelId }
@@ -192,6 +203,7 @@ class DataRepository(val context: Context) {
         val jsonString = gson.toJson(filteredEntreprise)
         sharedPreferences.edit().putString("entreprises", jsonString).apply()
     }
+
     fun deleteRelance(relanceId: String) {
         val currentRelance = loadRelances().toMutableList()
         val filteredRelance = currentRelance.filter { it.id != relanceId }
@@ -201,7 +213,7 @@ class DataRepository(val context: Context) {
 
     fun deleteEntretien(entretienId: String) {
         val currentEntretien = loadEntretiens().toMutableList()
-        val filteredEntretien = currentEntretien.filter { it.id != entretienId}
+        val filteredEntretien = currentEntretien.filter { it.id != entretienId }
         val jsonString = gson.toJson(filteredEntretien)
         sharedPreferences.edit().putString("entretiens", jsonString).apply()
     }
@@ -214,9 +226,13 @@ class DataRepository(val context: Context) {
                 saveEntreprise(entreprise)
             }
         } else {
-            Log.d("DataRepository", "addContactToEntreprise : No entreprise found with Nom: $entrepriseNom")
+            Log.d(
+                "DataRepository",
+                "addContactToEntreprise : No entreprise found with Nom: $entrepriseNom"
+            )
         }
     }
+
     fun getEntrepriseByNom(nom: String?): Entreprise? {
         Log.d("DataRepository", "Recherche de l'entreprise avec le nom : $nom")
         val result = entreprises?.find { it.nom == nom }
@@ -255,6 +271,7 @@ class DataRepository(val context: Context) {
         val contacts = gson.fromJson<List<Contact>>(contactString, type) ?: return null
         return contacts.find { it.id == id }
     }
+
     fun reloadEntreprises() {
         val jsonString = sharedPreferences.getString("entreprises", null)
         if (jsonString != null) {
@@ -262,7 +279,6 @@ class DataRepository(val context: Context) {
             gson.fromJson<List<Entreprise>>(jsonString, type) ?: emptyList()
         }
     }
-
 
     fun reloadEntretiens() {
         val jsonString = sharedPreferences.getString("entretiens", null)
@@ -304,7 +320,7 @@ class DataRepository(val context: Context) {
         }
     }
 
-    private fun loadCandidatures(): List<Candidature>{
+    private fun loadCandidatures(): List<Candidature> {
         val jsonString = sharedPreferences.getString("candidatures", null)
         return if (jsonString != null) {
             val type = object : TypeToken<List<Candidature>>() {}.type
@@ -345,6 +361,7 @@ class DataRepository(val context: Context) {
             emptyList()
         }
     }
+
     private fun loadEntretiens(): List<Entretien> {
         val entretiensJson = sharedPreferences.getString("entretiens", null)
         return if (entretiensJson != null) {
@@ -361,15 +378,16 @@ class DataRepository(val context: Context) {
             val type = object : TypeToken<List<Contact>>() {}.type
             val contacts = gson.fromJson<List<Contact>>(contactsJson, type)
             contacts.forEach { contact ->
-                Log.d("DataRepository", "Loaded contact ${contact.id} with entreprise ID : ${contact.entrepriseNom}")
+                Log.d(
+                    "DataRepository",
+                    "Loaded contact ${contact.id} with entreprise ID : ${contact.entrepriseNom}"
+                )
             }
             return contacts
         } else {
             return emptyList()
         }
     }
-
-
 
     fun loadAppelsForContact(contact_id: String): List<Appel> {
         return loadAppels().filter { it.contact_id == contact_id }
@@ -408,20 +426,24 @@ class DataRepository(val context: Context) {
         return allRelances?.filter { it.candidatureId == candidatureId } ?: emptyList()
     }
 
-
     fun getOrCreateEntreprise(companyName: String): Entreprise {
         val existing = loadEntreprises().find { it.nom == companyName }
         if (existing != null) {
             return existing
         }
 
-        val newEntreprise = Entreprise(nom = companyName, contactIds = mutableListOf(), entretiens = mutableListOf())
+        val newEntreprise = Entreprise(
+            nom = companyName,
+            contactIds = mutableListOf(),
+            entretiens = mutableListOf()
+        )
         saveEntreprise(newEntreprise)
         return newEntreprise
     }
 
     fun getOrCreateContact(nom: String, prenom: String, entrepriseNom: String): Contact {
-        val existing = loadContacts().find { it.nom == nom && it.prenom == prenom && it.entrepriseNom == entrepriseNom }
+        val existing =
+            loadContacts().find { it.nom == nom && it.prenom == prenom && it.entrepriseNom == entrepriseNom }
         if (existing != null) {
             return existing
         }
@@ -442,9 +464,18 @@ class DataRepository(val context: Context) {
     }
 
     fun editCandidature(
-        candidatureId: String, newTitre: String, newEtat: String, newNotes: String, newPlateforme: String,
-        newTypePoste: String, newLieuPoste: String, newEntrepriseNom: String, newDate: Date,
-        newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>, newRelances: MutableList<String>
+        candidatureId: String,
+        newTitre: String,
+        newEtat: String,
+        newNotes: String,
+        newPlateforme: String,
+        newTypePoste: String,
+        newLieuPoste: String,
+        newEntrepriseNom: String,
+        newDate: Date,
+        newEntretiens: MutableList<String>,
+        newAppelsIds: MutableList<String>,
+        newRelances: MutableList<String>
     ) {
         val candidatures = loadCandidatures().toMutableList()
         val index = candidatures.indexOfFirst { it.id == candidatureId }
@@ -471,8 +502,11 @@ class DataRepository(val context: Context) {
 
 
     fun editEntreprise(
-        entrepriseNom: String, newName: String, newContactIds: MutableList<String>,
-        newRelancesIds: MutableList<String>, newEntretiensIds: MutableList<String>,
+        entrepriseNom: String,
+        newName: String,
+        newContactIds: MutableList<String>,
+        newRelancesIds: MutableList<String>,
+        newEntretiensIds: MutableList<String>,
         newCandidaturesIds: MutableList<String>
     ) {
         val entreprises = loadEntreprises().toMutableList()
@@ -493,8 +527,13 @@ class DataRepository(val context: Context) {
     }
 
     fun editRelance(
-        relanceId: String, newDate: Date, newPlateformeUtilise: String, newEntrepriseNom: String,
-        newContactId: String?, newCandidatureId: String, newNotes: String?
+        relanceId: String,
+        newDate: Date,
+        newPlateformeUtilise: String,
+        newEntrepriseNom: String,
+        newContactId: String?,
+        newCandidatureId: String,
+        newNotes: String?
     ) {
         val relances = loadRelances().toMutableList()
         val index = relances.indexOfFirst { it.id == relanceId }
@@ -514,9 +553,15 @@ class DataRepository(val context: Context) {
         }
     }
 
+    // TODO : Implement editAppel method into EditAppelActivity
     fun editAppel(
-        appelId: String, newCandidatureId: String, newContactId: String?, newEntrepriseNom: String,
-        newDateAppel: Date, newObjet: String, newNotes: String
+        appelId: String,
+        newCandidatureId: String,
+        newContactId: String?,
+        newEntrepriseNom: String,
+        newDateAppel: Date,
+        newObjet: String,
+        newNotes: String
     ) {
         val appels = loadAppels().toMutableList()
         val index = appels.indexOfFirst { it.id == appelId }
@@ -537,8 +582,13 @@ class DataRepository(val context: Context) {
     }
 
     fun editContact(
-        contactId: String, newNom: String, newPrenom: String, newEmail: String,
-        newTelephone: String, newEntrepriseNom: String, newAppelsIds: MutableList<String>,
+        contactId: String,
+        newNom: String,
+        newPrenom: String,
+        newEmail: String,
+        newTelephone: String,
+        newEntrepriseNom: String,
+        newAppelsIds: MutableList<String>,
         newCandidatureIds: MutableList<String>
     ) {
         val contacts = loadContacts().toMutableList()
@@ -561,9 +611,15 @@ class DataRepository(val context: Context) {
     }
 
     fun editEntretien(
-        entretienId: String, newEntrepriseNom: String, newContactId: String?,
-        newCandidatureId: String, newDateEntretien: Date, newType: String, newMode: String,
-        newNotesPreEntretien: String?, newNotesPostEntretien: String?
+        entretienId: String,
+        newEntrepriseNom: String,
+        newContactId: String?,
+        newCandidatureId: String,
+        newDateEntretien: Date,
+        newType: String,
+        newMode: String,
+        newNotesPreEntretien: String?,
+        newNotesPostEntretien: String?
     ) {
         val entretiens = loadEntretiens().toMutableList()
         val index = entretiens.indexOfFirst { it.id == entretienId }
@@ -590,17 +646,42 @@ class DataRepository(val context: Context) {
     }
 
     fun getPlateformeOptions(): List<String> {
-        return listOf("---", "HelloWork", "LinkedIn", "Indeed", "Welcome To The Jungle", "SpaceMonk", "Jobteaser", "Monster", "Keljob", "RegioJob", "bretagne-alternance", "Ouest-France Emploi", "Meteojob", "Jooble", "APEC", "Talent.io", "Téléphone", "Email", "Sur place", "WhatsApp", "Autre")
+        return listOf(
+            "---",
+            "HelloWork",
+            "LinkedIn",
+            "Indeed",
+            "Welcome To The Jungle",
+            "SpaceMonk",
+            "Jobteaser",
+            "Monster",
+            "Keljob",
+            "RegioJob",
+            "bretagne-alternance",
+            "Ouest-France Emploi",
+            "Meteojob",
+            "Jooble",
+            "APEC",
+            "Talent.io",
+            "Téléphone",
+            "Email",
+            "Sur place",
+            "WhatsApp",
+            "Autre"
+        )
     }
 
+    // TODO : Implement getTypeEntretienOptions
     fun getTypeEntretienOptions(): List<String> {
         return listOf("---", "Présentiel", "Visio-conférence")
     }
 
+    // TODO : Implement getTypeRelanceOptions
     fun getTypesRelanceOptions(): List<String> {
         return listOf("---", "Présentiel", "Visioconférence")
     }
 
+    // TODO : Implement getTypeEvementOptions
     fun getTypeEvenementOptions(): List<String> {
         return listOf("---", "Candidature", "Relance", "Entretien", "Appel")
     }
@@ -650,6 +731,8 @@ class DataRepository(val context: Context) {
                 relance
             }
         }
+
+        // Todo : Mettre à jour le nom dans les évènements
 
         // Sauvegarder les données mises à jour
         saveAllData()
@@ -716,4 +799,361 @@ class DataRepository(val context: Context) {
         }
     }
 
+
+    fun getUpcomingInterviews(days: Int): List<Entretien> {
+        val now = Calendar.getInstance()
+        val future = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, days) }
+        return loadEntretiens().filter { it.date_entretien in now.time..future.time }
+    }
+
+    fun getGraphData(dayOffset: Int = 0): String {
+        val candidatures = loadCandidatures()
+        val now = Calendar.getInstance()
+        now.add(Calendar.DAY_OF_YEAR, dayOffset)
+        val start = Calendar.getInstance()
+        start.time = now.time
+        start.add(Calendar.DAY_OF_YEAR, -6)
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
+        val startDate = sdf.format(start.time)
+        val endDate = sdf.format(now.time)
+
+        val dailyCounts = mutableMapOf<String, Int>()
+        for (i in 0..6) {
+            val date = start.time
+            val dateString = sdf.format(date)
+            dailyCounts[dateString] = candidatures.count { sdf.format(it.date_candidature) == dateString }
+            start.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((date, count) in dailyCounts) {
+            labels.put(date)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Candidatures par jour")
+                    put("backgroundColor", "#4CAF50")
+                    put("data", data)
+                })
+            })
+        }
+
+        val title = "Candidatures sur $startDate à $endDate"
+
+        val htmlContent = """
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+            <h2>$title</h2>
+            <canvas id="myChart"></canvas>
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: $chartData,
+                    options: {
+                        responsive: true,
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    """
+        Log.d("DataRepository", "HTML content: $htmlContent")
+        return htmlContent
+    }
+
+
+
+
+    fun getInterviewsPerCandidature(): String {
+        val candidatures = loadCandidatures()
+        val entretiens = loadEntretiens()
+
+        val candidaturesCount = candidatures.size
+        val entretiensCount = entretiens.groupBy { it.candidature_id }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((candidatureId, count) in entretiensCount) {
+            val candidature = candidatures.find { it.id == candidatureId }
+            labels.put(candidature?.titre_offre ?: "Unknown")
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Entretiens par candidature")
+                    put("backgroundColor", "#FF9800")
+                    put("data", data)
+                })
+            })
+        }
+
+        return """
+            <html>
+            <head>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            </head>
+            <body>
+                <canvas id="myChart"></canvas>
+                <script>
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: $chartData,
+                        options: {
+                            responsive: true,
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
+            </body>
+            </html>
+        """
+    }
+
+    fun getCandidaturesPerCompany(): String {
+        val candidatures = loadCandidatures()
+        val candidaturesCount =
+            candidatures.groupBy { it.entrepriseNom }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((company, count) in candidaturesCount) {
+            labels.put(company)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Candidatures par entreprise")
+                    put("backgroundColor", "#FF6384")
+                    put("data", data)
+                })
+            })
+        }
+
+        return """
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+            <canvas id="myChart"></canvas>
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: $chartData,
+                    options: {
+                        responsive: true,
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    """
+    }
+
+    fun getCandidaturesPerLocation(): String {
+        val candidatures = loadCandidatures()
+        val candidaturesCount = candidatures.groupBy { it.lieuPoste }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((location, count) in candidaturesCount) {
+            labels.put(location ?: "Unknown")
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Candidatures par lieu de poste")
+                    put("backgroundColor", "#36A2EB")
+                    put("data", data)
+                })
+            })
+        }
+
+        return """
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+            <canvas id="myChart"></canvas>
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: $chartData,
+                    options: {
+                        responsive: true,
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    """
+    }
+
+    fun getCandidaturesPerState(): String {
+        val candidatures = loadCandidatures()
+        val candidaturesCount = candidatures.groupBy { it.etat }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((state, count) in candidaturesCount) {
+            labels.put(state)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Candidatures par état")
+                    put("backgroundColor", "#FFCE56")
+                    put("data", data)
+                })
+            })
+        }
+
+        return """
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+            <canvas id="myChart"></canvas>
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: $chartData,
+                    options: {
+                        responsive: true,
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    """
+    }
+
+    fun getCandidaturesPerPlateforme(): String {
+        val candidatures = loadCandidatures()
+        val candidaturesCount = candidatures.groupBy { it.plateforme }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((plateforme, count) in candidaturesCount) {
+            labels.put(plateforme)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Candidatures par plateforme")
+                    put("backgroundColor", "#4BC0C0")
+                    put("data", data)
+                })
+            })
+        }
+
+        return """
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+            <canvas id="myChart"></canvas>
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: $chartData,
+                    options: {
+                        responsive: true,
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    """
+    }
+
+    fun getCandidaturesPerTypePoste(): String {
+        val candidatures = loadCandidatures()
+        val candidaturesCount = candidatures.groupBy { it.type_poste }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((typePoste, count) in candidaturesCount) {
+            labels.put(typePoste)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Candidatures par type de poste")
+                    put("backgroundColor", "#9966FF")
+                    put("data", data)
+                })
+            })
+        }
+
+        return """
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+            <canvas id="myChart"></canvas>
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: $chartData,
+                    options: {
+                        responsive: true,
+                    }
+                });
+            </script>
+        </body>
+        </html>
+    """
+    }
 }

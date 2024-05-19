@@ -18,6 +18,7 @@ import com.delhomme.jobber.Appel.EditAppelActivity
 import com.delhomme.jobber.Appel.adapter.AppelAdapter
 import com.delhomme.jobber.Appel.model.Appel
 import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.CandidatureState
 import com.delhomme.jobber.Contact.AddContactActivity
 import com.delhomme.jobber.Contact.DetailsContactActivity
 import com.delhomme.jobber.Contact.EditContactActivity
@@ -25,8 +26,8 @@ import com.delhomme.jobber.Contact.adapter.ContactAdapter
 import com.delhomme.jobber.Contact.model.Contact
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entretien.AddEntretienActivity
-import com.delhomme.jobber.Entretien.EditEntretienActivity
 import com.delhomme.jobber.Entretien.DetailsEntretienActivity
+import com.delhomme.jobber.Entretien.EditEntretienActivity
 import com.delhomme.jobber.Entretien.adapter.EntretienAdapter
 import com.delhomme.jobber.Entretien.model.Entretien
 import com.delhomme.jobber.R
@@ -73,11 +74,9 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
     private fun displayCandidatureDetails() {
         val entrepriseNom = candidature.entrepriseNom
-        Log.d("displayCandidatureDetails", "Nom de l'entreprise à rechercher : $entrepriseNom")
         val entreprise = dataRepository.getEntrepriseByNom(entrepriseNom)
-        Log.d("displayCandidatureDetails", "Entreprise trouvée : $entreprise")
-        Log.d("displayCandidatureDetails", "Nom de l'entreprise trouvée : ${entreprise?.nom}")
         val entrepriseAffiche = entreprise?.nom ?: "Unknown Entreprise"
+        findViewById<TextView>(R.id.titreoffre).text = candidature.titre_offre
         findViewById<TextView>(R.id.tvCandidatureInfo).text = "Candidature for ${candidature.titre_offre} as $entrepriseAffiche"
         findViewById<TextView>(R.id.tvEntrepriseCandidature).text = entrepriseAffiche
         findViewById<TextView>(R.id.tvNotesCandidature).text = candidature.notes
@@ -85,8 +84,20 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvTypePoste).text = candidature.type_poste
         findViewById<TextView>(R.id.tvPlateforme).text = candidature.plateforme
         findViewById<TextView>(R.id.tvLieuPoste).text = candidature.lieuPoste
-    }
 
+        val stateWithEmoji = when (candidature.state) {
+            CandidatureState.CANDIDATEE_ET_EN_ATTENTE -> "🕒 Candidature en attente"
+            CandidatureState.EN_ATTENTE_APRES_ENTRETIEN -> "🕒 En attente après entretien"
+            CandidatureState.FAIRE_UN_RETOUR_POST_ENTRETIEN -> "🔄 Faire un retour post entretien"
+            CandidatureState.A_RELANCEE_APRES_ENTRETIEN -> "🔄 Relancée après entretien"
+            CandidatureState.A_RELANCEE -> "🔄 À relancer"
+            CandidatureState.RELANCEE_ET_EN_ATTENTE -> "🕒 Relancée et en attente"
+            CandidatureState.AUCUNE_REPONSE -> "🚫 Aucune réponse"
+            CandidatureState.NON_RETENU -> "❌ Non retenue"
+            CandidatureState.ERREUR -> "⚠️ Erreur"
+        }
+        findViewById<TextView>(R.id.tvEtatCandidature).text = stateWithEmoji
+    }
 
     private fun setupRecyclerView() {
         setupContactRecyclerView()
@@ -101,7 +112,6 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         setupAddRelanceButton()
         setupAddEntretienButton()
     }
-
 
     private fun setupContactRecyclerView() {
         val contacts = dataRepository.loadContactsForEntreprise(candidature.entrepriseNom)
@@ -144,10 +154,17 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         val newContacts = dataRepository.loadContactsForEntreprise(candidature.entrepriseNom)
         contactAdapter.updateContacts(newContacts)
     }
+
     private fun setupRelanceRecyclerView() {
         val relances = dataRepository.loadRelancesForCandidature(candidature.id)
         if (relances != null) {
-            relanceAdapter = RelanceAdapter(relances, dataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked, this::onEditRelanceClicked)
+            relanceAdapter = RelanceAdapter(
+                relances,
+                dataRepository,
+                this::onRelanceClicked,
+                this::onDeleteRelanceClicked,
+                this::onEditRelanceClicked
+            )
             findViewById<RecyclerView>(R.id.recyclerViewRelances).apply {
                 layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
                 adapter = relanceAdapter
@@ -167,6 +184,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         dataRepository.deleteRelance(relanceId)
         relanceAdapter.updateRelances(dataRepository.loadRelancesForCandidature(candidature.id))
     }
+
     private fun updateRelanceList() {
         val relances = dataRepository.loadRelancesForCandidature(candidature.id)
         if (relances.isNotEmpty()) {
@@ -196,6 +214,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         dataRepository.deleteAppel(appelId)
         updateAppelList()
     }
+
     private fun updateAppelList() {
         val updatedAppels = dataRepository.loadAppelsForCandidature(candidature.id)
         Log.d("DetailsCandidatureActivity", "Appels of candidature : $updatedAppels")
@@ -204,7 +223,13 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
     private fun setupEntretienRecyclerView() {
         val entretiens = dataRepository.loadEntretiensForCandidature(candidature.id)
-        entretienAdapter = EntretienAdapter(entretiens, dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
+        entretienAdapter = EntretienAdapter(
+            entretiens,
+            dataRepository,
+            this::onEntretienClicked,
+            this::onDeleteEntretienClicked,
+            this::onEditEntretienClicked
+        )
 
         findViewById<RecyclerView>(R.id.recyclerViewEntretiens).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
@@ -232,7 +257,6 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         }
         startActivity(intent)
         updateEntretienList()
-
     }
 
     private fun onEditAppelClicked(appelId: String) {
@@ -301,6 +325,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
@@ -317,5 +342,4 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         updateAppelList()
         updateRelanceList()
     }
-
 }

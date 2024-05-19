@@ -48,7 +48,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-
         <TextView
             android:id="@+id/tvEtatCandidature"
             android:layout_width="0dp"
@@ -108,6 +107,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp" />
+
         <TextView
             android:id="@+id/lblContacts"
             android:layout_width="0dp"
@@ -197,6 +197,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp" />
+
         <TextView
             android:id="@+id/lblRelances"
             android:layout_width="0dp"
