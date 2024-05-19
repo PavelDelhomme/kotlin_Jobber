@@ -1,5 +1,6 @@
 package com.delhomme.jobber.Entreprise
 
+import RelanceAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -34,7 +35,6 @@ import com.delhomme.jobber.R
 import com.delhomme.jobber.Relance.AddRelanceActivity
 import com.delhomme.jobber.Relance.DetailsRelanceActivity
 import com.delhomme.jobber.Relance.EditRelanceActivity
-import com.delhomme.jobber.Relance.adapter.RelanceAdapter
 import com.delhomme.jobber.Relance.model.Relance
 
 class DetailsEntrepriseActivity : AppCompatActivity() {

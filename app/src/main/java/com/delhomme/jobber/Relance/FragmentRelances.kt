@@ -1,5 +1,6 @@
 package com.delhomme.jobber.Relance
 
+import RelanceAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
-import com.delhomme.jobber.Relance.adapter.RelanceAdapter
 import com.delhomme.jobber.Relance.model.Relance
 
 class FragmentRelances : Fragment() {

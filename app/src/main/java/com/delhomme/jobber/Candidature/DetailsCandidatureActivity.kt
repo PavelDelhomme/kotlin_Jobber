@@ -1,5 +1,6 @@
 package com.delhomme.jobber.Candidature
 
+import RelanceAdapter
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
@@ -32,7 +33,6 @@ import com.delhomme.jobber.R
 import com.delhomme.jobber.Relance.AddRelanceActivity
 import com.delhomme.jobber.Relance.DetailsRelanceActivity
 import com.delhomme.jobber.Relance.EditRelanceActivity
-import com.delhomme.jobber.Relance.adapter.RelanceAdapter
 import com.delhomme.jobber.Relance.model.Relance
 import java.util.Locale
 

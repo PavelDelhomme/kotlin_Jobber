@@ -1,5 +1,3 @@
-package com.delhomme.jobber.Relance.adapter
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,22 +18,22 @@ class RelanceAdapter(
     private val editClickListener: (String) -> Unit
 ) : RecyclerView.Adapter<RelanceAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val dateRelance: TextView = view.findViewById(R.id.dateRelance)
-        private val entreprise: TextView = view.findViewById(R.id.entrepriseRelance)
-        private val candidatureTitre: TextView = view.findViewById(R.id.candidatureTitre)
-        private val plateformeUtilise: TextView = view.findViewById(R.id.plateformeRelance)
-        private val notesRelance: TextView = view.findViewById(R.id.notesRelance)
-        private val deleteButton: ImageButton = view.findViewById(R.id.btnDeleteRelance)
-        private val btnEdit: ImageButton = view.findViewById(R.id.btnEditRelance)
+        val dateRelance: TextView = view.findViewById(R.id.dateRelance)
+        val entreprise: TextView = view.findViewById(R.id.entrepriseRelance)
+        val candidatureTitre: TextView = view.findViewById(R.id.candidatureTitre)
+        val plateformeUtilise: TextView = view.findViewById(R.id.plateformeRelance)
+        val notesRelance: TextView = view.findViewById(R.id.notesRelance)
+        val deleteButton: ImageButton = view.findViewById(R.id.btnDeleteRelance)
+        val btnEdit: ImageButton = view.findViewById(R.id.btnEditRelance)
 
         fun bind(relance: Relance, dataRepository: DataRepository, clickListener: (Relance) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
             val entrepriseName = dataRepository.getEntrepriseByNom(relance.entrepriseNom)?.nom ?: "Entreprise inconnue"
             val candidature = dataRepository.getCandidatureById(relance.candidatureId)?.titre_offre ?: "Offre inconnue"
-            dateRelance.text = SimpleDateFormat("dd/MM/yyyyy", Locale.getDefault()).format(relance.date_relance)
+            dateRelance.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(relance.date_relance)
             entreprise.text = entrepriseName
             candidatureTitre.text = candidature
             plateformeUtilise.text = relance.plateformeUtilisee
-            notesRelance.text = relance.notes ?: "Aucune notes de relances"
+            notesRelance.text = relance.notes ?: "Aucune note de relance"
 
             itemView.setOnClickListener { clickListener(relance) }
             btnEdit.setOnClickListener { editListener(relance.id) }
