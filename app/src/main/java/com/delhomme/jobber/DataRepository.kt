@@ -800,14 +800,12 @@ class DataRepository(val context: Context) {
     }
 
 
-    fun getUpcomingInterviews(days: Int): List<Entretien> {
-        val now = Calendar.getInstance()
-        val future = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, days) }
-        return loadEntretiens().filter { it.date_entretien in now.time..future.time }
-    }
-
     fun getGraphData(dayOffset: Int = 0): String {
         val candidatures = loadCandidatures()
+        val appels = getAppelsLast7Days()
+        val relances = getRelancesLast7Days()
+        val entretiens = getUpcomingInterviews(7) + getPastInterviews()
+
         val now = Calendar.getInstance()
         now.add(Calendar.DAY_OF_YEAR, dayOffset)
         val start = Calendar.getInstance()
@@ -819,67 +817,120 @@ class DataRepository(val context: Context) {
         val endDate = sdf.format(now.time)
 
         val dailyCounts = mutableMapOf<String, Int>()
+        val dailyAppels = mutableMapOf<String, Int>()
+        val dailyRelances = mutableMapOf<String, Int>()
+        val dailyEntretiens = mutableMapOf<String, Int>()
+
         for (i in 0..6) {
             val date = start.time
             val dateString = sdf.format(date)
             dailyCounts[dateString] = candidatures.count { sdf.format(it.date_candidature) == dateString }
+            dailyAppels[dateString] = appels.count { sdf.format(it.date_appel) == dateString }
+            dailyRelances[dateString] = relances.count { sdf.format(it.date_relance) == dateString }
+            dailyEntretiens[dateString] = entretiens.count { sdf.format(it.date_entretien) == dateString }
             start.add(Calendar.DAY_OF_YEAR, 1)
         }
 
         val labels = JSONArray()
-        val data = JSONArray()
-        for ((date, count) in dailyCounts) {
+        val dataCandidatures = JSONArray()
+        val dataAppels = JSONArray()
+        val dataRelances = JSONArray()
+        val dataEntretiens = JSONArray()
+        for ((date) in dailyCounts) {
             labels.put(date)
-            data.put(count)
+            dataCandidatures.put(dailyCounts[date])
+            dataAppels.put(dailyAppels[date])
+            dataRelances.put(dailyRelances[date])
+            dataEntretiens.put(dailyEntretiens[date])
         }
 
         val chartData = JSONObject().apply {
             put("labels", labels)
             put("datasets", JSONArray().apply {
                 put(JSONObject().apply {
-                    put("label", "Candidatures par jour")
+                    put("label", "Candidatures")
                     put("backgroundColor", "#4CAF50")
-                    put("data", data)
+                    put("data", dataCandidatures)
+                })
+                put(JSONObject().apply {
+                    put("label", "Appels")
+                    put("backgroundColor", "#FF6384")
+                    put("data", dataAppels)
+                })
+                put(JSONObject().apply {
+                    put("label", "Relances")
+                    put("backgroundColor", "#36A2EB")
+                    put("data", dataRelances)
+                })
+                put(JSONObject().apply {
+                    put("label", "Entretiens")
+                    put("backgroundColor", "#FFCE56")
+                    put("data", dataEntretiens)
                 })
             })
         }
 
-        val title = "Candidatures sur $startDate à $endDate"
+        val title = "Activité sur $startDate à $endDate"
 
         val htmlContent = """
-        <html>
-        <head>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        </head>
-        <body>
-            <h2>$title</h2>
-            <canvas id="myChart"></canvas>
-            <script>
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: $chartData,
-                    options: {
-                        responsive: true,
-                        scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }]
+            <html>
+            <head>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            </head>
+            <body>
+                <h2>$title</h2>
+                <canvas id="myChart"></canvas>
+                <script>
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: $chartData,
+                        options: {
+                            responsive: true,
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true,
+                                        precision: 0 // This ensures the y-axis displays integer values
+                                    }
+                                }]
+                            }
                         }
-                    }
-                });
-            </script>
-        </body>
-        </html>
-    """
+                    });
+                </script>
+            </body>
+            </html>
+        """
+
         Log.d("DataRepository", "HTML content: $htmlContent")
         return htmlContent
     }
 
+    fun getAppelsLast7Days(): List<Appel> {
+        val now = Calendar.getInstance()
+        val start = Calendar.getInstance()
+        start.add(Calendar.DAY_OF_YEAR, -7)
 
+        return loadAppels().filter { it.date_appel in start.time..now.time }
+    }
 
+    fun getRelancesLast7Days(): List<Relance> {
+        val now = Calendar.getInstance()
+        val start = Calendar.getInstance()
+        start.add(Calendar.DAY_OF_YEAR, -7)
+        return loadRelances().filter { it.date_relance in start.time..now.time }
+    }
+
+    fun getUpcomingInterviews(days: Int): List<Entretien> {
+        val now = Calendar.getInstance()
+        val future = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, days) }
+        return loadEntretiens().filter { it.date_entretien in now.time..future.time }
+    }
+
+    fun getPastInterviews(): List<Entretien> {
+        val now = Calendar.getInstance()
+        return loadEntretiens().filter { it.date_entretien.before(now.time) }
+    }
 
     fun getInterviewsPerCandidature(): String {
         val candidatures = loadCandidatures()
