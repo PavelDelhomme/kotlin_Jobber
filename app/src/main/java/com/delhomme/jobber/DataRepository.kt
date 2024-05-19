@@ -1,7 +1,15 @@
 package com.delhomme.jobber
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.delhomme.jobber.Appel.model.Appel
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.Contact.model.Contact
@@ -74,6 +82,8 @@ class DataRepository(val context: Context) {
         candidatures = mutableCandidature
         val jsonString = gson.toJson(candidatures)
         sharedPreferences.edit().putString("candidatures", jsonString).apply()
+
+        updateCandidatureState(candidature)
     }
 
 
@@ -112,6 +122,7 @@ class DataRepository(val context: Context) {
                 }
                 it.relances.add(relance.id)
                 saveCandidature(it)
+                updateCandidatureState(it)
             }
         }
         val jsonString = gson.toJson(relances)
@@ -132,6 +143,7 @@ class DataRepository(val context: Context) {
             if (!it.entretiens.contains(entretien.id)) {
                 it.entretiens.add(entretien.id)
                 saveCandidature(it)
+                updateCandidatureState(it)
             }
         }
 
@@ -168,6 +180,11 @@ class DataRepository(val context: Context) {
         } else {
             appels.add(appel)
         }
+
+        val candidature = appel.candidature_id?.let { getCandidatureById(it) }
+        candidature?.let {
+            updateCandidatureState(it)
+        }
         val jsonString = gson.toJson(appels)
         sharedPreferences.edit().putString("appels", jsonString).apply()
     }
@@ -193,6 +210,11 @@ class DataRepository(val context: Context) {
     fun deleteAppel(appelId: String) {
         val currentAppel = loadAppels().toMutableList()
         val filteredAppel = currentAppel.filter { it.id != appelId }
+        val appelGet = getAppelById(appelId)
+        val candidature = appelGet?.candidature_id?.let { getCandidatureById(it) }
+        candidature?.let {
+            updateCandidatureState(it)
+        }
         val jsonString = gson.toJson(filteredAppel)
         sharedPreferences.edit().putString("appels", jsonString).apply()
     }
@@ -207,6 +229,11 @@ class DataRepository(val context: Context) {
     fun deleteRelance(relanceId: String) {
         val currentRelance = loadRelances().toMutableList()
         val filteredRelance = currentRelance.filter { it.id != relanceId }
+        val relanceGet = getRelanceById(relanceId)
+        val candidature = relanceGet?.candidatureId?.let { getCandidatureById(it) }
+        candidature?.let {
+            updateCandidatureState(it)
+        }
         val jsonString = gson.toJson(filteredRelance)
         sharedPreferences.edit().putString("relances", jsonString).apply()
     }
@@ -214,6 +241,11 @@ class DataRepository(val context: Context) {
     fun deleteEntretien(entretienId: String) {
         val currentEntretien = loadEntretiens().toMutableList()
         val filteredEntretien = currentEntretien.filter { it.id != entretienId }
+        val entretienGet = getEntretienById(entretienId)
+        val candidature = entretienGet?.candidature_id?.let { getCandidatureById(it) }
+        candidature?.let {
+            updateCandidatureState(it)
+        }
         val jsonString = gson.toJson(filteredEntretien)
         sharedPreferences.edit().putString("entretiens", jsonString).apply()
     }
@@ -466,7 +498,7 @@ class DataRepository(val context: Context) {
     fun editCandidature(
         candidatureId: String,
         newTitre: String,
-        newEtat: String,
+        newEtat: CandidatureState,
         newNotes: String,
         newPlateforme: String,
         newTypePoste: String,
@@ -483,7 +515,7 @@ class DataRepository(val context: Context) {
             val oldCandidature = candidatures[index]
             val updatedCandidature = oldCandidature.copy(
                 titre_offre = newTitre,
-                etat = newEtat,
+                state = newEtat,
                 notes = newNotes,
                 plateforme = newPlateforme,
                 type_poste = newTypePoste,
@@ -747,13 +779,11 @@ class DataRepository(val context: Context) {
             putString("relances", gson.toJson(relances))
         }.apply()
     }
-
     fun updateCandidatureState(candidature: Candidature) {
         val today = Calendar.getInstance().time
         val candidatedDate = candidature.date_candidature
         val daysSinceCandidated = (today.time - candidatedDate.time) / (1000 * 60 * 60 * 24)
 
-        // Check si aucun entretiens, appels, ou relances associée avec cette candidature
         val entretiens = loadEntretiensForCandidature(candidature.id)
         val appels = loadAppelsForCandidature(candidature.id)
         val relances = loadRelancesForCandidature(candidature.id)
@@ -761,28 +791,25 @@ class DataRepository(val context: Context) {
         val sevenDaysAfterCandidature = Date(candidatedDate.time + 7 * (1000 * 60 * 60 * 24))
 
         val newState = when {
-            // Candidature est dans les 7 jours suivant la candidature
             daysSinceCandidated <= 7 -> CandidatureState.CANDIDATEE_ET_EN_ATTENTE
-
-            // Aucun entretien, appel, interaction ou relance dans les 7 derniers jours suivant la candidature
             entretiens.isEmpty() && appels.isEmpty() && relances.none { it.date_relance <= sevenDaysAfterCandidature } -> CandidatureState.A_RELANCEE
-
-            // Relance ajoutée avant ou après les 7 jours suivant la candidature
             relances.any { it.date_relance > sevenDaysAfterCandidature } -> CandidatureState.RELANCEE_ET_EN_ATTENTE
-
-            // En attente après entretien si retour post-entretien effectué
             entretiens.isNotEmpty() && candidature.retourPostEntretien && daysSinceCandidated <= 14 -> CandidatureState.EN_ATTENTE_APRES_ENTRETIEN
-
-            // Aucune réponse après relance
             relances.isNotEmpty() && daysSinceCandidated > 14 -> CandidatureState.AUCUNE_REPONSE
-
-            // Par défaut
             else -> CandidatureState.ERREUR
         }
 
-        candidature.state = newState
-        saveCandidature(candidature)
+        if (candidature.state != newState) {
+            candidature.state = newState
+            saveCandidature(candidature)
+
+            // Envoyer une notification
+            val title = "État de candidature mis à jour"
+            val message = "La candidature pour ${candidature.titre_offre} est maintenant ${newState.name}"
+            sendNotification(context, title, message)
+        }
     }
+
 
     fun checkAndUpdateCandidatureStates() {
         val candidatures = getCandidatures()
@@ -1078,7 +1105,7 @@ class DataRepository(val context: Context) {
 
     fun getCandidaturesPerState(): String {
         val candidatures = loadCandidatures()
-        val candidaturesCount = candidatures.groupBy { it.etat }.mapValues { it.value.size }
+        val candidaturesCount = candidatures.groupBy { it.state }.mapValues { it.value.size }
 
         val labels = JSONArray()
         val data = JSONArray()
@@ -1206,5 +1233,41 @@ class DataRepository(val context: Context) {
         </body>
         </html>
     """
+    }
+
+    fun sendNotification(context: Context, title: String, message: String) {
+        Log.d("DataRepository", "sendNotification called with title: $title and message : $message")
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = NotificationChannel("JOBBER_CHANNEL", "Jobber Notifications", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = "Channel for Jobber notifications"
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
+
+        val builder = NotificationCompat.Builder(context, "JOBBER_CHANNEL")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        with(NotificationManagerCompat.from(context)) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.d("NotificationReceiver", "Request permissions")
+                return
+            }
+            Log.d("NotificationReceiver", "No request permissions because they're granted!")
+            notify(1001, builder.build())
+        }
     }
 }

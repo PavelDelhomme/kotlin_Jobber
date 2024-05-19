@@ -38,7 +38,7 @@ class CandidatureAdapter(
             nomPoste.text = candidature.titre_offre
             entreprise.text = entrepriseNom
             date.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(candidature.date_candidature)
-            etat.text = candidature.etat
+            etat.text = candidature.state.toString()
             typePoste.text = candidature.type_poste
             plateforme.text = candidature.plateforme
             notes.text = candidature.notes

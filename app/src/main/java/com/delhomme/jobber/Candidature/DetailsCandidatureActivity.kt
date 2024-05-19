@@ -46,6 +46,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     private lateinit var appelAdapter: AppelAdapter
     private lateinit var entretienAdapter: EntretienAdapter
     private lateinit var relanceAdapter: RelanceAdapter
+    private lateinit var buttonChangeState: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -333,7 +334,6 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
     override fun onResume() {
         super.onResume()
         dataRepository.reloadEntreprises()
@@ -341,5 +341,9 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         updateContactList()
         updateAppelList()
         updateRelanceList()
+
+        candidature = dataRepository.getCandidatureById(candidatureId!!) ?: return
+        displayCandidatureDetails()
     }
+
 }

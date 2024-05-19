@@ -87,9 +87,8 @@ class AddCandidatureActivity : AppCompatActivity() {
             plateforme = plateformeUtilisee,
             type_poste = typePoste,
             lieuPoste = lieuPoste,
-            etat = "Candidaté et en attente",
+            state = CandidatureState.CANDIDATEE_ET_EN_ATTENTE,
             notes = notesCandidature,
-            state = CandidatureState.CANDIDATEE_ET_EN_ATTENTE
         )
 
         dataRepository.saveCandidature(newCandidature)

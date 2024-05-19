@@ -69,6 +69,7 @@ class FragmentCandidatures : Fragment() {
     override fun onResume() {
         super.onResume()
         adapter.updateCandidatures(dataRepository.getCandidatures())
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(updateReceiver)
     }
 
     override fun onDestroyView() {

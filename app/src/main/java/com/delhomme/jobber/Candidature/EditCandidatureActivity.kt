@@ -74,7 +74,6 @@ class EditCandidatureActivity : AppCompatActivity() {
             val candidature = dataRepository.getCandidatureById(it)
             candidature?.let { cand ->
                 findViewById<EditText>(R.id.etTitreOffre).setText(cand.titre_offre)
-                findViewById<EditText>(R.id.etEtat).setText(cand.etat)
                 findViewById<EditText>(R.id.etNotes).setText(cand.notes)
                 setupDatePicker(cand.date_candidature)
                 findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).setText(dataRepository.getEntrepriseByNom(cand.entrepriseNom)?.nom)
@@ -91,7 +90,6 @@ class EditCandidatureActivity : AppCompatActivity() {
         val titre = findViewById<EditText>(R.id.etTitreOffre).text.toString()
         val entrepriseNom = findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).text.toString()
         val entrepriseId = dataRepository.getOrCreateEntreprise(entrepriseNom).nom
-        val etat = findViewById<EditText>(R.id.etEtat).text.toString()
         val notes = findViewById<EditText>(R.id.etNotes).text.toString()
         val plateforme = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()
         val typePoste = findViewById<Spinner>(R.id.spinner_type_poste).selectedItem.toString()
@@ -102,12 +100,12 @@ class EditCandidatureActivity : AppCompatActivity() {
         val entretiensIds = existingCandidature?.entretiens ?: mutableListOf()
         val appelsIds = existingCandidature?.appels ?: mutableListOf()
         val relancesIds = existingCandidature?.relances ?: mutableListOf()
-
+        val stateCandidature = existingCandidature?.state
         if (candidatureId != null) {
             dataRepository.editCandidature(
                 candidatureId!!,
                 titre,
-                etat,
+                stateCandidature!!,
                 notes,
                 plateforme,
                 typePoste,

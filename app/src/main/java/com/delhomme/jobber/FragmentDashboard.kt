@@ -96,4 +96,15 @@ class FragmentDashboard : Fragment() {
         val upcomingInterviews = dataRepository.getUpcomingInterviews(7)
         adapter.updateEntretiens(upcomingInterviews)
     }
+
+    private fun reloadData() {
+        updateUpcomingInterviews()
+
+        loadGraphData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        reloadData()
+    }
 }

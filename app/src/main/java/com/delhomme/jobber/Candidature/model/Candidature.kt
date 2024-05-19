@@ -12,7 +12,6 @@ data class Candidature(
     val plateforme: String,
     val lieuPoste: String?,
     val date_candidature: Date,
-    val etat: String,
     val notes: String,
     val entretiens: MutableList<String> = mutableListOf(),
     val appels: MutableList<String> = mutableListOf(),
