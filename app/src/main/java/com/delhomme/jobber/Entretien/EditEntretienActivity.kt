@@ -34,9 +34,7 @@ class EditEntretienActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_entretien)
 
-        if (supportActionBar != null) {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         dataRepository = DataRepository(this)
         entretienId = intent.getStringExtra("ENTRETIEN_ID")
@@ -125,7 +123,7 @@ class EditEntretienActivity : AppCompatActivity() {
         val nomContact = autoCompleteTextViewContact.text.toString()
 
         val entreprise = dataRepository.getOrCreateEntreprise(nomEntreprise)
-        val contact = dataRepository.getContactById(nomContact)
+        val contact = dataRepository.getOrCreateContact(nomContact.split(" ")[0], nomContact.split(" ")[1], entreprise.nom)
 
         if (entretienId != null) {
             val entretien = dataRepository.getEntretienById(entretienId!!)!!

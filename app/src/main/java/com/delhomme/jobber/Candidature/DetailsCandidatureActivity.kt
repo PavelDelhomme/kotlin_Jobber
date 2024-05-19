@@ -25,8 +25,8 @@ import com.delhomme.jobber.Contact.adapter.ContactAdapter
 import com.delhomme.jobber.Contact.model.Contact
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entretien.AddEntretienActivity
-import com.delhomme.jobber.Entretien.DetailsEntretienActivity
 import com.delhomme.jobber.Entretien.EditEntretienActivity
+import com.delhomme.jobber.Entretien.DetailsEntretienActivity
 import com.delhomme.jobber.Entretien.adapter.EntretienAdapter
 import com.delhomme.jobber.Entretien.model.Entretien
 import com.delhomme.jobber.R

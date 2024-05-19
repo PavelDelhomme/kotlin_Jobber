@@ -2,6 +2,7 @@ package com.delhomme.jobber.Entretien
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
@@ -11,6 +12,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entretien.model.Entretien
 import com.delhomme.jobber.R
@@ -34,9 +36,7 @@ class AddEntretienActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_entretien)
 
-        if (supportActionBar != null) {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         dataRepository = DataRepository(this)
         setupUI()
@@ -53,7 +53,7 @@ class AddEntretienActivity : AppCompatActivity() {
 
         ArrayAdapter.createFromResource(
             this,
-            R.array.types_entretien, // Assume you have an array in resources
+            R.array.types_entretien,
             android.R.layout.simple_spinner_item
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -62,7 +62,7 @@ class AddEntretienActivity : AppCompatActivity() {
 
         ArrayAdapter.createFromResource(
             this,
-            R.array.modes_entretien, // Assume you have an array in resources
+            R.array.modes_entretien,
             android.R.layout.simple_spinner_item
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -107,7 +107,20 @@ class AddEntretienActivity : AppCompatActivity() {
 
             autoCompleteTextViewEntreprise.setText(entreprise?.nom)
             autoCompleteTextViewEntreprise.isEnabled = false
+            setupContactAutoComplete(entreprise?.nom)
         }
+
+        autoCompleteTextViewEntreprise.setOnItemClickListener { parent, _, position, _ ->
+            val selectedEntreprise = parent.getItemAtPosition(position) as String
+            setupContactAutoComplete(selectedEntreprise)
+        }
+    }
+
+    private fun setupContactAutoComplete(entrepriseNom: String?) {
+        if (entrepriseNom.isNullOrEmpty()) return
+        val contacts = dataRepository.loadContactsForEntreprise(entrepriseNom)
+        val contactAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, contacts.map { "${it.nom} ${it.prenom}" })
+        autoCompleteTextViewContact.setAdapter(contactAdapter)
     }
 
     private fun addEntretien() {
@@ -119,34 +132,36 @@ class AddEntretienActivity : AppCompatActivity() {
         val nomEntreprise = autoCompleteTextViewEntreprise.text.toString()
         val nomContact = autoCompleteTextViewContact.text.toString()
 
+        val (nom, prenom) = nomContact.split(" ").let {
+            if (it.size == 2) it[0] to it[1] else return@let "Unknown" to "Contact"
+        }
+
         val entreprise = dataRepository.getOrCreateEntreprise(nomEntreprise)
-        val contact = dataRepository.getContactById(nomContact)
+        val contact = dataRepository.getOrCreateContact(nom, prenom, entreprise.nom)
 
         val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
+
+        candidatureId?.let {
+            dataRepository.addCandidatureToContact(contact.id, it)
+        }
 
         val entretien = Entretien(
             id = UUID.randomUUID().toString(),
             entrepriseNom = entreprise.nom,
+            contact_id = contact.id,
+            candidature_id = candidatureId ?: "",
             date_entretien = dateEntretien,
             type = typeEntretien,
             mode = modeEntretien,
             notes_pre_entretien = notesPreEntretien,
-            candidature_id = candidatureId.toString()
         )
-
-        if (candidatureId != null) {
-            val candidature = dataRepository.getCandidatureById(candidatureId)
-            candidature?.let {
-                it.entretiens.add(entretien.id)
-                dataRepository.saveCandidature(it)
-            }
-        }
 
         dataRepository.saveEntretien(entretien)
         entreprise.entretiens.add(entretien.id)
         dataRepository.saveEntreprise(entreprise)
 
         Toast.makeText(this, "Entretien ajouté pour ${entreprise.nom}", Toast.LENGTH_SHORT).show()
+        LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("ENTRETIENS_UPDATED"))
         finish()
     }
 

@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Calendar
 import java.util.Date
+import java.util.UUID
 
 class DataRepository(val context: Context) {
     private val sharedPreferences = context.getSharedPreferences("CandidaturesPrefs", Context.MODE_PRIVATE)
@@ -114,10 +115,30 @@ class DataRepository(val context: Context) {
         val index = entretiens.indexOfFirst { it.id == entretien.id }
         if (index != -1) {
             entretiens[index] = entretien
+        } else {
+            entretiens.add(entretien)
         }
+
+        val candidature = getCandidatureById(entretien.candidature_id)
+        candidature?.let {
+            if (!it.entretiens.contains(entretien.id)) {
+                it.entretiens.add(entretien.id)
+                saveCandidature(it)
+            }
+        }
+
+        val contact = getContactById(entretien.contact_id)
+        contact?.let {
+            if (it.candidatureIds?.contains(entretien.candidature_id) == false) {
+                it.candidatureIds?.add(entretien.candidature_id)
+                saveContact(it)
+            }
+        }
+
         val jsonString = gson.toJson(entretiens)
         sharedPreferences.edit().putString("entretiens", jsonString).apply()
     }
+
 
     fun saveContact(contact: Contact) {
         val contacts = loadContacts().toMutableList()
@@ -267,7 +288,6 @@ class DataRepository(val context: Context) {
         }
     }
 
-
     fun reloadContacts() {
         val jsonString = sharedPreferences.getString("contacts", null)
         if (jsonString != null) {
@@ -276,7 +296,6 @@ class DataRepository(val context: Context) {
         }
     }
 
-
     fun reloadCandidatures() {
         val jsonString = sharedPreferences.getString("candidatures", null)
         if (jsonString != null) {
@@ -284,7 +303,6 @@ class DataRepository(val context: Context) {
             gson.fromJson<List<Candidature>>(jsonString, type) ?: emptyList()
         }
     }
-
 
     private fun loadCandidatures(): List<Candidature>{
         val jsonString = sharedPreferences.getString("candidatures", null)
@@ -352,6 +370,7 @@ class DataRepository(val context: Context) {
     }
 
 
+
     fun loadAppelsForContact(contact_id: String): List<Appel> {
         return loadAppels().filter { it.contact_id == contact_id }
     }
@@ -375,7 +394,7 @@ class DataRepository(val context: Context) {
     fun loadEntretiensForCandidature(candidatureId: String): List<Entretien> {
         return loadEntretiens().filter { it.candidature_id == candidatureId }
     }
-    // TODO FIXED ici je fait la récupération des contact théoriquement en filtrant par ID d'entreprise
+
     fun loadContactsForEntreprise(entrepriseNom: String?): List<Contact> {
         return loadContacts().filter { it.entrepriseNom == entrepriseNom }
     }
@@ -401,7 +420,32 @@ class DataRepository(val context: Context) {
         return newEntreprise
     }
 
-    fun editCandidature(candidatureId: String, newTitre: String, newEtat: String, newNotes: String, newPlateforme: String, newTypePoste: String, newLieuPoste: String, newEntrepriseNom: String, newDate: Date, newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>, newRelances: MutableList<String>) {
+    fun getOrCreateContact(nom: String, prenom: String, entrepriseNom: String): Contact {
+        val existing = loadContacts().find { it.nom == nom && it.prenom == prenom && it.entrepriseNom == entrepriseNom }
+        if (existing != null) {
+            return existing
+        }
+
+        val newContact = Contact(
+            id = UUID.randomUUID().toString(),
+            nom = nom,
+            prenom = prenom,
+            email = "",
+            telephone = "",
+            entrepriseNom = entrepriseNom,
+            appelsIds = mutableListOf(),
+            candidatureIds = mutableListOf()
+        )
+        saveContact(newContact)
+        addContactToEntreprise(newContact.id, entrepriseNom)
+        return newContact
+    }
+
+    fun editCandidature(
+        candidatureId: String, newTitre: String, newEtat: String, newNotes: String, newPlateforme: String,
+        newTypePoste: String, newLieuPoste: String, newEntrepriseNom: String, newDate: Date,
+        newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>, newRelances: MutableList<String>
+    ) {
         val candidatures = loadCandidatures().toMutableList()
         val index = candidatures.indexOfFirst { it.id == candidatureId }
         if (index != -1) {
@@ -425,7 +469,12 @@ class DataRepository(val context: Context) {
         }
     }
 
-    fun editEntreprise(entrepriseNom: String, newName: String, newContactIds: MutableList<String>, newRelancesIds: MutableList<String>, newEntretiensIds: MutableList<String>, newCandidaturesIds: MutableList<String>) {
+
+    fun editEntreprise(
+        entrepriseNom: String, newName: String, newContactIds: MutableList<String>,
+        newRelancesIds: MutableList<String>, newEntretiensIds: MutableList<String>,
+        newCandidaturesIds: MutableList<String>
+    ) {
         val entreprises = loadEntreprises().toMutableList()
         val index = entreprises.indexOfFirst { it.nom == entrepriseNom }
         if (index != -1) {
@@ -443,8 +492,10 @@ class DataRepository(val context: Context) {
         }
     }
 
-
-    fun editRelance(relanceId: String, newDate: Date, newPlateformeUtilise: String, newEntrepriseNom: String, newContactId: String?, newCandidatureId: String, newNotes: String?) {
+    fun editRelance(
+        relanceId: String, newDate: Date, newPlateformeUtilise: String, newEntrepriseNom: String,
+        newContactId: String?, newCandidatureId: String, newNotes: String?
+    ) {
         val relances = loadRelances().toMutableList()
         val index = relances.indexOfFirst { it.id == relanceId }
         if (index != -1) {
@@ -461,10 +512,12 @@ class DataRepository(val context: Context) {
             val jsonString = gson.toJson(relances)
             sharedPreferences.edit().putString("relances", jsonString).apply()
         }
-
     }
 
-    fun editAppel(appelId: String, newCandidatureId: String, newContactId: String?, newEntrepriseNom: String, newDateAppel: Date, newObjet: String, newNotes: String) {
+    fun editAppel(
+        appelId: String, newCandidatureId: String, newContactId: String?, newEntrepriseNom: String,
+        newDateAppel: Date, newObjet: String, newNotes: String
+    ) {
         val appels = loadAppels().toMutableList()
         val index = appels.indexOfFirst { it.id == appelId }
         if (index != -1) {
@@ -481,9 +534,13 @@ class DataRepository(val context: Context) {
             val jsonString = gson.toJson(appels)
             sharedPreferences.edit().putString("appels", jsonString).apply()
         }
-
     }
-    fun editContact(contactId: String, newNom: String, newPrenom: String, newEmail: String, newTelephone: String, newEntrepriseNom: String, newAppelsIds: MutableList<String>, newCandidatureIds: MutableList<String>) {
+
+    fun editContact(
+        contactId: String, newNom: String, newPrenom: String, newEmail: String,
+        newTelephone: String, newEntrepriseNom: String, newAppelsIds: MutableList<String>,
+        newCandidatureIds: MutableList<String>
+    ) {
         val contacts = loadContacts().toMutableList()
         val index = contacts.indexOfFirst { it.id == contactId }
         if (index != -1) {
@@ -503,8 +560,11 @@ class DataRepository(val context: Context) {
         }
     }
 
-
-    fun editEntretien(entretienId: String, newEntrepriseNom: String, newContactId: String?, newCandidatureId: String, newDateEntretien: Date, newType: String, newMode: String, newNotesPreEntretien: String?, newNotesPostEntretien: String?) {
+    fun editEntretien(
+        entretienId: String, newEntrepriseNom: String, newContactId: String?,
+        newCandidatureId: String, newDateEntretien: Date, newType: String, newMode: String,
+        newNotesPreEntretien: String?, newNotesPostEntretien: String?
+    ) {
         val entretiens = loadEntretiens().toMutableList()
         val index = entretiens.indexOfFirst { it.id == entretienId }
         if (index != -1) {
@@ -524,6 +584,7 @@ class DataRepository(val context: Context) {
             sharedPreferences.edit().putString("entretiens", jsonString).apply()
         }
     }
+
     fun getTypePosteOptions(): List<String> {
         return listOf("---", "CDD", "CDI", "Freelance", "Intérim", "Alternance")
     }
@@ -645,5 +706,14 @@ class DataRepository(val context: Context) {
         candidatures.forEach { updateCandidatureState(it) }
     }
 
+    fun addCandidatureToContact(contactId: String, candidatureId: String) {
+        val contact = getContactById(contactId)
+        contact?.let {
+            if (it.candidatureIds?.contains(candidatureId) == false) {
+                it.candidatureIds?.add(candidatureId)
+                saveContact(it)
+            }
+        }
+    }
 
 }

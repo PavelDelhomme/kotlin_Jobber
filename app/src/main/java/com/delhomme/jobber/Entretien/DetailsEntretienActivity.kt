@@ -6,24 +6,38 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Entretien.model.Entretien
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class DetailsEntretienActivity : AppCompatActivity() {
+
+    private lateinit var dataRepository: DataRepository
+    private var entretienId: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_details_entretiens)
+        setContentView(R.layout.activity_details_entretien)
 
-        if (supportActionBar != null) {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        dataRepository = DataRepository(this)
+        entretienId = intent.getStringExtra("ENTRETIEN_ID")
+
+        entretienId?.let {
+            val entretien = dataRepository.getEntretienById(it)
+            entretien?.let { bindData(it) }
         }
 
-        val entretienId = intent.getStringExtra("ENTRETIEN_ID") ?: return
-        val dataRepository = DataRepository(this)
-        val entretien = dataRepository.getEntretienById(entretienId) ?: return
+        findViewById<Button>(R.id.btnReturn).setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun bindData(entretien: Entretien) {
         val entrepriseNom = dataRepository.getEntrepriseByNom(entretien.entrepriseNom)
-        val candidatureOffre = dataRepository.getCandidatureById(entretien.candidature_id!!)
+        val candidatureOffre = dataRepository.getCandidatureById(entretien.candidature_id)
 
         findViewById<TextView>(R.id.tvEntretienDate).text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(entretien.date_entretien)
         findViewById<TextView>(R.id.tvEntretienEntreprise).text = entrepriseNom?.nom
@@ -31,18 +45,12 @@ class DetailsEntretienActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvEntretienType).text = entretien.type
         findViewById<TextView>(R.id.tvEntretienMode).text = entretien.mode
         findViewById<TextView>(R.id.tvEntretienNotes).text = entretien.notes_pre_entretien ?: "Aucune note"
-
-        findViewById<Button>(R.id.btnReturn).setOnClickListener {
-            finish()
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
         }
         return super.onOptionsItemSelected(item)
     }
