@@ -108,6 +108,16 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp" />
 
+        <ImageButton
+            android:id="@+id/button_mark_as_rejected"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="72dp"
+            android:layout_marginEnd="16dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/lblContacts"
             android:layout_width="0dp"

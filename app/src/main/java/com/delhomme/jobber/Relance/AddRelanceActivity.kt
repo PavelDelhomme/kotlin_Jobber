@@ -69,7 +69,9 @@ class AddRelanceActivity : AppCompatActivity() {
         val dr = DataRepository(this)
         val entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
         val contacts = entrepriseId?.let { dr.loadContactsForEntreprise(it) } ?: listOf()
-        contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, contacts.map { it.getFullName() })
+        val contactNames = contacts.map { it.getFullName() }.toMutableList()
+        contactNames.add(0, "--") // Ajoute l'option pour aucun contact sélectionné
+        contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, contactNames)
         contactAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spContact.adapter = contactAdapter
     }
@@ -105,7 +107,11 @@ class AddRelanceActivity : AppCompatActivity() {
 
         val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).parse(etDateRelance.text.toString()) ?: Date()
         val selectedContactPosition = spContact.selectedItemPosition
-        val contact = (spContact.adapter.getItem(selectedContactPosition) as? Contact)
+        val contact: Contact? = if (selectedContactPosition > 0) {
+            spContact.adapter.getItem(selectedContactPosition) as? Contact
+        } else {
+            null
+        }
         val plateforme = spPlateformeRelance.selectedItem.toString()
         val notes = etNotesRelance.text.toString()
         val entrepriseNom = autoCompleteTextViewRelanceEntreprise.text.toString()

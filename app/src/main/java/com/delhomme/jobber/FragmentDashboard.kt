@@ -22,6 +22,7 @@ class FragmentDashboard : Fragment() {
 
     private lateinit var recyclerViewUpcomingInterviews: RecyclerView
     private lateinit var btnPrevious: Button
+    private lateinit var btnToday: Button
     private lateinit var btnNext: Button
     private lateinit var webView: WebView
 
@@ -41,6 +42,7 @@ class FragmentDashboard : Fragment() {
 
         recyclerViewUpcomingInterviews = view.findViewById(R.id.recyclerViewUpcomingInterviews)
         btnPrevious = view.findViewById(R.id.btnPrevious)
+        btnToday = view.findViewById(R.id.btnToday)
         btnNext = view.findViewById(R.id.btnNext)
         webView = view.findViewById(R.id.webView)
 
@@ -76,6 +78,11 @@ class FragmentDashboard : Fragment() {
     private fun setupGraphNavigation() {
         btnPrevious.setOnClickListener {
             dayOffset -= 7
+            loadGraphData()
+        }
+
+        btnToday.setOnClickListener {
+            dayOffset = 0
             loadGraphData()
         }
 

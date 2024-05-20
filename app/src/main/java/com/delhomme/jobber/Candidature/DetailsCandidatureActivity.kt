@@ -7,9 +7,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Appel.AddAppelActivity
@@ -46,7 +48,6 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     private lateinit var appelAdapter: AppelAdapter
     private lateinit var entretienAdapter: EntretienAdapter
     private lateinit var relanceAdapter: RelanceAdapter
-    private lateinit var buttonChangeState: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +72,10 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         setupRecyclerView()
         displayCandidatureDetails()
         setupAddButtons()
+
+        findViewById<ImageButton>(R.id.button_mark_as_rejected).setOnClickListener {
+            markAsRejected()
+        }
     }
 
     private fun displayCandidatureDetails() {
@@ -89,6 +94,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         val stateWithEmoji = when (candidature.state) {
             CandidatureState.CANDIDATEE_ET_EN_ATTENTE -> "🕒 Candidature en attente"
             CandidatureState.EN_ATTENTE_APRES_ENTRETIEN -> "🕒 En attente après entretien"
+            CandidatureState.EN_ATTENTE_D_UN_ENTRETIEN -> "🕒 En attente d'un entretien"
             CandidatureState.FAIRE_UN_RETOUR_POST_ENTRETIEN -> "🔄 Faire un retour post entretien"
             CandidatureState.A_RELANCEE_APRES_ENTRETIEN -> "🔄 Relancée après entretien"
             CandidatureState.A_RELANCEE -> "🔄 À relancer"
@@ -96,6 +102,8 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             CandidatureState.AUCUNE_REPONSE -> "🚫 Aucune réponse"
             CandidatureState.NON_RETENU -> "❌ Non retenue"
             CandidatureState.ERREUR -> "⚠️ Erreur"
+            CandidatureState.NON_RETENU_APRES_ENTRETIEN -> "❌️ Non retenue après entretien"
+            CandidatureState.NON_RETENU_SANS_ENTRETIEN -> "❌ Non retenue"
         }
         findViewById<TextView>(R.id.tvEtatCandidature).text = stateWithEmoji
     }
@@ -113,6 +121,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         setupAddRelanceButton()
         setupAddEntretienButton()
     }
+
 
     private fun setupContactRecyclerView() {
         val contacts = dataRepository.loadContactsForEntreprise(candidature.entrepriseNom)
@@ -344,6 +353,21 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
         candidature = dataRepository.getCandidatureById(candidatureId!!) ?: return
         displayCandidatureDetails()
+    }
+
+    private fun markAsRejected() {
+        candidature.reponseEntreprise = true
+        if (candidature.entretiens.isEmpty()) {
+            candidature.state = CandidatureState.NON_RETENU_SANS_ENTRETIEN
+        } else {
+            candidature.state = CandidatureState.NON_RETENU_APRES_ENTRETIEN
+        }
+        dataRepository.saveCandidature(candidature)
+        dataRepository.updateCandidatureState(candidature)
+
+        val intent = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        finish()
     }
 
 }

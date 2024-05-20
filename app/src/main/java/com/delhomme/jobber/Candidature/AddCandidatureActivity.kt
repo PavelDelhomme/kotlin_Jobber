@@ -72,7 +72,7 @@ class AddCandidatureActivity : AppCompatActivity() {
         val notesCandidature = findViewById<EditText>(R.id.editText_notes).text.toString()
         val lieuPoste = findViewById<EditText>(R.id.editText_lieuPoste).text.toString()
 
-        val entreprise = DataRepository(this).getOrCreateEntreprise(nomEntreprise)
+        val entreprise = dataRepository.getOrCreateEntreprise(nomEntreprise)
 
         if (dataRepository.getCandidatures().any { it.titre_offre == titreOffre && it.entrepriseNom == entreprise.nom }) {
             Toast.makeText(this, "Cette candidature existe déjà !", Toast.LENGTH_SHORT).show()
@@ -94,12 +94,8 @@ class AddCandidatureActivity : AppCompatActivity() {
         dataRepository.saveCandidature(newCandidature)
         Toast.makeText(this, "Candidature ajoutée avec succès", Toast.LENGTH_SHORT).show()
 
-        notifyCandidatureListUpdated()
-        finish()
-    }
-
-    private fun notifyCandidatureListUpdated() {
-        val intent = Intent("com.delhomme.jobber.CANDIDATURE_LIST_UPDATED")
+        val intent = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        finish()
     }
 }

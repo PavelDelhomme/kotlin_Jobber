@@ -1,4 +1,4 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.Notification
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -12,6 +12,8 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.delhomme.jobber.MainActivity
+import com.delhomme.jobber.R
 
 class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -33,11 +35,7 @@ class NotificationReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
 
         with(NotificationManagerCompat.from(context)) {
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 Log.d("NotificationReceiver", "Request permissions")
                 return
             }

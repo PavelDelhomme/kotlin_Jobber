@@ -28,6 +28,7 @@ import com.delhomme.jobber.Contact.FragmentContacts
 import com.delhomme.jobber.Entreprise.FragmentEntreprises
 import com.delhomme.jobber.Entretien.AddEntretienActivity
 import com.delhomme.jobber.Entretien.FragmentEntretiens
+import com.delhomme.jobber.Notification.NotificationReceiver
 import com.delhomme.jobber.Relance.FragmentRelances
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView

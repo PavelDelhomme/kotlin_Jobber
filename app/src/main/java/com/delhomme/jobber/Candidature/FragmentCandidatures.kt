@@ -38,13 +38,14 @@ class FragmentCandidatures : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        adapter = CandidatureAdapter(dataRepository.getCandidatures(),dataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked, this::onEditCandidatureClicked)
+        adapter = CandidatureAdapter(dataRepository.getCandidatures(), dataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked, this::onEditCandidatureClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         view.findViewById<Button>(R.id.btnAddCandidature).setOnClickListener {
             startActivity(Intent(activity, AddCandidatureActivity::class.java))
         }
+
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(updateReceiver, IntentFilter("com.jobber.CANDIDATURE_LIST_UPDATED"))
     }
 
@@ -57,7 +58,6 @@ class FragmentCandidatures : Fragment() {
 
     private fun onDeleteCandidatureClicked(candidatureId: String) {
         dataRepository.deleteCandidature(candidatureId)
-        adapter.updateCandidatures(dataRepository.getCandidatures())
     }
 
     private fun onEditCandidatureClicked(candidatureId: String) {
@@ -66,9 +66,15 @@ class FragmentCandidatures : Fragment() {
         }
         startActivity(intent)
     }
+
     override fun onResume() {
         super.onResume()
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(updateReceiver, IntentFilter("com.jobber.CANDIDATURE_LIST_UPDATED"))
         adapter.updateCandidatures(dataRepository.getCandidatures())
+    }
+
+    override fun onPause() {
+        super.onPause()
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(updateReceiver)
     }
 
@@ -76,5 +82,4 @@ class FragmentCandidatures : Fragment() {
         super.onDestroyView()
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(updateReceiver)
     }
-
 }

@@ -7,6 +7,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.CandidatureState
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
@@ -39,6 +40,21 @@ class CandidatureAdapter(
             entreprise.text = entrepriseNom
             date.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(candidature.date_candidature)
             etat.text = candidature.state.toString()
+            etat.text = when (candidature.state) {
+                CandidatureState.CANDIDATEE_ET_EN_ATTENTE -> "🕒 Candidature en attente"
+                CandidatureState.EN_ATTENTE_APRES_ENTRETIEN -> "🕒 En attente après entretien"
+                CandidatureState.EN_ATTENTE_D_UN_ENTRETIEN -> "🕒 En attente d'un entretien"
+                CandidatureState.FAIRE_UN_RETOUR_POST_ENTRETIEN -> "🔄 Faire un retour post entretien"
+                CandidatureState.A_RELANCEE_APRES_ENTRETIEN -> "🔄 Relancée après entretien"
+                CandidatureState.A_RELANCEE -> "🔄 À relancer"
+                CandidatureState.RELANCEE_ET_EN_ATTENTE -> "🕒 Relancée et en attente"
+                CandidatureState.AUCUNE_REPONSE -> "🚫 Aucune réponse"
+                CandidatureState.NON_RETENU -> "❌ Non retenue"
+                CandidatureState.ERREUR -> "⚠️ Erreur"
+                CandidatureState.NON_RETENU_APRES_ENTRETIEN -> "❌️ Non retenue après entretien"
+                CandidatureState.NON_RETENU_SANS_ENTRETIEN -> "❌ Non retenue"
+            }
+
             typePoste.text = candidature.type_poste
             plateforme.text = candidature.plateforme
             notes.text = candidature.notes

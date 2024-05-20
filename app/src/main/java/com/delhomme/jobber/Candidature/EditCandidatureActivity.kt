@@ -1,6 +1,7 @@
 package com.delhomme.jobber.Candidature
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -9,6 +10,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
@@ -117,6 +119,10 @@ class EditCandidatureActivity : AppCompatActivity() {
                 relancesIds
             )
             Toast.makeText(this, "Candidature mise à jour avec succès", Toast.LENGTH_SHORT).show()
+            val intentCandidature = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+            val intentEntreprise = Intent("com.jobber.ENTREPRISE_LIST_UPDATED")
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intentCandidature)
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intentEntreprise)
             finish()
         } else {
             Toast.makeText(this, "Erreur : ID de candidature manquant", Toast.LENGTH_SHORT).show()
