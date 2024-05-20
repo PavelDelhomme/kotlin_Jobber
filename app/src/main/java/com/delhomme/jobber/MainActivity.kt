@@ -28,6 +28,7 @@ import com.delhomme.jobber.Contact.FragmentContacts
 import com.delhomme.jobber.Entreprise.FragmentEntreprises
 import com.delhomme.jobber.Entretien.AddEntretienActivity
 import com.delhomme.jobber.Entretien.FragmentEntretiens
+import com.delhomme.jobber.Notification.FragmentNotifications
 import com.delhomme.jobber.Notification.NotificationReceiver
 import com.delhomme.jobber.Relance.FragmentRelances
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -173,6 +174,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_calendrier -> {
                 replaceFragment(FragmentCalendrier())
+            }
+            R.id.nav_notifications -> {
+                replaceFragment(FragmentNotifications())
             }
         }
         drawerLayout.closeDrawer(navView)
