@@ -10,11 +10,13 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.Appel.model.Appel
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.Contact.model.Contact
 import com.delhomme.jobber.Entreprise.model.Entreprise
 import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.Notification.model.Notification
 import com.delhomme.jobber.Relance.model.Relance
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -37,6 +39,7 @@ class DataRepository(val context: Context) {
     private var appels: List<Appel>? = null
     private var entretiens: List<Entretien>? = null
     private var relances: List<Relance>? = null
+    private var notifications: List<Notification>? = null
 
     init {
         loadInitialData()
@@ -50,6 +53,7 @@ class DataRepository(val context: Context) {
         appels = loadAppels()
         entretiens = loadEntretiens()
         relances = loadRelances()
+        notifications = loadNotifications()
     }
 
     fun getCandidatures() = candidatures ?: emptyList()
@@ -77,6 +81,9 @@ class DataRepository(val context: Context) {
                     candidatureIds = mutableListOf(candidature.id)
                 )
                 saveEntreprise(newEntreprise)
+                val intent_entreprise_list = Intent("ccom.jobber.ENTREPRISE_LIST_UPDATED")
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent_entreprise_list)
+
             }
         }
         candidatures = mutableCandidature
@@ -84,6 +91,9 @@ class DataRepository(val context: Context) {
         sharedPreferences.edit().putString("candidatures", jsonString).apply()
 
         updateCandidatureState(candidature)
+
+        val intent_candidature_list = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent_candidature_list)
     }
 
 
@@ -128,6 +138,7 @@ class DataRepository(val context: Context) {
         val jsonString = gson.toJson(relances)
         sharedPreferences.edit().putString("relances", jsonString).apply()
     }
+
 
     fun saveEntretien(entretien: Entretien) {
         val entretiens = loadEntretiens().toMutableList()
@@ -192,13 +203,29 @@ class DataRepository(val context: Context) {
     fun deleteCandidature(candidatureId: String) {
         val candidatures = loadCandidatures().toMutableList()
         val candidature = candidatures.find { it.id == candidatureId }
-        candidatures.remove(candidature)
-        val entreprise = getEntrepriseByNom(candidature?.entrepriseNom)
-        entreprise?.candidatureIds?.remove(candidatureId)
-        saveEntreprise(entreprise!!)
-        val jsonString = gson.toJson(candidatures)
-        sharedPreferences.edit().putString("candidatures", jsonString).apply()
+
+        if (candidature != null) {
+            val entreprise = getEntrepriseByNom(candidature?.entrepriseNom)
+            entreprise?.candidatureIds?.remove(candidatureId)
+
+            entreprise?.let {
+                saveEntreprise(it)
+            }
+
+            candidatures.remove(candidature)
+            val jsonString = gson.toJson(candidatures)
+            sharedPreferences.edit().putString("candidatures", jsonString).apply()
+
+            val intent = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            Log.d("DataRepository", "Broadcast sent: com.jobber.CANDIDATURE_LIST_UPDATED")
+        } else {
+            Log.e("DataRepository", "Candidature wtih ID $candidatureId not found")
+        }
+
     }
+
+
 
     fun deleteContact(contactId: String) {
         val currentContact = loadContacts().toMutableList()
@@ -420,7 +447,6 @@ class DataRepository(val context: Context) {
             return emptyList()
         }
     }
-
     fun loadAppelsForContact(contact_id: String): List<Appel> {
         return loadAppels().filter { it.contact_id == contact_id }
     }
@@ -529,9 +555,11 @@ class DataRepository(val context: Context) {
             candidatures[index] = updatedCandidature
             val jsonString = gson.toJson(candidatures)
             sharedPreferences.edit().putString("candidatures", jsonString).apply()
+
+            val intent = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }
     }
-
 
     fun editEntreprise(
         entrepriseNom: String,
@@ -779,6 +807,7 @@ class DataRepository(val context: Context) {
             putString("relances", gson.toJson(relances))
         }.apply()
     }
+
     fun updateCandidatureState(candidature: Candidature) {
         val today = Calendar.getInstance().time
         val candidatedDate = candidature.date_candidature
@@ -790,7 +819,14 @@ class DataRepository(val context: Context) {
 
         val sevenDaysAfterCandidature = Date(candidatedDate.time + 7 * (1000 * 60 * 60 * 24))
 
+        Log.d("DataRepository", "Updating state for Candidature: ${candidature.id}")
+        Log.d("DataRepository", "Days since candidated: $daysSinceCandidated")
+        Log.d("DataRepository", "Interviews: $entretiens")
+        Log.d("DataRepository", "Calls: $appels")
+        Log.d("DataRepository", "Follow-ups: $relances")
+
         val newState = when {
+            candidature.reponseEntreprise -> CandidatureState.NON_RETENU_SANS_ENTRETIEN
             daysSinceCandidated <= 7 -> CandidatureState.CANDIDATEE_ET_EN_ATTENTE
             entretiens.isEmpty() && appels.isEmpty() && relances.none { it.date_relance <= sevenDaysAfterCandidature } -> CandidatureState.A_RELANCEE
             relances.any { it.date_relance > sevenDaysAfterCandidature } -> CandidatureState.RELANCEE_ET_EN_ATTENTE
@@ -798,6 +834,8 @@ class DataRepository(val context: Context) {
             relances.isNotEmpty() && daysSinceCandidated > 14 -> CandidatureState.AUCUNE_REPONSE
             else -> CandidatureState.ERREUR
         }
+
+        Log.d("DataRepository", "New state determined: $newState")
 
         if (candidature.state != newState) {
             candidature.state = newState
@@ -929,7 +967,6 @@ class DataRepository(val context: Context) {
             </html>
         """
 
-        Log.d("DataRepository", "HTML content: $htmlContent")
         return htmlContent
     }
 
@@ -1269,5 +1306,60 @@ class DataRepository(val context: Context) {
             Log.d("NotificationReceiver", "No request permissions because they're granted!")
             notify(1001, builder.build())
         }
+
+        // Add the notification to the list
+        val newNotification = Notification(
+            titre = title,
+            message = message,
+            date = Date()
+        )
+        saveNotification(newNotification)
     }
+
+    fun getNotifications(): List<Notification> {
+        return notifications ?: emptyList()
+    }
+    fun deleteNotification(notification: Notification) {
+        val mutableNotifications = notifications?.toMutableList() ?: mutableListOf()
+        mutableNotifications.remove(notification)
+        notifications = mutableNotifications
+        saveNotifications()
+
+        val intent = Intent("com.jobber.NOTIFICATION_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+    }
+
+    fun markNotificationAsRead(notification: Notification) {
+        deleteNotification(notification)
+    }
+
+
+
+    private fun saveNotifications() {
+        val jsonString = gson.toJson(notifications)
+        sharedPreferences.edit().putString("notifications", jsonString).apply()
+    }
+
+    private fun loadNotifications(): List<Notification> {
+        val notificationsJson = sharedPreferences.getString("notifications", null)
+        return if (notificationsJson != null) {
+            val type = object : TypeToken<List<Notification>>() {}.type
+            gson.fromJson(notificationsJson, type)
+        } else {
+            emptyList()
+        }
+    }
+
+    fun saveNotification(notification: Notification) {
+        val mutableNotifications = notifications?.toMutableList() ?: mutableListOf()
+        mutableNotifications.add(notification)
+        notifications = mutableNotifications
+        val jsonString = gson.toJson(notifications)
+        sharedPreferences.edit().putString("notifications", jsonString).apply()
+
+        val intent = Intent("com.jobber.NOTIFICATION_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+    }
+
+
 }

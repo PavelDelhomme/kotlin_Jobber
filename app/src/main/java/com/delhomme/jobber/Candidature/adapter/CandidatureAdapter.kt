@@ -1,5 +1,6 @@
 package com.delhomme.jobber.Candidature.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -76,7 +77,8 @@ class CandidatureAdapter(
     override fun getItemCount(): Int = candidatures.size
 
     fun updateCandidatures(newList: List<Candidature>) {
-        candidatures = newList
+        this.candidatures = newList
         notifyDataSetChanged()
+        Log.d("CandidatureAdapter", "Candidatures updated: ${newList.size}")
     }
 }

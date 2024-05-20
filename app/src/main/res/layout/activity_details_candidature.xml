@@ -59,12 +59,36 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
+            android:id="@+id/titre_notes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="Notes sur la candidautre"
+            app:layout_constraintTop_toTopOf="@id/tvNotesCandidature"
+            app:layout_constraintStart_toStartOf="@id/tvNotesCandidature"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
             android:id="@+id/tvNotesCandidature"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@id/tvEtatCandidature"
+            app:layout_constraintTop_toBottomOf="@id/titre_notes"
+            app:layout_constraintStart_toStartOf="@id/titre_plateforme"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/titre_plateforme"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="Plateforme de la candidature"
+            app:layout_constraintTop_toTopOf="@id/tvEtatCandidature"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -74,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@id/tvNotesCandidature"
+            app:layout_constraintTop_toBottomOf="@id/titre_plateforme"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

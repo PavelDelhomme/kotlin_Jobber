@@ -103,6 +103,7 @@ class EditCandidatureActivity : AppCompatActivity() {
         val appelsIds = existingCandidature?.appels ?: mutableListOf()
         val relancesIds = existingCandidature?.relances ?: mutableListOf()
         val stateCandidature = existingCandidature?.state
+
         if (candidatureId != null) {
             dataRepository.editCandidature(
                 candidatureId!!,
@@ -119,10 +120,8 @@ class EditCandidatureActivity : AppCompatActivity() {
                 relancesIds
             )
             Toast.makeText(this, "Candidature mise à jour avec succès", Toast.LENGTH_SHORT).show()
-            val intentCandidature = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
-            val intentEntreprise = Intent("com.jobber.ENTREPRISE_LIST_UPDATED")
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intentCandidature)
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intentEntreprise)
+            LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("com.jobber.CANDIDATURE_LIST_UPDATED"))
+            LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("com.jobber.ENTREPRISE_LIST_UPDATED"))
             finish()
         } else {
             Toast.makeText(this, "Erreur : ID de candidature manquant", Toast.LENGTH_SHORT).show()

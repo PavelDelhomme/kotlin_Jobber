@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ class FragmentCandidatures : Fragment() {
 
     private val updateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d("FragmentCandidatures", "Broadcast received: com.jobber.CANDIDATURE_LIST_UPDATED")
             adapter.updateCandidatures(dataRepository.getCandidatures())
         }
     }
@@ -38,7 +40,13 @@ class FragmentCandidatures : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        adapter = CandidatureAdapter(dataRepository.getCandidatures(), dataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked, this::onEditCandidatureClicked)
+        adapter = CandidatureAdapter(
+            dataRepository.getCandidatures(),
+            dataRepository,
+            this::onCandidatureClicked,
+            this::onDeleteCandidatureClicked,
+            this::onEditCandidatureClicked
+        )
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
