@@ -6,10 +6,14 @@ import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,6 +53,9 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     private lateinit var entretienAdapter: EntretienAdapter
     private lateinit var relanceAdapter: RelanceAdapter
 
+    private lateinit var spinnerState: Spinner
+    private lateinit var buttonConfirmChangeState: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details_candidature)
@@ -71,7 +78,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
         setupRecyclerView()
         displayCandidatureDetails()
-        setupAddButtons()
+        setupButtons()
 
         findViewById<ImageButton>(R.id.button_mark_as_rejected).setOnClickListener {
             markAsRejected()
@@ -115,6 +122,10 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         setupRelanceRecyclerView()
     }
 
+    private fun setupButtons() {
+        setupAddButtons()
+        setupStateButtons()
+    }
     private fun setupAddButtons() {
         setupAddContactButton()
         setupAddAppelButton()
@@ -122,6 +133,50 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         setupAddEntretienButton()
     }
 
+    private fun setupStateButtons() {
+        spinnerState = findViewById(R.id.spinnerState)
+        buttonConfirmChangeState = findViewById(R.id.buttonConfirmChangeState)
+
+        val states = CandidatureState.values().map { it.name }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, states)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerState.adapter = adapter
+
+        findViewById<Button>(R.id.buttonChangeState).setOnClickListener {
+            spinnerState.visibility = View.VISIBLE
+            buttonConfirmChangeState.visibility = View.VISIBLE
+        }
+        buttonConfirmChangeState.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Confirmation")
+                .setMessage("Voulez-vous vraiment changer l'état de cette candidature ?")
+                .setPositiveButton("Oui") { dialog, _ ->
+                    changeStateManually()
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Non") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
+        }
+    }
+
+    private fun changeStateManually() {
+        val selectedState = CandidatureState.valueOf(spinnerState.selectedItem.toString())
+        candidature.state = selectedState
+        candidature.etatManuel = true
+
+        dataRepository.saveCandidature(candidature)
+
+        val intent = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+
+        spinnerState.visibility = View.GONE
+        buttonConfirmChangeState.visibility = View.GONE
+
+        displayCandidatureDetails()
+    }
 
     private fun setupContactRecyclerView() {
         val contacts = dataRepository.loadContactsForEntreprise(candidature.entrepriseNom)
@@ -356,7 +411,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     }
 
     private fun markAsRejected() {
-        candidature.reponseEntreprise = true
+        candidature.etatManuel = true
         if (candidature.entretiens.isEmpty()) {
             candidature.state = CandidatureState.NON_RETENU_SANS_ENTRETIEN
         } else {

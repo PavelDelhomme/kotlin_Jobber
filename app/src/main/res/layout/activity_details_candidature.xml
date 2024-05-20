@@ -2,93 +2,102 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollViewDetails"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/scrollViewDetails"
     tools:context=".Candidature.DetailsCandidatureActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
+        <!-- Candidature Title -->
         <TextView
             android:id="@+id/titreoffre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:layout_marginBottom="8dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Company Name -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
             android:id="@+id/tvEntrepriseCandidature"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             app:layout_constraintTop_toBottomOf="@id/titreoffre"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Date of Candidature -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
             android:id="@+id/tvDateCandidature"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             app:layout_constraintTop_toBottomOf="@id/tvEntrepriseCandidature"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Candidature Info -->
         <TextView
             android:id="@+id/tvCandidatureInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:textSize="18sp"
             app:layout_constraintTop_toBottomOf="@id/tvDateCandidature"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Candidature State -->
         <TextView
             android:id="@+id/tvEtatCandidature"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:textSize="18sp"
             app:layout_constraintTop_toBottomOf="@id/tvCandidatureInfo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Notes Section -->
         <TextView
             android:id="@+id/titre_notes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:text="Notes sur la candidature"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:text="Notes sur la candidautre"
-            app:layout_constraintTop_toTopOf="@id/tvNotesCandidature"
-            app:layout_constraintStart_toStartOf="@id/tvNotesCandidature"
+            app:layout_constraintTop_toBottomOf="@id/tvEtatCandidature"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/tvNotesCandidature"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:textSize="18sp"
             app:layout_constraintTop_toBottomOf="@id/titre_notes"
-            app:layout_constraintStart_toStartOf="@id/titre_plateforme"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Plateforme Section -->
         <TextView
             android:id="@+id/titre_plateforme"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:text="Plateforme de la candidature"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:text="Plateforme de la candidature"
-            app:layout_constraintTop_toTopOf="@id/tvEtatCandidature"
+            app:layout_constraintTop_toBottomOf="@id/tvNotesCandidature"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -96,57 +105,61 @@
             android:id="@+id/tvPlateforme"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:textSize="18sp"
             app:layout_constraintTop_toBottomOf="@id/titre_plateforme"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Type of Job -->
         <TextView
             android:id="@+id/tvTypePoste"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:textSize="18sp"
             app:layout_constraintTop_toBottomOf="@id/tvPlateforme"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Location of Job -->
         <TextView
             android:id="@+id/tvLieuPoste"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:textSize="18sp"
             app:layout_constraintTop_toBottomOf="@id/tvTypePoste"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Edit and Mark as Rejected Buttons -->
         <ImageButton
             android:id="@+id/btnEditCandidature"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
             android:src="@android:drawable/ic_menu_edit"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp" />
 
         <ImageButton
             android:id="@+id/button_mark_as_rejected"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginTop="72dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:layout_constraintTop_toBottomOf="@id/btnEditCandidature"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginEnd="16dp" />
 
+        <!-- Contacts Section -->
         <TextView
             android:id="@+id/lblContacts"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/candidature_details_liste_contacts"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/tvLieuPoste"
@@ -157,7 +170,7 @@
             android:id="@+id/recyclerViewContacts"
             android:layout_width="0dp"
             android:layout_height="100dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/lblContacts"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -167,18 +180,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Contact"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/recyclerViewContacts"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Appels Section -->
         <TextView
             android:id="@+id/lblAppels"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="@string/candidature_details_liste_appels"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/btnAddContact"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -187,28 +201,28 @@
             android:id="@+id/recyclerViewAppels"
             android:layout_width="0dp"
             android:layout_height="100dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/lblAppels"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-
         <Button
             android:id="@+id/btnAddAppel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Appel"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/recyclerViewAppels"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Entretiens Section -->
         <TextView
             android:id="@+id/lblEntretiens"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="@string/candidature_details_liste_entretiens"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/btnAddAppel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -217,7 +231,7 @@
             android:id="@+id/recyclerViewEntretiens"
             android:layout_width="0dp"
             android:layout_height="100dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/lblEntretiens"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -227,18 +241,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Entretien"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/recyclerViewEntretiens"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Relances Section -->
         <TextView
             android:id="@+id/lblRelances"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="@string/candidature_details_liste_relances"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/btnAddEntretien"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -247,7 +262,7 @@
             android:id="@+id/recyclerViewRelances"
             android:layout_width="0dp"
             android:layout_height="100dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/lblRelances"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -257,20 +272,42 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Relance"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/recyclerViewRelances"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Change State Button -->
         <Button
             android:id="@+id/buttonChangeState"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Change state"
+            android:layout_marginBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/btnAddRelance"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Spinner
+            android:id="@+id/spinnerState"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/buttonChangeState"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/buttonConfirmChangeState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="Confirm"
+            app:layout_constraintTop_toBottomOf="@id/spinnerState"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

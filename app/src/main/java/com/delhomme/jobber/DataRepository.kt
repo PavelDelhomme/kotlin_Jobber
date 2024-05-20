@@ -809,6 +809,9 @@ class DataRepository(val context: Context) {
     }
 
     fun updateCandidatureState(candidature: Candidature) {
+        if (candidature.etatManuel) {
+            return
+        }
         val today = Calendar.getInstance().time
         val candidatedDate = candidature.date_candidature
         val daysSinceCandidated = (today.time - candidatedDate.time) / (1000 * 60 * 60 * 24)
@@ -826,7 +829,6 @@ class DataRepository(val context: Context) {
         Log.d("DataRepository", "Follow-ups: $relances")
 
         val newState = when {
-            candidature.reponseEntreprise -> CandidatureState.NON_RETENU_SANS_ENTRETIEN
             daysSinceCandidated <= 7 -> CandidatureState.CANDIDATEE_ET_EN_ATTENTE
             entretiens.isEmpty() && appels.isEmpty() && relances.none { it.date_relance <= sevenDaysAfterCandidature } -> CandidatureState.A_RELANCEE
             relances.any { it.date_relance > sevenDaysAfterCandidature } -> CandidatureState.RELANCEE_ET_EN_ATTENTE
