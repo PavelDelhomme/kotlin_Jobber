@@ -1,5 +1,6 @@
 package com.delhomme.jobber.Calendrier
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,15 +16,16 @@ class HoursAdapter(private val hours: List<String>) : RecyclerView.Adapter<Hours
         fun bind(hour: String) {
             hourText.text = hour
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HourViewHolder {
+        Log.d("HoursAdapter", "Creating view holder for type: $viewType")
         val view = LayoutInflater.from(parent.context).inflate(R.layout.hour_item_layout, parent, false)
         return HourViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: HourViewHolder, position: Int) {
+        Log.d("HoursAdapter", "Binding view holder at position: $position")
         holder.bind(hours[position])
     }
 

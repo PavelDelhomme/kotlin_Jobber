@@ -26,19 +26,21 @@ class FragmentCalendrier : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_calendrier, container, false)
-        hoursRecyclerView = view.findViewById(R.id.hoursRecyclerView)
-        currentDayTextView = view.findViewById(R.id.currentDay)
-
-        // Set the layout manager
-        hoursRecyclerView.layoutManager = LinearLayoutManager(context)
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupRecyclerViews()
+        hoursRecyclerView = view.findViewById(R.id.hoursRecyclerView)
+        eventsRecyclerView = view.findViewById(R.id.eventsRecyclerView)
+
+        hoursRecyclerView.layoutManager = LinearLayoutManager(context)
+        eventsRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        currentDayTextView = view.findViewById(R.id.currentDay)
+
+
         loadEventsAndHours()
         setupDayView()
 
@@ -48,20 +50,6 @@ class FragmentCalendrier : Fragment() {
         view.findViewById<Button>(R.id.nextDayButton).setOnClickListener {
             adjustDay(1)
         }
-    }
-    private fun setupRecyclerViews() {
-        hoursRecyclerView = view?.findViewById(R.id.hoursRecyclerView) ?: throw IllegalStateException("View should not be null")
-        eventsRecyclerView = view?.findViewById(R.id.eventsRecyclerView) ?: throw IllegalStateException("View should not be null")
-
-        hoursRecyclerView.layoutManager = LinearLayoutManager(context)
-        eventsRecyclerView.layoutManager = LinearLayoutManager(context)
-
-        hoursRecyclerView.adapter = HoursAdapter(createHoursList())
-        eventsRecyclerView.adapter = EventAdapter(DataRepository(requireContext()).getEvents())
-    }
-
-    private fun createHoursList(): List<String> {
-        return List(24) { hour -> "${hour}:00"}
     }
 
     private fun adjustDay(dayDelta: Int) {
@@ -74,13 +62,6 @@ class FragmentCalendrier : Fragment() {
         loadEventsAndHours()
     }
 
-    private fun updateViewMode(viewMode: String) {
-        when(viewMode) {
-            "Jour" -> setupDayView()
-            "5 jours" -> setupFiveDayView()
-            "Mois" -> setupMonthView()
-        }
-    }
     private fun setupDayView() {
         val dateString = currentDayTextView.text.toString()
         if (dateString.isNotEmpty()) {
@@ -106,47 +87,6 @@ class FragmentCalendrier : Fragment() {
         } else {
             Log.e("FragmentCalendrier", "Date string is empty")
         }
-    }
-
-
-    private fun setupFiveDayView() {
-        try {
-            val calendar = Calendar.getInstance()
-            val dateFormat = SimpleDateFormat("EEE, d MMM, yyyy", Locale.FRENCH)
-            val dateString = currentDayTextView.text.toString()
-            val startDate = dateFormat.parse(dateString)
-            if (startDate != null) {
-                calendar.time = startDate
-                val days = mutableListOf<Date>()
-                for (i in 0 until 5) {
-                    days.add(calendar.time)
-                    calendar.add(Calendar.DAY_OF_YEAR, 1)
-                }
-                hoursRecyclerView.adapter = FiveDaysAdapter(days)
-            } else {
-                Log.e("FragmentCalendrier", "Could not parse the date: $dateString")
-            }
-        } catch (e: ParseException) {
-            Log.e("FragmentCalendrier", "Unparseable date...", e)
-        }
-    }
-
-
-    private fun setupMonthView() {
-        val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("EEE, d MMM, yyyy", Locale.FRENCH)
-        val startDate = dateFormat.parse(currentDayTextView.text.toString()) ?: return
-
-        calendar.time = startDate
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val maxDayInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val days = mutableListOf<Date>()
-
-        for (i in 1..maxDayInMonth) {
-            days.add(calendar.time)
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
-        }
-        hoursRecyclerView.adapter = MonthAdapter(days)
     }
 
     private fun createSampleEvents(): List<Event> {
