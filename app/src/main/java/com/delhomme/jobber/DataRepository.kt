@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.Appel.model.Appel
+import com.delhomme.jobber.Calendrier.Event
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.Contact.model.Contact
 import com.delhomme.jobber.Entreprise.model.Entreprise
@@ -40,6 +41,7 @@ class DataRepository(val context: Context) {
     private var entretiens: List<Entretien>? = null
     private var relances: List<Relance>? = null
     private var notifications: List<Notification>? = null
+    private var events: List<Event>? = null
 
     init {
         loadInitialData()
@@ -54,6 +56,7 @@ class DataRepository(val context: Context) {
         entretiens = loadEntretiens()
         relances = loadRelances()
         notifications = loadNotifications()
+        events = loadEvents()
     }
 
     fun getCandidatures() = candidatures ?: emptyList()
@@ -199,7 +202,7 @@ class DataRepository(val context: Context) {
         val jsonString = gson.toJson(appels)
         sharedPreferences.edit().putString("appels", jsonString).apply()
     }
-
+    // todo : Faire de l'héritage ou polymorphisme
     fun deleteCandidature(candidatureId: String) {
         val candidatures = loadCandidatures().toMutableList()
         val candidature = candidatures.find { it.id == candidatureId }
@@ -522,17 +525,9 @@ class DataRepository(val context: Context) {
     }
 
     fun editCandidature(
-        candidatureId: String,
-        newTitre: String,
-        newEtat: CandidatureState,
-        newNotes: String,
-        newPlateforme: String,
-        newTypePoste: String,
-        newLieuPoste: String,
-        newEntrepriseNom: String,
-        newDate: Date,
-        newEntretiens: MutableList<String>,
-        newAppelsIds: MutableList<String>,
+        candidatureId: String, newTitre: String, newEtat: CandidatureState, newNotes: String,
+        newPlateforme: String, newTypePoste: String, newLieuPoste: String, newEntrepriseNom: String,
+        newDate: Date, newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>,
         newRelances: MutableList<String>
     ) {
         val candidatures = loadCandidatures().toMutableList()
@@ -562,11 +557,8 @@ class DataRepository(val context: Context) {
     }
 
     fun editEntreprise(
-        entrepriseNom: String,
-        newName: String,
-        newContactIds: MutableList<String>,
-        newRelancesIds: MutableList<String>,
-        newEntretiensIds: MutableList<String>,
+        entrepriseNom: String, newName: String, newContactIds: MutableList<String>,
+        newRelancesIds: MutableList<String>, newEntretiensIds: MutableList<String>,
         newCandidaturesIds: MutableList<String>
     ) {
         val entreprises = loadEntreprises().toMutableList()
@@ -587,13 +579,8 @@ class DataRepository(val context: Context) {
     }
 
     fun editRelance(
-        relanceId: String,
-        newDate: Date,
-        newPlateformeUtilise: String,
-        newEntrepriseNom: String,
-        newContactId: String?,
-        newCandidatureId: String,
-        newNotes: String?
+        relanceId: String, newDate: Date, newPlateformeUtilise: String, newEntrepriseNom: String,
+        newContactId: String?, newCandidatureId: String, newNotes: String?
     ) {
         val relances = loadRelances().toMutableList()
         val index = relances.indexOfFirst { it.id == relanceId }
@@ -615,13 +602,8 @@ class DataRepository(val context: Context) {
 
     // TODO : Implement editAppel method into EditAppelActivity
     fun editAppel(
-        appelId: String,
-        newCandidatureId: String,
-        newContactId: String?,
-        newEntrepriseNom: String,
-        newDateAppel: Date,
-        newObjet: String,
-        newNotes: String
+        appelId: String, newCandidatureId: String, newContactId: String?, newEntrepriseNom: String,
+        newDateAppel: Date, newObjet: String, newNotes: String
     ) {
         val appels = loadAppels().toMutableList()
         val index = appels.indexOfFirst { it.id == appelId }
@@ -1335,8 +1317,6 @@ class DataRepository(val context: Context) {
         deleteNotification(notification)
     }
 
-
-
     private fun saveNotifications() {
         val jsonString = gson.toJson(notifications)
         sharedPreferences.edit().putString("notifications", jsonString).apply()
@@ -1352,6 +1332,16 @@ class DataRepository(val context: Context) {
         }
     }
 
+    private fun loadEvents(): List<Event> {
+        val eventsJson = sharedPreferences.getString("events", null)
+        return if (eventsJson != null) {
+            val type = object : TypeToken<List<Event>>() {}.type
+            gson.fromJson(eventsJson, type)
+        } else {
+            emptyList()
+        }
+    }
+
     fun saveNotification(notification: Notification) {
         val mutableNotifications = notifications?.toMutableList() ?: mutableListOf()
         mutableNotifications.add(notification)
@@ -1360,6 +1350,35 @@ class DataRepository(val context: Context) {
         sharedPreferences.edit().putString("notifications", jsonString).apply()
 
         val intent = Intent("com.jobber.NOTIFICATION_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+    }
+
+    fun saveEvent(event: Event) {
+        val mutableEvents = events?.toMutableList() ?: mutableListOf()
+        mutableEvents.add(event)
+        events = mutableEvents
+        val jsonString = gson.toJson(events)
+        sharedPreferences.edit().putString("events", jsonString).apply()
+
+        val intent = Intent("com.jobber.EVENTS_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+    }
+
+    private fun saveEvents() {
+        val jsonString = gson.toJson(events)
+        sharedPreferences.edit().putString("events", jsonString).apply()
+    }
+    fun getEvents(): List<Event> {
+        return events ?: emptyList()
+    }
+
+    fun deleteEvent(event: Event) {
+        val mutableEvents = events?.toMutableList() ?: mutableListOf()
+        mutableEvents.remove(event)
+        events = mutableEvents
+        saveEvents()
+
+        val intent = Intent("com.jobber.EVENTS_LIST_UPDATED")
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 

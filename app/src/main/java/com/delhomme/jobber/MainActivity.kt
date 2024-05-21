@@ -21,6 +21,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.delhomme.jobber.Appel.AddAppelActivity
 import com.delhomme.jobber.Appel.FragmentAppels
+import com.delhomme.jobber.Calendrier.FragmentCalendrier
 import com.delhomme.jobber.Candidature.AddCandidatureActivity
 import com.delhomme.jobber.Candidature.FragmentCandidatures
 import com.delhomme.jobber.Contact.AddContactActivity

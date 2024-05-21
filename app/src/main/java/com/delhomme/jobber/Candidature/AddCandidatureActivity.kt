@@ -12,6 +12,8 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.delhomme.jobber.Calendrier.Event
+import com.delhomme.jobber.Calendrier.EventType
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.CandidatureState
 import com.delhomme.jobber.DataRepository
@@ -94,8 +96,24 @@ class AddCandidatureActivity : AppCompatActivity() {
         dataRepository.saveCandidature(newCandidature)
         Toast.makeText(this, "Candidature ajoutée avec succès", Toast.LENGTH_SHORT).show()
 
-        val intent = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        val event = Event(
+            id = UUID.randomUUID().toString(),
+            title = "Candidature : $titreOffre",
+            description = "Candidature pour $nomEntreprise à ${etDateCandidature.text}",
+            startTime = dateCandidature.time,
+            endTime = dateCandidature.time + 10 * 60 * 1000,
+            type = EventType.Candidature,
+            relatedId = newCandidature.id,
+            entrepriseId = entreprise.nom
+        )
+        dataRepository.saveEvent(event)
+
+        val intentEvent = Intent("com.jobber.EVENEMENT_LIST_UPDATED")
+
+
+        val intentCandidature = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentCandidature)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentEvent)
         finish()
     }
 }
