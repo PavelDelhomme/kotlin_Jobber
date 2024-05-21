@@ -6,38 +6,35 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/nomPoste"
+        android:id="@+id/date_candidature"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textColor="#666666"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnEditCandidature"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/entreprise"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#666666"
-        app:layout_constraintStart_toStartOf="@id/nomPoste"
-        app:layout_constraintEnd_toEndOf="@id/nomPoste"
-        app:layout_constraintTop_toBottomOf="@id/nomPoste"
-        android:layout_marginEnd="8dp"/>
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date_candidature"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
-        android:id="@+id/date"
+        android:id="@+id/nomPoste"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
+        android:textStyle="bold"
         android:textColor="#666666"
-        app:layout_constraintStart_toStartOf="@id/entreprise"
-        app:layout_constraintEnd_toEndOf="@id/entreprise"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/entreprise"
-        android:layout_marginEnd="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/etat"
@@ -45,60 +42,34 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="#FF5722"
-        app:layout_constraintStart_toStartOf="@id/date"
-        app:layout_constraintEnd_toEndOf="@id/date"
-        app:layout_constraintTop_toBottomOf="@id/date"
-        android:layout_marginEnd="8dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nomPoste"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/typePoste"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@id/etat"
-        app:layout_constraintEnd_toEndOf="@id/etat"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etat"
-        android:layout_marginEnd="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/plateforme"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@id/typePoste"
-        app:layout_constraintEnd_toEndOf="@id/typePoste"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/typePoste"
-        android:layout_marginEnd="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/tvNotesCandidature"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="@id/plateforme"
-        app:layout_constraintEnd_toEndOf="@id/plateforme"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/plateforme"
-        android:layout_marginEnd="8dp"/>
-
-    <ImageButton
-        android:id="@+id/btnEditCandidature"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_edit"
-        android:contentDescription="Edit"
-        app:layout_constraintEnd_toStartOf="@+id/btnDeleteCandidature"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"/>
-
-    <ImageButton
-        android:id="@+id/btnDeleteCandidature"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:background="@color/design_default_color_error"
-        android:contentDescription="Delete"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

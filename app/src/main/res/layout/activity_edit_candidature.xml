@@ -16,6 +16,7 @@
             android:layout_height="wrap_content"
             android:hint="Titre de l'offre"
             android:inputType="text"/>
+
         <EditText
             android:id="@+id/etDateCandidature"
             android:layout_width="match_parent"
@@ -40,13 +41,14 @@
             android:inputType="textMultiLine"/>
 
         <Spinner
+            android:id="@+id/spinner_type_poste"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/spinner_type_poste" />
+            android:layout_height="wrap_content"/>
+
         <Spinner
+            android:id="@+id/spinner_plateforme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/spinner_plateforme" />
+            android:layout_height="wrap_content"/>
 
         <EditText
             android:id="@+id/etLieuPoste"
@@ -60,5 +62,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Enregistrer les modifications"/>
+
+        <Button
+            android:id="@+id/btnCancelCandidatureChanges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Annuler"/>
     </LinearLayout>
 </ScrollView>

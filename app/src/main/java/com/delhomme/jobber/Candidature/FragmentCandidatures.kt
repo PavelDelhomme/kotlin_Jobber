@@ -10,14 +10,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Candidature.adapter.CandidatureAdapter
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentCandidatures : Fragment() {
     private lateinit var adapter: CandidatureAdapter
@@ -40,6 +43,8 @@ class FragmentCandidatures : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+        val emptyView = view.findViewById<TextView>(R.id.empty_view_candidatures)
+
         adapter = CandidatureAdapter(
             dataRepository.getCandidatures(),
             dataRepository,
@@ -50,11 +55,54 @@ class FragmentCandidatures : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
+        updateUI(recyclerView, emptyView)
+
         view.findViewById<Button>(R.id.btnAddCandidature).setOnClickListener {
             startActivity(Intent(activity, AddCandidatureActivity::class.java))
         }
 
+
+        val swipeCallback = SwipeCallback(requireContext(),
+            { position ->
+                val candidature = adapter.candidatures[position]
+                showDeleteConfirmationDialog(candidature.id, position)
+            },
+            { position ->
+                val candidature = adapter.candidatures[position]
+                onEditCandidatureClicked(candidature.id)
+            }
+        )
+
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
+
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(updateReceiver, IntentFilter("com.jobber.CANDIDATURE_LIST_UPDATED"))
+    }
+
+    private fun updateUI(recyclerView: RecyclerView, emptyView: TextView) {
+        if (adapter.itemCount > 0) {
+            recyclerView.visibility = View.VISIBLE
+            emptyView.visibility = View.GONE
+        } else {
+            recyclerView.visibility = View.GONE
+            emptyView.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showDeleteConfirmationDialog(candidatureId: String, position: Int) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Confirmation de suppression")
+            .setMessage("Voulez-vous vraiment supprimer cette candidature ?")
+            .setNegativeButton("Annuler") { dialog, _ ->
+                adapter.notifyItemChanged(position)
+                dialog.dismiss()
+            }
+            .setPositiveButton("Supprimer") { dialog, _ ->
+                onDeleteCandidatureClicked(candidatureId)
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun onCandidatureClicked(candidature: Candidature) {

@@ -3,11 +3,11 @@ package com.delhomme.jobber.Notification.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Notification.model.Notification
 import com.delhomme.jobber.R
+import com.google.android.material.button.MaterialButton
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -21,8 +21,8 @@ class NotificationAdapter(
         private val title: TextView = view.findViewById(R.id.notificationTitle)
         private val message: TextView = view.findViewById(R.id.notificationMessage)
         private val date: TextView = view.findViewById(R.id.notificationDate)
-        private val btnDelete: Button = view.findViewById(R.id.btnDeleteNotification)
-        private val btnMarkAsRead: Button = view.findViewById(R.id.btnMarkAsRead)
+        private val btnDelete: MaterialButton = view.findViewById(R.id.btnDeleteNotification)
+        private val btnMarkAsRead: MaterialButton = view.findViewById(R.id.btnMarkAsRead)
 
         fun bind(notification: Notification, onDeleteClick: (Notification) -> Unit, onMarkAsReadClick: (Notification) -> Unit) {
             title.text = notification.titre

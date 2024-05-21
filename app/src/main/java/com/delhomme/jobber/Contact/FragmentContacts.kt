@@ -11,12 +11,15 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Candidature.SwipeCallback
 import com.delhomme.jobber.Contact.adapter.ContactAdapter
 import com.delhomme.jobber.Contact.model.Contact
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentContacts : Fragment() {
     private lateinit var adapter: ContactAdapter
@@ -33,7 +36,12 @@ class FragmentContacts : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewContacts)
-        adapter = ContactAdapter(dataRepository.getContacts(), dataRepository, this::onContactClicked, this::onDeleteContactClicked, this::onEditContactClicked)
+        adapter = ContactAdapter(
+            dataRepository.getContacts(),
+            dataRepository,
+            this::onContactClicked,
+            this::onDeleteContactClicked,
+            this::onEditContactClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -41,6 +49,20 @@ class FragmentContacts : Fragment() {
         addButton.setOnClickListener {
             startActivity(Intent(activity, AddContactActivity::class.java))
         }
+
+        val swipeCallback = SwipeCallback(requireContext(),
+            { position ->
+                val contact = adapter.contacts[position]
+                showDeleteConfirmationDialog(contact.id, position)
+            },
+            { position ->
+                val contact = adapter.contacts[position]
+                onEditContactClicked(contact.id)
+            }
+        )
+
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
 
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -50,6 +72,21 @@ class FragmentContacts : Fragment() {
 
         LocalBroadcastManager.getInstance(requireContext())
             .registerReceiver(broadcastReceiver, IntentFilter("CONTACTS_UPDATED"))
+    }
+
+    private fun showDeleteConfirmationDialog(contactId: String, position: Int) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Confirmation de suppression")
+            .setMessage("Voulez-vous vraiement supprimer ce contact ?")
+            .setNegativeButton("Annuler") { dialog, _ ->
+                adapter.notifyItemChanged(position)
+                dialog.dismiss()
+            }
+            .setPositiveButton("Supprimer") { dialog, _ ->
+                onDeleteContactClicked(contactId)
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun onContactClicked(contact: Contact) {

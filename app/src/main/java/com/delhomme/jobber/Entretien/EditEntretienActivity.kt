@@ -42,6 +42,9 @@ class EditEntretienActivity : AppCompatActivity() {
         setupUI()
         setupListeners()
         setupFields()
+        findViewById<Button>(R.id.btnCancelEntretienChanges).setOnClickListener {
+            cancelChange()
+        }
     }
 
     private fun setupUI() {
@@ -144,5 +147,9 @@ class EditEntretienActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Erreur : ID de l'entretien manquant", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun cancelChange() {
+        finish()
     }
 }

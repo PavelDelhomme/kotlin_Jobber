@@ -42,6 +42,10 @@ class EditRelanceActivity : AppCompatActivity() {
         setupUI()
         setupListeners()
         loadData()
+
+        findViewById<Button>(R.id.btnCancelRelanceChanges).setOnClickListener {
+            cancelChanges()
+        }
     }
 
     private fun setupEntrepriseAutoComplete() {
@@ -148,5 +152,9 @@ class EditRelanceActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun cancelChanges() {
+        finish()
     }
 }

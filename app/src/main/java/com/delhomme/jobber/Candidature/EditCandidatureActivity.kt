@@ -40,6 +40,9 @@ class EditCandidatureActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSaveCandidatureChanges).setOnClickListener {
             saveChanges()
         }
+        findViewById<Button>(R.id.btnCancelCandidatureChanges).setOnClickListener {
+            cancelChanges()
+        }
     }
 
     private fun setupEntrepriseAutoComplete() {
@@ -126,5 +129,9 @@ class EditCandidatureActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Erreur : ID de candidature manquant", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun cancelChanges() {
+        finish()
     }
 }

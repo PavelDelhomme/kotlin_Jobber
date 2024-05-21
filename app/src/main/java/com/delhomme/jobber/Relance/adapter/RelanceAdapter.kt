@@ -1,7 +1,7 @@
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.DataRepository
@@ -23,8 +23,6 @@ class RelanceAdapter(
         val candidatureTitre: TextView = view.findViewById(R.id.candidatureTitre)
         val plateformeUtilise: TextView = view.findViewById(R.id.plateformeRelance)
         val notesRelance: TextView = view.findViewById(R.id.notesRelance)
-        val deleteButton: ImageButton = view.findViewById(R.id.btnDeleteRelance)
-        val btnEdit: ImageButton = view.findViewById(R.id.btnEditRelance)
 
         fun bind(relance: Relance, dataRepository: DataRepository, clickListener: (Relance) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
             val entrepriseName = dataRepository.getEntrepriseByNom(relance.entrepriseNom)?.nom ?: "Entreprise inconnue"
@@ -36,8 +34,6 @@ class RelanceAdapter(
             notesRelance.text = relance.notes ?: "Aucune note de relance"
 
             itemView.setOnClickListener { clickListener(relance) }
-            btnEdit.setOnClickListener { editListener(relance.id) }
-            deleteButton.setOnClickListener { deleteListener(relance.id) }
         }
     }
 

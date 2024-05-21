@@ -11,10 +11,9 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/btnEditAppel"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/tvObjetAppel"
         android:layout_marginEnd="8dp"/>
 
     <TextView
@@ -22,10 +21,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@id/tvDateAppel"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvDateAppel"
-        app:layout_constraintBottom_toTopOf="@+id/tvContactAppel"
         android:layout_marginEnd="8dp"/>
 
     <TextView
@@ -33,10 +31,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@id/tvObjetAppel"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvObjetAppel"
-        app:layout_constraintBottom_toTopOf="@+id/tvNotesAppels"
         android:layout_marginEnd="8dp"/>
 
     <TextView
@@ -44,31 +41,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@id/tvContactAppel"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvContactAppel"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="8dp"/>
-    <ImageButton
-        android:id="@+id/btnEditAppel"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_edit"
-        android:contentDescription="Edit"
-        app:layout_constraintEnd_toStartOf="@+id/btnDeleteAppel"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"/>
-
-    <ImageButton
-        android:id="@+id/btnDeleteAppel"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:background="@color/design_default_color_error"
-        android:contentDescription="Delete"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

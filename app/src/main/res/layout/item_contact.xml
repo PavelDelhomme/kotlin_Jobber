@@ -13,13 +13,12 @@
         android:textStyle="bold"
         android:textColor="#000000"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnEditContact"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/entreprise"
+        app:layout_constraintBottom_toTopOf="@+id/entrepriseContact"
         android:layout_marginEnd="8dp"/>
 
     <TextView
-        android:id="@+id/entreprise"
+        android:id="@+id/entrepriseContact"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
@@ -36,9 +35,9 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="#666666"
-        app:layout_constraintStart_toStartOf="@id/entreprise"
-        app:layout_constraintEnd_toEndOf="@id/entreprise"
-        app:layout_constraintTop_toBottomOf="@id/entreprise"
+        app:layout_constraintStart_toStartOf="@id/entrepriseContact"
+        app:layout_constraintEnd_toEndOf="@id/entrepriseContact"
+        app:layout_constraintTop_toBottomOf="@id/entrepriseContact"
         app:layout_constraintBottom_toTopOf="@+id/emailContact"
         android:layout_marginEnd="8dp"/>
 
@@ -53,25 +52,4 @@
         app:layout_constraintTop_toBottomOf="@id/telephoneContact"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="8dp"/>
-
-    <ImageButton
-        android:id="@+id/btnEditContact"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_edit"
-        android:contentDescription="Edit"
-        app:layout_constraintEnd_toStartOf="@+id/btnDeleteContact"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"/>
-
-    <ImageButton
-        android:id="@+id/btnDeleteContact"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:contentDescription="Delete"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,5 +22,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Enregistrer les modifications" />
+
+
+        <Button
+            android:id="@+id/btnCancelEntrepriseChanges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Annuler"/>
     </LinearLayout>
 </ScrollView>

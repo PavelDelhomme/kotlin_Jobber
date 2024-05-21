@@ -33,6 +33,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvContacts" />
+        <TextView
+            android:id="@+id/empty_view_contacts_candidatures"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aucuns appels pour la candidature"
+            android:layout_below="@id/btnAddContact"/>
+
 
         <Button
             android:id="@+id/btnAddContact"
@@ -54,6 +61,14 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tvAppels" />
 
+        <TextView
+            android:id="@+id/empty_view_appels"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aucuns appels pour la candidature"
+            android:layout_below="@id/btnAddContact"/>
+
+
         <Button
             android:id="@+id/btnAddAppel"
             android:layout_width="match_parent"
@@ -73,6 +88,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvRelances" />
+
+        <TextView
+            android:id="@+id/empty_view_relances_candidatures"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aucuns appels pour la candidature"
+            android:layout_below="@id/btnAddContact"/>
+
 
         <Button
             android:id="@+id/btnAddRelance"
@@ -94,6 +117,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvEntretiens" />
+        <TextView
+            android:id="@+id/empty_view_entretiens_candidatures"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aucuns appels pour la candidature"
+            android:layout_below="@id/btnAddContact"/>
+
 
         <Button
             android:id="@+id/btnAddEntretien"

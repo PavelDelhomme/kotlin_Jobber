@@ -52,4 +52,10 @@
         android:layout_height="wrap_content"
         android:text="Sauvegarder"
         android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/btnCancelEntretienChanges"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Annuler"/>
 </LinearLayout>

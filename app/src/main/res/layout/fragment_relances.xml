@@ -14,6 +14,13 @@
         tools:listitem="@layout/item_relance"
         android:scrollbars="vertical" />
 
+    <TextView
+        android:id="@+id/empty_view_relances"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aucunes relances pour la candidature" />
+
+
     <Button
         android:id="@+id/btnAddRelance"
         android:layout_width="match_parent"

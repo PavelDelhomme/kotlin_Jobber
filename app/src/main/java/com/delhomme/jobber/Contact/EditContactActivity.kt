@@ -53,6 +53,9 @@ class EditContactActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to update contact!", Toast.LENGTH_SHORT).show()
             }
         }
+        findViewById<Button>(R.id.btnCancelContactChanges).setOnClickListener {
+            cancelChanges()
+        }
     }
 
     private fun setupEntrepriseAutoComplete() {
@@ -101,5 +104,9 @@ class EditContactActivity : AppCompatActivity() {
             return true
         }
         return false
+    }
+
+    private fun cancelChanges() {
+        finish()
     }
 }

@@ -3,15 +3,16 @@ package com.delhomme.jobber.Entretien.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entretien.model.Entretien
 import com.delhomme.jobber.R
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class EntretienAdapter(
-    private var entretiens: List<Entretien>,
+    var entretiens: List<Entretien>,
     private val dataRepository: DataRepository,
     private val itemClickListener: (Entretien) -> Unit,
     private val deleteClickListener: (String) -> Unit,
@@ -22,8 +23,6 @@ class EntretienAdapter(
         val dateEntretien: TextView = view.findViewById(R.id.dateEntretien)
         val entrepriseEntretien: TextView = view.findViewById(R.id.entrepriseEntretien)
         val typeEntretien: TextView = view.findViewById(R.id.typeEntretien)
-        val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteEntretien)
-        val btnEdit: ImageButton = view.findViewById(R.id.btnEditEntretien)
 
         fun bind(
             entretien: Entretien,
@@ -33,13 +32,15 @@ class EntretienAdapter(
             editListener: (String) -> Unit
         ) {
             val entrepriseName = dataRepository.getEntrepriseByNom(entretien.entrepriseNom)?.nom ?: "Entreprise inconnue"
-            dateEntretien.text = entretien.date_entretien.toString() // Vous pouvez formater la date si nécessaire
+            dateEntretien.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(entretien.date_entretien)
             entrepriseEntretien.text = entrepriseName
             typeEntretien.text = entretien.type
 
             itemView.setOnClickListener { clickListener(entretien) }
-            btnEdit.setOnClickListener { editListener(entretien.id) }
-            btnDelete.setOnClickListener { deleteListener(entretien.id) }
+            itemView.setOnLongClickListener {
+                editListener(entretien.id)
+                true
+            }
         }
     }
 

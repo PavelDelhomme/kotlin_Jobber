@@ -45,4 +45,10 @@
         android:layout_height="wrap_content"
         android:text="Enregistrer"
         android:layout_gravity="center_horizontal" />
+    <Button
+        android:id="@+id/btnCancelRelanceChanges"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Annuler"/>
 </LinearLayout>

@@ -9,14 +9,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Candidature.SwipeCallback
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entretien.adapter.EntretienAdapter
 import com.delhomme.jobber.Entretien.model.Entretien
 import com.delhomme.jobber.R
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentEntretiens : Fragment() {
     private lateinit var adapter: EntretienAdapter
@@ -30,9 +34,13 @@ class FragmentEntretiens : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewEntretiens)
+        val emptyView = view.findViewById<TextView>(R.id.empty_view_entretiens)
+
         adapter = EntretienAdapter(dataRepository.getEntretiens(), dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
+
+        updateUI(recyclerView, emptyView)
 
         view.findViewById<Button>(R.id.btnAddEntretien).setOnClickListener {
             startActivity(Intent(activity, AddEntretienActivity::class.java))
@@ -44,8 +52,47 @@ class FragmentEntretiens : Fragment() {
             }
         }
 
+        val swipeCallback = SwipeCallback(requireContext(),
+            { position ->
+                val entretien = adapter.entretiens[position]
+                showDeleteConfirmationDialog(entretien.id, position)
+            },
+            { position ->
+                val entretien = adapter.entretiens[position]
+                onEditEntretienClicked(entretien.id)
+            }
+        )
+
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
         LocalBroadcastManager.getInstance(requireContext())
             .registerReceiver(broadcastReceiver, IntentFilter("ENTRETIENS_UPDATED"))
+    }
+
+    private fun updateUI(recyclerView: RecyclerView, emptyView: TextView) {
+        if (adapter.itemCount > 0) {
+            recyclerView.visibility = View.VISIBLE
+            emptyView.visibility = View.GONE
+        } else {
+            recyclerView.visibility = View.GONE
+            emptyView.visibility = View.VISIBLE
+        }
+    }
+    private fun showDeleteConfirmationDialog(entretienId: String, position: Int) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Confirmation de suppression")
+            .setMessage("Voulez-vous vraiment supprimer cet entretien ?")
+            .setNegativeButton("Annuler") { dialog, _ ->
+                adapter.notifyItemChanged(position)
+                dialog.dismiss()
+            }
+            .setPositiveButton("Supprimer") { dialog, _ ->
+                onDeleteEntretienClicked(entretienId)
+                dialog.dismiss()
+            }
+            .show()
+
     }
 
     private fun onEntretienClicked(entretien: Entretien) {

@@ -35,6 +35,9 @@ class EditEntrepriseActivity : AppCompatActivity() {
         btnSaveEntrepriseChanges.setOnClickListener {
             saveEntrepriseChanges()
         }
+        findViewById<Button>(R.id.btnCancelEntrepriseChanges).setOnClickListener {
+            cancelChange()
+        }
     }
 
     private fun saveEntrepriseChanges() {
@@ -70,5 +73,9 @@ class EditEntrepriseActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun cancelChange() {
+        finish()
     }
 }

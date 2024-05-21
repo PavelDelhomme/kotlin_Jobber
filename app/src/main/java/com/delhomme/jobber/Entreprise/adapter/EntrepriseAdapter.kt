@@ -8,7 +8,7 @@ import com.delhomme.jobber.Entreprise.model.Entreprise
 import com.delhomme.jobber.R
 
 class EntrepriseAdapter(
-    private var entreprises: List<Entreprise>,
+    var entreprises: List<Entreprise>,
     private val itemClickListener: (Entreprise) -> Unit,
     private val deleteClickListener: (String) -> Unit,
     private val editClickListener: (String) -> Unit
@@ -27,8 +27,6 @@ class EntrepriseAdapter(
         ) {
             tvEntrepriseName.text = entreprise.nom
             itemView.setOnClickListener { clickListener(entreprise) }
-            btnEdit.setOnClickListener { editListener(entreprise.nom) }
-            btnDelete.setOnClickListener { deleteListener(entreprise.nom) }
         }
     }
 
