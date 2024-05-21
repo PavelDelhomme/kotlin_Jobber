@@ -11,24 +11,16 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="16sp"
+        android:background="#F6F635"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnEditEvent"
+        app:layout_constraintEnd_toEndOf="@id/eventType"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/eventDescription"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/eventTitle"
-        app:layout_constraintStart_toStartOf="@id/eventTitle"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <TextView
         android:id="@+id/eventType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/eventDescription"
-        app:layout_constraintStart_toStartOf="@id/eventDescription" />
+        app:layout_constraintTop_toBottomOf="@id/eventTitle"
+        app:layout_constraintStart_toStartOf="@id/eventTitle" />
 
     <TextView
         android:id="@+id/eventStartTime"
@@ -43,17 +35,5 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/eventStartTime"
         app:layout_constraintStart_toStartOf="@id/eventStartTime" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnEditEvent"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:contentDescription="Edit"
-        android:layout_marginStart="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:icon="@android:drawable/ic_menu_edit"
-        style="@style/Widget.MaterialComponents.Button.Icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

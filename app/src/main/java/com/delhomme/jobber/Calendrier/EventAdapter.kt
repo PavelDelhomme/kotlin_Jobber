@@ -14,14 +14,12 @@ class EventAdapter(private var events: List<Event>) : RecyclerView.Adapter<Event
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.eventTitle)
-        val description: TextView = view.findViewById(R.id.eventDescription)
         val type: TextView = view.findViewById(R.id.eventType)
         val startTime: TextView = view.findViewById(R.id.eventStartTime)
         val endTime: TextView = view.findViewById(R.id.eventEndTime)
 
         fun bind(event: Event) {
             title.text = event.title
-            description.text = event.description
             type.text = event.type.name
             startTime.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(Date(event.startTime))
             endTime.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(Date(event.endTime))

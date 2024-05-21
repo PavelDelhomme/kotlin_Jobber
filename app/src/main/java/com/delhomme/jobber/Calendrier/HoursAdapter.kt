@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.R
 
 
-class HoursAdapter : RecyclerView.Adapter<HoursAdapter.HourViewHolder>() {
-    private val hours = List(24) { "$it:00" } // Generate hours from 0:00 to 23:00
-
+class HoursAdapter(private val hours: List<String>) : RecyclerView.Adapter<HoursAdapter.HourViewHolder>() {
     class HourViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val hourText: TextView = view.findViewById(R.id.hourText)
+        private val hourText: TextView = view.findViewById(R.id.hourText)
+
+        fun bind(hour: String) {
+            hourText.text = hour
+        }
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HourViewHolder {
@@ -21,7 +24,7 @@ class HoursAdapter : RecyclerView.Adapter<HoursAdapter.HourViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: HourViewHolder, position: Int) {
-        holder.hourText.text = hours[position]
+        holder.bind(hours[position])
     }
 
     override fun getItemCount() = hours.size

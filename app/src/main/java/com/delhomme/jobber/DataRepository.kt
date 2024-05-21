@@ -804,12 +804,6 @@ class DataRepository(val context: Context) {
 
         val sevenDaysAfterCandidature = Date(candidatedDate.time + 7 * (1000 * 60 * 60 * 24))
 
-        Log.d("DataRepository", "Updating state for Candidature: ${candidature.id}")
-        Log.d("DataRepository", "Days since candidated: $daysSinceCandidated")
-        Log.d("DataRepository", "Interviews: $entretiens")
-        Log.d("DataRepository", "Calls: $appels")
-        Log.d("DataRepository", "Follow-ups: $relances")
-
         val newState = when {
             daysSinceCandidated <= 7 -> CandidatureState.CANDIDATEE_ET_EN_ATTENTE
             entretiens.isEmpty() && appels.isEmpty() && relances.none { it.date_relance <= sevenDaysAfterCandidature } -> CandidatureState.A_RELANCEE
@@ -818,8 +812,6 @@ class DataRepository(val context: Context) {
             relances.isNotEmpty() && daysSinceCandidated > 14 -> CandidatureState.AUCUNE_REPONSE
             else -> CandidatureState.ERREUR
         }
-
-        Log.d("DataRepository", "New state determined: $newState")
 
         if (candidature.state != newState) {
             candidature.state = newState
@@ -848,8 +840,39 @@ class DataRepository(val context: Context) {
         }
     }
 
+    private fun generate_graph(title: String, chartData: JSONObject, chartId: String, chartType: String): String {
+        return """
+                <html>
+                <head>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                </head>
+                <body>
+                    <h2>$title</h2>
+                    <canvas id="$chartId"></canvas>
+                    <script>
+                        var ctx = document.getElementById('$chartId').getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: '$chartType,
+                            data: $chartData,
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                            precision: 0 // This ensures the y-axis displays integer values
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </body>
+                </html>
+            """
+    }
 
-    fun getGraphData(dayOffset: Int = 0): String {
+    fun generateGlobalData(dayOffset: Int = 0): String {
         val candidatures = loadCandidatures()
         val appels = getAppelsLast7Days()
         val relances = getRelancesLast7Days()
@@ -920,39 +943,12 @@ class DataRepository(val context: Context) {
         }
 
         val title = "Activité sur $startDate à $endDate"
+        val graphId = "global_data_chart"
 
-        val htmlContent = """
-            <html>
-            <head>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            </head>
-            <body>
-                <h2>$title</h2>
-                <canvas id="myChart"></canvas>
-                <script>
-                    var ctx = document.getElementById('myChart').getContext('2d');
-                    var myChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: $chartData,
-                        options: {
-                            responsive: true,
-                            scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true,
-                                        precision: 0 // This ensures the y-axis displays integer values
-                                    }
-                                }]
-                            }
-                        }
-                    });
-                </script>
-            </body>
-            </html>
-        """
-
-        return htmlContent
+        return generate_graph(title, chartData, graphId, "bar")
     }
+
+
 
     fun getAppelsLast7Days(): List<Appel> {
         val now = Calendar.getInstance()
@@ -1301,7 +1297,7 @@ class DataRepository(val context: Context) {
     }
 
     fun getNotifications(): List<Notification> {
-        return notifications ?: emptyList()
+        return notifications?.sortedByDescending { it.date } ?: emptyList()
     }
     fun deleteNotification(notification: Notification) {
         val mutableNotifications = notifications?.toMutableList() ?: mutableListOf()

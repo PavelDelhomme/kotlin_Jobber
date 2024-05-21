@@ -5,14 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.Spinner
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -24,6 +22,7 @@ import java.util.Locale
 class FragmentCalendrier : Fragment() {
     private lateinit var hoursRecyclerView: RecyclerView
     private lateinit var currentDayTextView: TextView
+    private lateinit var eventsRecyclerView: RecyclerView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_calendrier, container, false)
@@ -39,43 +38,40 @@ class FragmentCalendrier : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val today = Calendar.getInstance()
-        currentDayTextView.text = SimpleDateFormat("EEE, d MMM, yyyy", Locale.FRENCH).format(today.time)
+        setupRecyclerViews()
+        loadEventsAndHours()
+        setupDayView()
+
         view.findViewById<Button>(R.id.prevDayButton).setOnClickListener {
-            changeDay(-1)
+            adjustDay(-1)
         }
         view.findViewById<Button>(R.id.nextDayButton).setOnClickListener {
-            changeDay(1)
+            adjustDay(1)
         }
+    }
+    private fun setupRecyclerViews() {
+        hoursRecyclerView = view?.findViewById(R.id.hoursRecyclerView) ?: throw IllegalStateException("View should not be null")
+        eventsRecyclerView = view?.findViewById(R.id.eventsRecyclerView) ?: throw IllegalStateException("View should not be null")
 
-        view.findViewById<Spinner>(R.id.viewSelector).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                updateViewMode(parent.getItemAtPosition(position).toString())
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
+        hoursRecyclerView.layoutManager = LinearLayoutManager(context)
+        eventsRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        val viewModes = arrayOf("Jour", "5 jours", "Mois")
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, viewModes)
-        view.findViewById<Spinner>(R.id.viewSelector).adapter = spinnerAdapter
-
-        updateViewMode("Jour")
+        hoursRecyclerView.adapter = HoursAdapter(createHoursList())
+        eventsRecyclerView.adapter = EventAdapter(DataRepository(requireContext()).getEvents())
     }
 
-    private fun changeDay(dayChange: Int) {
-        val dateString = currentDayTextView.text.toString()
-        if (!dateString.isEmpty()) {
-            try {
-                val dateFormat = SimpleDateFormat("EEE., d, MM, yyyy", Locale.FRENCH)
-                val cal = Calendar.getInstance()
-                cal.setTime(dateFormat.parse(dateString))
-                cal.add(Calendar.DAY_OF_YEAR, dayChange)
-                currentDayTextView.setText(dateFormat.format(cal.time))
-            } catch (e: ParseException) {
-                Log.e("CalendarError", "Error parsing date : $dateString\n$e")
+    private fun createHoursList(): List<String> {
+        return List(24) { hour -> "${hour}:00"}
+    }
 
-            }
+    private fun adjustDay(dayDelta: Int) {
+        val dateFormat = SimpleDateFormat("EEE, d MMM, yyyy", Locale.FRENCH)
+        val cal = Calendar.getInstance().apply {
+            time = dateFormat.parse(currentDayTextView.text.toString()) ?: return
+            add(Calendar.DAY_OF_YEAR, dayDelta)
         }
+        currentDayTextView.text = dateFormat.format(cal.time)
+        loadEventsAndHours()
     }
 
     private fun updateViewMode(viewMode: String) {
@@ -85,10 +81,8 @@ class FragmentCalendrier : Fragment() {
             "Mois" -> setupMonthView()
         }
     }
-
     private fun setupDayView() {
         val dateString = currentDayTextView.text.toString()
-        //hoursRecyclerView.adapter = HoursAdapter()
         if (dateString.isNotEmpty()) {
             try {
                 val calendar = Calendar.getInstance()
@@ -96,24 +90,25 @@ class FragmentCalendrier : Fragment() {
                 val startDate = dateFormat.parse(dateString)
                 calendar.time = startDate
 
-                val events = createSampleEvents()
-
-                val hours = List(24) { index -> HourEvent(index.toString() + ":00", events.filter { it.startTime <= index && it.endTime > index })}
-
-                hoursRecyclerView.adapter = CombinedHoursEventsAdapter(hours)
-                EventAdapter(events)
-                val days = mutableListOf<Date>()
-                for (i in 0 until 1) {
-                    days.add(calendar.time)
-                    calendar.add(Calendar.DAY_OF_YEAR, 1)
+                val events = createSampleEvents() // Make sure this returns correctly timed events
+                val hoursEvents = List(24) { hour ->
+                    HourEvent("$hour:00", events.filter {
+                        val eventCal = Calendar.getInstance()
+                        eventCal.time = Date(it.startTime)
+                        eventCal.get(Calendar.HOUR_OF_DAY) == hour
+                    })
                 }
+
+                hoursRecyclerView.adapter = CombinedHoursEventsAdapter(hoursEvents)
             } catch (e: ParseException) {
-                Log.e("FragmentCalendrier", "Unparseable date : $dateString", e)
+                Log.e("FragmentCalendrier", "Unparseable date: $dateString", e)
             }
         } else {
             Log.e("FragmentCalendrier", "Date string is empty")
         }
     }
+
+
     private fun setupFiveDayView() {
         try {
             val calendar = Calendar.getInstance()
@@ -178,6 +173,18 @@ class FragmentCalendrier : Fragment() {
                 entrepriseId = "E002"
             )
         )
+    }
+
+    private fun loadEventsAndHours() {
+        val events = DataRepository(requireContext()).getEvents()
+        val hoursEvents = List(24) { hour ->
+            HourEvent("$hour:00", events.filter {
+                val eventCal = Calendar.getInstance()
+                eventCal.time = Date(it.startTime)
+                eventCal.get(Calendar.HOUR_OF_DAY) == hour
+            })
+        }
+        hoursRecyclerView.adapter = CombinedHoursEventsAdapter(hoursEvents)
     }
 
 }

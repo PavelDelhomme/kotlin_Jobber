@@ -1,49 +1,79 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Calendrier.FragmentCalendrier">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/currentDay"
+    <!-- Header for navigation and date display -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
         android:gravity="center"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:padding="16dp"/>
+        android:padding="8dp">
 
-    <Button
-        android:id="@+id/prevDayButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/currentDay"
-        android:text="Prev" />
+        <Button
+            android:id="@+id/prevDayButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prev" />
 
-    <Button
-        android:id="@+id/nextDayButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/currentDay"
-        android:text="Next"/>
+        <TextView
+            android:id="@+id/currentDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textStyle="bold" />
 
-    <Spinner
-        android:id="@+id/viewSelector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/currentDay"
-        android:entries="@array/view_options" />
+        <Button
+            android:id="@+id/nextDayButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next" />
+    </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/hoursRecyclerView"
+    <!-- Container for hours and events -->
+    <LinearLayout
+        android:id="@+id/layoutHoursEvents"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/viewSelector"
-        android:padding="16dp"
-        android:clipToPadding="false"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:scrollbars="vertical" />
+        android:layout_below="@id/headerLayout"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <!-- Column for hours -->
+        <FrameLayout
+            android:id="@+id/hoursColumn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="3dp"
+            android:background="#FF0000"
+            android:layout_weight=".5">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/hoursRecyclerView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                tools:listitem="@layout/hour_item_layout"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </FrameLayout>
+
+        <!-- Column for events -->
+        <FrameLayout
+            android:id="@+id/eventsColumn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:layout_weight="2.5"
+            android:background="#00FF00">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/eventsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        </FrameLayout>
+    </LinearLayout>
 </RelativeLayout>

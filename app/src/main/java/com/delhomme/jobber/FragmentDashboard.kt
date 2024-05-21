@@ -96,7 +96,7 @@ class FragmentDashboard : Fragment() {
     }
 
     private fun loadGraphData() {
-        val graphData = dataRepository.getGraphData(dayOffset)
+        val graphData = dataRepository.generateGlobalData(dayOffset)
         Log.d("FragmentDashboard", "Loading graph data: $graphData")
         webView.settings.javaScriptEnabled = true
         webView.loadDataWithBaseURL(null, graphData, "text/html", "UTF-8", null)
