@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -38,6 +39,8 @@ class FragmentRelances : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val emptyView = view.findViewById<TextView>(R.id.empty_view_relances)
+
+        (activity as AppCompatActivity).supportActionBar?.title = "Relances"
 
         adapter = RelanceAdapter(dataRepository.getRelances(), dataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked, this::onEditRelanceClicked)
         recyclerView.adapter = adapter

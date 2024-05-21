@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +32,10 @@ class FragmentAppels : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        (activity as AppCompatActivity).supportActionBar?.title = "Appels"
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvAppels)
         val emptyView = view.findViewById<TextView>(R.id.empty_view_appels)
 

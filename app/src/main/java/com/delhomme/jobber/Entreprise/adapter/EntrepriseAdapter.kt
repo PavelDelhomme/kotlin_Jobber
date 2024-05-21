@@ -1,7 +1,7 @@
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Entreprise.model.Entreprise
@@ -16,8 +16,6 @@ class EntrepriseAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val tvEntrepriseName: TextView = view.findViewById(R.id.tvEntrepriseName)
-        private val btnEdit: ImageButton = view.findViewById(R.id.btnEditEntreprise)
-        private val btnDelete: ImageButton = view.findViewById(R.id.btnDeleteEntreprise)
 
         fun bind(
             entreprise: Entreprise,
@@ -48,7 +46,7 @@ class EntrepriseAdapter(
     override fun getItemCount(): Int = entreprises.size
 
     fun updateEntreprises(newEntreprises: List<Entreprise>) {
-        entreprises = newEntreprises
+        entreprises = newEntreprises.sortedBy { it.nom }
         notifyDataSetChanged()
     }
 }

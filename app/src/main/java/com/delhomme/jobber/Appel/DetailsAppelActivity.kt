@@ -1,6 +1,7 @@
 package com.delhomme.jobber.Appel
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +37,8 @@ class DetailsAppelActivity : AppCompatActivity() {
         appelObjet.text = appel.objet
         appelNotes.text = appel.notes
 
-        setTitle("Appel pour ${appelObjet.text} du ${appelDate.text} avec ${appelNomContact.text}")
+        setTitle("${appelObjet.text}:${appelDate.text} - ${appelNomContact.text}")
+        Log.d("DetailsAppelActivityPerso", "")
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

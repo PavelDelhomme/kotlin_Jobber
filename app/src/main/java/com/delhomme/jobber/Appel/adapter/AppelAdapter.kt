@@ -24,6 +24,7 @@ class AppelAdapter(
         private val textViewObjet: TextView = view.findViewById(R.id.tvObjetAppel)
         private val textViewContact: TextView = view.findViewById(R.id.tvContactAppel)
         private val textViewNotes: TextView = view.findViewById(R.id.tvNotesAppels)
+        private val textViewEntreprise: TextView = view.findViewById(R.id.tvEntrepriseAppel)
 
         fun bind(appel: Appel, dataRepository: DataRepository, clickListener: (Appel) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
             val contactName = appel.contact_id?.let { dataRepository.getContactById(it)?.getFullName() } ?: "No Contact"
@@ -31,6 +32,7 @@ class AppelAdapter(
             textViewObjet.text = appel.objet
             textViewContact.text = contactName
             textViewNotes.text = appel.notes
+            textViewEntreprise.text = appel.entrepriseNom
             itemView.setOnClickListener { clickListener(appel) }
         }
     }

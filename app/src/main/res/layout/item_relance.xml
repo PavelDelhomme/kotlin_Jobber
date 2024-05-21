@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp">
@@ -11,9 +12,9 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="#000000"
+        android:textColor="#FF0000"
+        android:text="XX/XX/XXXX"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnEditRelance"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="8dp"/>
 
@@ -22,9 +23,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        android:textColor="#666666"
+        android:textColor="#FFFFFF"
+        android:text="Xxxxxxx"
         app:layout_constraintStart_toStartOf="@id/dateRelance"
-        app:layout_constraintEnd_toEndOf="@id/dateRelance"
+        app:layout_constraintEnd_toEndOf="@id/candidatureTitre"
         app:layout_constraintTop_toBottomOf="@id/dateRelance"
         android:layout_marginEnd="8dp"/>
 
@@ -34,21 +36,22 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="#666666"
-        app:layout_constraintStart_toStartOf="@id/entrepriseRelance"
-        app:layout_constraintEnd_toEndOf="@id/entrepriseRelance"
+        android:text="Xxxxx xxxxxx"
         app:layout_constraintTop_toBottomOf="@id/entrepriseRelance"
-        android:layout_marginEnd="8dp"/>
+        android:layout_marginEnd="8dp"
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/plateformeRelance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        android:textColor="#666666"
-        app:layout_constraintStart_toStartOf="@id/candidatureTitre"
-        app:layout_constraintEnd_toEndOf="@id/candidatureTitre"
+        android:textColor="#FFFFFF"
+        android:textStyle="italic"
+        android:text="Xxxxxxx"
         app:layout_constraintTop_toBottomOf="@id/candidatureTitre"
-        android:layout_marginEnd="8dp"/>
+        android:layout_marginEnd="8dp"
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/notesRelance"
@@ -56,10 +59,9 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="#FF5722"
-        app:layout_constraintStart_toStartOf="@id/plateformeRelance"
-        app:layout_constraintEnd_toEndOf="@id/plateformeRelance"
+        android:text="Xxxxxxxxxxxxxxxxxxxxx"
         app:layout_constraintTop_toBottomOf="@id/plateformeRelance"
-        android:layout_marginEnd="8dp"/>
-
+        android:layout_marginEnd="8dp"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

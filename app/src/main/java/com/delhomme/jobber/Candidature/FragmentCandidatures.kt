@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -44,6 +45,8 @@ class FragmentCandidatures : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val emptyView = view.findViewById<TextView>(R.id.empty_view_candidatures)
+
+        (activity as AppCompatActivity).supportActionBar?.title = "Candidatures"
 
         adapter = CandidatureAdapter(
             dataRepository.getCandidatures(),
