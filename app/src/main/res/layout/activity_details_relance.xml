@@ -35,6 +35,16 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp" />
 
+        <ImageButton
+            android:id="@+id/btnDeleteRelance"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:layout_constraintTop_toBottomOf="@id/btnEditRelance"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="16dp" />
+
         <TextView
             android:id="@+id/tvPlateforme"
             android:layout_width="0dp"

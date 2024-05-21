@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import com.delhomme.jobber.Relance.model.Relance
@@ -55,6 +56,13 @@ class DetailsRelanceActivity : AppCompatActivity() {
                 putExtra("CANDIDATURE_ID", relance.candidatureId)
             }
             startActivity(intent)
+        }
+
+        findViewById<ImageButton>(R.id.btnDeleteRelance).setOnClickListener {
+            DataRepository(applicationContext).deleteRelance(relance.id)
+            val intentCandidature = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intentCandidature)
+            finish()
         }
     }
 
