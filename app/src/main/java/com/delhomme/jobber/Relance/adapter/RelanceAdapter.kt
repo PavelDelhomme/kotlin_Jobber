@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class RelanceAdapter(
-    private var relances: List<Relance>,
+    var relances: List<Relance>,
     private val dataRepository: DataRepository,
     private val itemClickListener: (Relance) -> Unit,
     private val deleteClickListener: (String) -> Unit,
@@ -34,6 +34,10 @@ class RelanceAdapter(
             notesRelance.text = relance.notes ?: "Aucune note de relance"
 
             itemView.setOnClickListener { clickListener(relance) }
+            itemView.setOnLongClickListener {
+                editListener(relance.id)
+                true
+            }
         }
     }
 

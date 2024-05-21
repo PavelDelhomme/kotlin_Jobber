@@ -1,7 +1,10 @@
 package com.delhomme.jobber.Relance
 
 import RelanceAdapter
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,15 +12,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Candidature.SwipeCallback
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import com.delhomme.jobber.Relance.model.Relance
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentRelances : Fragment() {
     private lateinit var adapter: RelanceAdapter
     private val dataRepository by lazy { DataRepository(requireContext()) }
+    private lateinit var broadcasReceiver: BroadcastReceiver
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +48,47 @@ class FragmentRelances : Fragment() {
         view.findViewById<Button>(R.id.btnAddRelance).setOnClickListener {
             startActivity(Intent(activity, AddRelanceActivity::class.java))
         }
+
+        broadcasReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                adapter.updateRelances(dataRepository.getRelances())
+            }
+        }
+
+        val swipeCallback = SwipeCallback(requireContext(),
+            {position ->
+                val relance = adapter.relances[position]
+                showDeleteConfirmationDialog(relance.id, position)
+            },
+            { position ->
+                val relance = adapter.relances[position]
+                onEditRelanceClicked(relance.id)
+            }
+        )
+
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(broadcasReceiver, IntentFilter("RELANCES_UPDATED"))
+
+    }
+
+
+    private fun showDeleteConfirmationDialog(relanceId: String, position: Int) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Confirmation de suppression")
+            .setMessage("Voulez-vous vraiment supprimer cette relance ?")
+            .setNegativeButton("Annuler") { dialog, _ ->
+                adapter.notifyItemChanged(position)
+                dialog.dismiss()
+            }
+            .setPositiveButton("Supprimer") { dialog, _ ->
+                onDeleteRelanceClicked(relanceId)
+                dialog.dismiss()
+            }
+            .show()
+
     }
 
     private fun updateUI(recyclerView: RecyclerView, emptyView: TextView) {

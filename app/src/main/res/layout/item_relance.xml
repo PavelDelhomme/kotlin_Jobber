@@ -61,26 +61,5 @@
         app:layout_constraintTop_toBottomOf="@id/plateformeRelance"
         android:layout_marginEnd="8dp"/>
 
-    <ImageButton
-        android:id="@+id/btnEditRelance"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_edit"
-        android:contentDescription="Edit"
-        app:layout_constraintEnd_toStartOf="@+id/btnDeleteRelance"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"/>
-
-    <ImageButton
-        android:id="@+id/btnDeleteRelance"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:background="@color/design_default_color_error"
-        android:contentDescription="Delete"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
