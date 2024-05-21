@@ -93,7 +93,7 @@ class EditEntretienActivity : AppCompatActivity() {
                 TimePickerDialog(this, { _, hour, minute ->
                     val selectedDate = Calendar.getInstance()
                     selectedDate.set(year, month, day, hour, minute)
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                     etDateEntretien.setText(dateFormat.format(selectedDate.time))
                 }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
@@ -103,7 +103,7 @@ class EditEntretienActivity : AppCompatActivity() {
     private fun setupFields() {
         entretienId?.let {
             dataRepository.getEntretienById(it)?.let { entretien ->
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                 etDateEntretien.setText(dateFormat.format(entretien.date_entretien))
                 etNotesPreEntretien.setText(entretien.notes_pre_entretien)
                 autoCompleteTextViewEntreprise.setText(entretien.entrepriseNom)
@@ -117,7 +117,7 @@ class EditEntretienActivity : AppCompatActivity() {
     }
 
     private fun saveEntretienChanges() {
-        val format = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        val format = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
         val dateEntretien = format.parse(etDateEntretien.text.toString()) ?: Date()
         val typeEntretien = spinnerTypeEntretien.selectedItem.toString()
         val modeEntretien = spinnerModeEntretien.selectedItem.toString()

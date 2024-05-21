@@ -27,7 +27,7 @@ class NotificationAdapter(
         fun bind(notification: Notification, onDeleteClick: (Notification) -> Unit, onMarkAsReadClick: (Notification) -> Unit) {
             title.text = notification.titre
             message.text = notification.message
-            date.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(notification.date)
+            date.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(notification.date)
 
             btnDelete.setOnClickListener { onDeleteClick(notification) }
             btnMarkAsRead.setOnClickListener { onMarkAsReadClick(notification) }

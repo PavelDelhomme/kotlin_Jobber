@@ -91,7 +91,7 @@ class EditRelanceActivity : AppCompatActivity() {
                 TimePickerDialog(this, { _, hour, minute ->
                     val selectedDate = Calendar.getInstance()
                     selectedDate.set(year, month, day, hour, minute)
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                     etDateRelance.setText(dateFormat.format(selectedDate.time))
                 }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
@@ -109,7 +109,7 @@ class EditRelanceActivity : AppCompatActivity() {
         relanceId?.let {
             val relance = dataRepository.getRelanceById(it)
             relance?.let {
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                 etDateRelance.setText(dateFormat.format(relance.date_relance))
                 etNotesRelance.setText(relance.notes)
                 spPlateformeRelance.setSelection((spPlateformeRelance.adapter as ArrayAdapter<String>).getPosition(relance.plateformeUtilisee))
@@ -123,7 +123,7 @@ class EditRelanceActivity : AppCompatActivity() {
         val selectedContactName = spContact.selectedItem.toString()
         val contact = dataRepository.getContacts().find { it.getFullName() == selectedContactName }
         val contactId = contact?.id
-        val dateRelance = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).parse(etDateRelance.text.toString())!!
+        val dateRelance = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateRelance.text.toString())!!
         val plateforme = spPlateformeRelance.selectedItem.toString()
         val notes = etNotesRelance.text.toString()
 

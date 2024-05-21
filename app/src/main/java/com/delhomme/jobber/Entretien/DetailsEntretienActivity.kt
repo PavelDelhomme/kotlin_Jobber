@@ -39,7 +39,7 @@ class DetailsEntretienActivity : AppCompatActivity() {
         val entrepriseNom = dataRepository.getEntrepriseByNom(entretien.entrepriseNom)
         val candidatureOffre = dataRepository.getCandidatureById(entretien.candidature_id)
 
-        findViewById<TextView>(R.id.tvEntretienDate).text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(entretien.date_entretien)
+        findViewById<TextView>(R.id.tvEntretienDate).text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(entretien.date_entretien)
         findViewById<TextView>(R.id.tvEntretienEntreprise).text = entrepriseNom?.nom
         findViewById<TextView>(R.id.tvEntretienCandidature).text = candidatureOffre?.titre_offre
         findViewById<TextView>(R.id.tvEntretienType).text = entretien.type

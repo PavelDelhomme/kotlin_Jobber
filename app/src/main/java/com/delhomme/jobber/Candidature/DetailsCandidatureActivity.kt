@@ -55,6 +55,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
     private lateinit var spinnerState: Spinner
     private lateinit var buttonConfirmChangeState: Button
+    private lateinit var buttonEditCandidature: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +84,15 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.button_mark_as_rejected).setOnClickListener {
             markAsRejected()
         }
+
+        findViewById<ImageButton>(R.id.btnEditCandidature).setOnClickListener {
+            val intent = Intent(this, EditCandidatureActivity::class.java)
+
+            intent.putExtra("CANDIDATURE_ID", candidatureId)
+
+            startActivity(intent)
+        }
+
     }
 
     private fun displayCandidatureDetails() {
@@ -90,10 +100,9 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         val entreprise = dataRepository.getEntrepriseByNom(entrepriseNom)
         val entrepriseAffiche = entreprise?.nom ?: "Unknown Entreprise"
         findViewById<TextView>(R.id.titreoffre).text = candidature.titre_offre
-        findViewById<TextView>(R.id.tvCandidatureInfo).text = "Candidature for ${candidature.titre_offre} as $entrepriseAffiche"
         findViewById<TextView>(R.id.tvEntrepriseCandidature).text = entrepriseAffiche
         findViewById<TextView>(R.id.tvNotesCandidature).text = candidature.notes
-        findViewById<TextView>(R.id.tvDateCandidature).text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(candidature.date_candidature)
+        findViewById<TextView>(R.id.tvDateCandidature).text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)
         findViewById<TextView>(R.id.tvTypePoste).text = candidature.type_poste
         findViewById<TextView>(R.id.tvPlateforme).text = candidature.plateforme
         findViewById<TextView>(R.id.tvLieuPoste).text = candidature.lieuPoste
@@ -161,7 +170,6 @@ class DetailsCandidatureActivity : AppCompatActivity() {
                 .show()
         }
     }
-
     private fun changeStateManually() {
         val selectedState = CandidatureState.valueOf(spinnerState.selectedItem.toString())
         candidature.state = selectedState

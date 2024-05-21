@@ -73,7 +73,7 @@ class EditAppelActivity : AppCompatActivity() {
                 TimePickerDialog(this, { _, hour, minute ->
                     val selectedDate = Calendar.getInstance()
                     selectedDate.set(year, month, day, hour, minute)
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                     etDateAppel.setText(dateFormat.format(selectedDate.time))
                 }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
@@ -107,7 +107,7 @@ class EditAppelActivity : AppCompatActivity() {
         appelId?.let {
             val appel = dataRepository.getAppelById(it)
             appel?.let {
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                 etDateAppel.setText(dateFormat.format(appel.date_appel))
                 etObjetAppel.setText(appel.objet)
                 etNotesAppel.setText(appel.notes)
@@ -117,7 +117,7 @@ class EditAppelActivity : AppCompatActivity() {
 
     private fun saveAppelChanges() {
         try {
-            val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).parse(etDateAppel.text.toString()) ?: Date()
+            val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateAppel.text.toString()) ?: Date()
             val objet = etObjetAppel.text.toString()
             val notes = etNotesAppel.text.toString()
 

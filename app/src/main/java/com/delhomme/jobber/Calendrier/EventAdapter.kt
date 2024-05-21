@@ -23,8 +23,8 @@ class EventAdapter(private var events: List<Event>) : RecyclerView.Adapter<Event
             title.text = event.title
             description.text = event.description
             type.text = event.type.name
-            startTime.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(event.startTime))
-            endTime.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(event.endTime))
+            startTime.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(Date(event.startTime))
+            endTime.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(Date(event.endTime))
         }
     }
 
@@ -34,7 +34,7 @@ class EventAdapter(private var events: List<Event>) : RecyclerView.Adapter<Event
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val event = events[position].data as Event
+        val event = events[position] // Just directly access the event
         holder.bind(event)
     }
 

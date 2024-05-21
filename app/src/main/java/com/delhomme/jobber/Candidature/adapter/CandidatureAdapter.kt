@@ -36,7 +36,7 @@ class CandidatureAdapter(
 
             nomPoste.text = candidature.titre_offre
             entreprise.text = entrepriseNom
-            date.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(candidature.date_candidature)
+            date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)
             etat.text = candidature.state.toString()
             etat.text = when (candidature.state) {
                 CandidatureState.CANDIDATEE_ET_EN_ATTENTE -> "🕒 Candidature en attente"

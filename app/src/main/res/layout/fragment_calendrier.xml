@@ -1,16 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Calendrier.FragmentCalendrier">
 
-    <com.github.sundeepk.compactcalendarview.CompactCalendarView
-        android:id="@+id/compactcalendar_view"
+    <TextView
+        android:id="@+id/currentDay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:padding="16dp"/>
+
+    <Button
+        android:id="@+id/prevDayButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/currentDay"
+        android:text="Prev" />
+
+    <Button
+        android:id="@+id/nextDayButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/currentDay"
+        android:text="Next"/>
+
+    <Spinner
+        android:id="@+id/viewSelector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/currentDay"
+        android:entries="@array/view_options" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/hoursRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:compactCalendarTextSize="12sp"
-        app:compactCalendarBackgroundColor="@color/white"
-        app:compactCalendarDayTextColor="@color/black"
-        app:compactCalendarCurrentDayTextColor="@color/red"
-        app:compactCalendarCurrentSelectedDayTextColor="@color/blue"/>
-</FrameLayout>
+        android:layout_below="@id/viewSelector"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:scrollbars="vertical" />
+</RelativeLayout>

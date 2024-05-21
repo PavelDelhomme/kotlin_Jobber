@@ -57,7 +57,7 @@ class AddCandidatureActivity : AppCompatActivity() {
                 TimePickerDialog(this, { _, hour, minute ->
                     val selectedDate = Calendar.getInstance()
                     selectedDate.set(year, month, day, hour, minute)
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                     etDateCandidature.setText(dateFormat.format(selectedDate.time))
                 }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
@@ -70,7 +70,7 @@ class AddCandidatureActivity : AppCompatActivity() {
         val nomEntreprise = findViewById<EditText>(R.id.editText_nom_entreprise).text.toString()
         val plateformeUtilisee = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()
         val typePoste = findViewById<Spinner>(R.id.spinner_type_poste).selectedItem.toString()
-        val dateCandidature = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).parse(etDateCandidature.text.toString())!!
+        val dateCandidature = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateCandidature.text.toString())!!
         val notesCandidature = findViewById<EditText>(R.id.editText_notes).text.toString()
         val lieuPoste = findViewById<EditText>(R.id.editText_lieuPoste).text.toString()
 

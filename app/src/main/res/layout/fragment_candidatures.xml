@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Aucuns appels pour la candidature"
-        android:layout_below="@id/btnAddContact"/>
+        android:layout_below="@id/recyclerView"
+        tools:ignore="MissingConstraints" />
 
 
     <androidx.recyclerview.widget.RecyclerView

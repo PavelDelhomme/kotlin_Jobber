@@ -33,7 +33,7 @@ class DetailsAppelActivity : AppCompatActivity() {
 
         appelNomContact.text = appelContact?.getFullName() ?: "No Contact"
         appelNomEntreprise.text = entreprise?.nom ?: "No Entreprise"
-        appelDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(appel.date_appel)
+        appelDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(appel.date_appel)
         appelObjet.text = appel.objet
         appelNotes.text = appel.notes
 

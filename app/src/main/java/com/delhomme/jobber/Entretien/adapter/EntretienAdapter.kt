@@ -32,7 +32,7 @@ class EntretienAdapter(
             editListener: (String) -> Unit
         ) {
             val entrepriseName = dataRepository.getEntrepriseByNom(entretien.entrepriseNom)?.nom ?: "Entreprise inconnue"
-            dateEntretien.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(entretien.date_entretien)
+            dateEntretien.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(entretien.date_entretien)
             entrepriseEntretien.text = entrepriseName
             typeEntretien.text = entretien.type
 

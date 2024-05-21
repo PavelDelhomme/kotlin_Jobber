@@ -91,6 +91,11 @@
         <item>WhatsApp</item>
         <item>Autre</item>
     </array>
+    <string-array name="view_options">
+        <item>Jour</item>
+        <item>5 jours</item>
+        <item>Mois</item>
+    </string-array>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

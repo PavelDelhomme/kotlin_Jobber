@@ -33,6 +33,12 @@ class EditCandidatureActivity : AppCompatActivity() {
         dataRepository = DataRepository(applicationContext)
         candidatureId = intent.getStringExtra("CANDIDATURE_ID")
 
+        if (candidatureId == null) {
+            Toast.makeText(this, "Erreur: ID de candidature manquant.", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
         setupSpinners()
         setupEntrepriseAutoComplete()
 
@@ -55,13 +61,13 @@ class EditCandidatureActivity : AppCompatActivity() {
 
     private fun setupDatePicker(date: Date) {
         val dateEditText = findViewById<EditText>(R.id.etDateCandidature)
-        dateEditText.setText(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date))
+        dateEditText.setText(SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(date))
 
         dateEditText.setOnClickListener {
             DatePickerDialog(this, DatePickerDialog.OnDateSetListener { _, year, month, day ->
                 val calendar = Calendar.getInstance()
                 calendar.set(year, month, day)
-                dateEditText.setText(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time))
+                dateEditText.setText(SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(calendar.time))
             }, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH)).show()
         }
     }
@@ -99,7 +105,7 @@ class EditCandidatureActivity : AppCompatActivity() {
         val plateforme = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()
         val typePoste = findViewById<Spinner>(R.id.spinner_type_poste).selectedItem.toString()
         val lieuPoste = findViewById<EditText>(R.id.etLieuPoste).text.toString()
-        val dateCandidature = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(findViewById<EditText>(R.id.etDateCandidature).text.toString())!!
+        val dateCandidature = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).parse(findViewById<EditText>(R.id.etDateCandidature).text.toString())!!
 
         val existingCandidature = candidatureId?.let { dataRepository.getCandidatureById(it) }
         val entretiensIds = existingCandidature?.entretiens ?: mutableListOf()

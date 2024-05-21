@@ -27,7 +27,7 @@ class RelanceAdapter(
         fun bind(relance: Relance, dataRepository: DataRepository, clickListener: (Relance) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
             val entrepriseName = dataRepository.getEntrepriseByNom(relance.entrepriseNom)?.nom ?: "Entreprise inconnue"
             val candidature = dataRepository.getCandidatureById(relance.candidatureId)?.titre_offre ?: "Offre inconnue"
-            dateRelance.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(relance.date_relance)
+            dateRelance.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)
             entreprise.text = entrepriseName
             candidatureTitre.text = candidature
             plateformeUtilise.text = relance.plateformeUtilisee

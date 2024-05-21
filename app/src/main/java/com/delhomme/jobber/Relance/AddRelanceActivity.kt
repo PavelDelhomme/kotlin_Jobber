@@ -90,7 +90,7 @@ class AddRelanceActivity : AppCompatActivity() {
                 TimePickerDialog(this, { _, hour, minute ->
                     val selectedDate = Calendar.getInstance()
                     selectedDate.set(year, month, day, hour, minute)
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                     etDateRelance.setText(dateFormat.format(selectedDate.time))
                 }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
@@ -105,7 +105,7 @@ class AddRelanceActivity : AppCompatActivity() {
             return
         }
 
-        val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).parse(etDateRelance.text.toString()) ?: Date()
+        val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateRelance.text.toString()) ?: Date()
         val selectedContactPosition = spContact.selectedItemPosition
         val contact: Contact? = if (selectedContactPosition > 0) {
             spContact.adapter.getItem(selectedContactPosition) as? Contact

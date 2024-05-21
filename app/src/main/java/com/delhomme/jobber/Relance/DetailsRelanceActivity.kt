@@ -59,7 +59,7 @@ class DetailsRelanceActivity : AppCompatActivity() {
     }
 
     private fun displayRelanceDetails() {
-        findViewById<TextView>(R.id.tvDateRelance).text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(relance.date_relance)
+        findViewById<TextView>(R.id.tvDateRelance).text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)
         findViewById<TextView>(R.id.tvPlateforme).text = relance.plateformeUtilisee
         findViewById<TextView>(R.id.tvEntreprise).text = relance.entrepriseNom
         findViewById<TextView>(R.id.tvContact).text = relance.contactId ?: "Aucun contact"
