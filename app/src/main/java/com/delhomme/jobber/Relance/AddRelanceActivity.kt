@@ -2,6 +2,7 @@ package com.delhomme.jobber.Relance
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
@@ -11,6 +12,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.Contact.model.Contact
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
@@ -127,6 +129,13 @@ class AddRelanceActivity : AppCompatActivity() {
 
         DataRepository(this).saveRelance(relance)
         Toast.makeText(this, "Relance ajoutée avec succès", Toast.LENGTH_SHORT).show()
+
+        val intentEvent = Intent("com.jobber.EVENEMENT_LIST_UPDATED")
+
+
+        val intentCandidature = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentCandidature)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intentEvent)
         finish()
     }
 
