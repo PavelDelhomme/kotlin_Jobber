@@ -1,82 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardBackgroundColor="@color/white">
 
-    <TextView
-        android:id="@+id/date_candidature"
-        android:text="Xxxxxxx"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#666666"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:padding="16dp">
+        <TextView
+            android:id="@+id/date_candidature"
+            android:text="Xxxxxxx"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/entreprise"
-        android:text="Xxxxxxx"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#2196F3"
-        app:layout_constraintTop_toTopOf="@id/date_candidature"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/entreprise"
+            android:text="Xxxxxxx"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#2196F3"
+            app:layout_constraintTop_toTopOf="@id/date_candidature"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/nomPoste"
-        android:text="Xxxxxxx"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#666666"
-        app:layout_constraintStart_toStartOf="parent"
-        android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@id/entreprise"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/nomPoste"
+            android:text="Xxxxxxx"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#666666"
+            app:layout_constraintStart_toStartOf="parent"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@id/entreprise"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/etat"
-        android:text="Xxxxxxx"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#FF5722"
-        android:textAlignment="center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nomPoste"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/etat"
+            android:text="Xxxxxxx"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#FF5722"
+            android:textAlignment="center"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nomPoste"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/typePoste"
-        android:text="Xxxxxxx"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="8sp"
-        app:layout_constraintTop_toBottomOf="@id/etat"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/typePoste"
+            android:text="Xxxxxxx"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="8sp"
+            app:layout_constraintTop_toBottomOf="@id/etat"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/plateforme"
-        android:layout_width="0dp"
-        android:layout_height="17dp"
-        android:text="Xxxxxxx"
-        android:textSize="8sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/typePoste" />
+        <TextView
+            android:id="@+id/plateforme"
+            android:layout_width="98dp"
+            android:layout_height="15dp"
+            android:text="Xxxxxxx"
+            android:textSize="8sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/typePoste" />
 
-    <TextView
-        android:id="@+id/tvNotesCandidature"
-        android:text="Xxxxxxx"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="9sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/plateforme"
-        app:layout_constraintEnd_toEndOf="parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tvNotesCandidature"
+            android:text="Xxxxxxx"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="9sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/plateforme"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

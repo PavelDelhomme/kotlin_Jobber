@@ -103,23 +103,24 @@ class AddAppelActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateContactSpinner(entrepriseId: String?) {
-        val contacts = entrepriseId?.let { dataRepository.loadContactsForEntreprise(it) } ?: listOf()
-        val contactNames = contacts.map { it.getFullName() }.toMutableList()
-        contactNames.add(0, "--")
-
+    private fun updateContactSpinner(entrepriseNom: String?) {
+        val contacts = dataRepository.loadContactsForEntreprise(entrepriseNom ?: "")
+        val contactNames = contacts.map { it.getFullName() }.toMutableList().apply {
+            add(0, "--")
+        }
         spContactsAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contactNames)
         contactMap = contacts.associateBy { it.getFullName() }
     }
+
 
     private fun addAppel(view: View) {
         val selectedContactName = spContactsAppel.selectedItem.toString()
         val contactId = if (selectedContactName != "--") contactMap[selectedContactName]?.id else null
         val selectedEntreprise = spEntreprisesAppel.selectedItem as? Entreprise
-        val entrepriseNom = selectedEntreprise?.nom
+        val entrepriseNom = selectedEntreprise?.nom ?: "No Company"
         val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
 
-        if (entrepriseNom == null) {
+        if (entrepriseNom == "No Company") {
             Toast.makeText(this, "Erreur: entreprise non sélectionnée ou non trouvée.", Toast.LENGTH_LONG).show()
             return
         }

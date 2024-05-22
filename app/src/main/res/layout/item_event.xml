@@ -5,35 +5,62 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/eventTitle"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/eventCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:background="#F6F635"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/eventType"
-        app:layout_constraintTop_toTopOf="parent" />
-    <TextView
-        android:id="@+id/eventType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/eventTitle"
-        app:layout_constraintStart_toStartOf="@id/eventTitle" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/eventStartTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/eventType"
-        app:layout_constraintStart_toStartOf="@id/eventType" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
 
-    <TextView
-        android:id="@+id/eventEndTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/eventStartTime"
-        app:layout_constraintStart_toStartOf="@id/eventStartTime" />
+            <TextView
+                android:id="@+id/eventTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
+            <TextView
+                android:id="@+id/eventType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/purple_700"
+                app:layout_constraintStart_toStartOf="@id/eventTitle"
+                app:layout_constraintTop_toBottomOf="@id/eventTitle" />
+
+            <TextView
+                android:id="@+id/eventStartTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/eventType"
+                app:layout_constraintTop_toBottomOf="@id/eventType" />
+
+            <TextView
+                android:id="@+id/eventEndTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/eventStartTime"
+                app:layout_constraintTop_toBottomOf="@id/eventStartTime" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageButton
+            android:id="@+id/deleteEventButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            />
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

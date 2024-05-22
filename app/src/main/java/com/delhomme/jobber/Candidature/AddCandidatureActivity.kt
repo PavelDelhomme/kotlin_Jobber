@@ -62,10 +62,11 @@ class AddCandidatureActivity : AppCompatActivity() {
                 }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
         }
+        Log.d("AddCandidatureActivityDate", "etDateCandidature setupDatePicker : $etDateCandidature")
     }
 
     private fun addCandidature() {
-        Log.d("AddCandidatureActivity", "Attempting to add a new candidature")
+        Log.d("AddCandidatureActivityDate", "Attempting to add a new candidature")
         val titreOffre = findViewById<EditText>(R.id.editText_titre_offre).text.toString()
         val nomEntreprise = findViewById<EditText>(R.id.editText_nom_entreprise).text.toString()
         val plateformeUtilisee = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()
@@ -94,6 +95,8 @@ class AddCandidatureActivity : AppCompatActivity() {
         )
 
         dataRepository.saveCandidature(newCandidature)
+
+        Log.d("AddCandidatureActivity", "newCandidature : $newCandidature\n newCandidature.date ${newCandidature.date_candidature}")
         Toast.makeText(this, "Candidature ajoutée avec succès", Toast.LENGTH_SHORT).show()
 
         val event = Event(

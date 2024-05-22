@@ -42,6 +42,16 @@
     <string name="enter_description">Description du poste</string>
     <string name="submit_candidature">Ajouter la candidature</string>
     <string name="est_spontannee">Spontannée ?</string>
+
+    <string-array name="candidature_states">
+        <item>Candidatée et en attente</item>
+        <item>Relancée et en attente</item>
+        <item>En attente après entretien</item>
+        <item>Aucune réponse</item>
+        <item>À relancer</item>
+        <item>Erreur</item>
+    </string-array>
+
     <array name="type_poste_options">
         <item>Type d\'emploi</item>
         <item>CDD</item>

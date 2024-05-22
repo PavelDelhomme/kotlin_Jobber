@@ -2,11 +2,12 @@ package com.delhomme.jobber.Calendrier
 
 data class Event(
     val id: String,
-    val title: String,
-    val description: String,
-    val startTime: Long,
-    val endTime: Long,
+    var title: String,
+    var description: String,
+    var startTime: Long,
+    var endTime: Long,
     val type: EventType,
     val relatedId: String,
-    val entrepriseId: String
+    val entrepriseId: String,
+    var color: String = "#FFFFFF"
 )

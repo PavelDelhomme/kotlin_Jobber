@@ -1,59 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardBackgroundColor="@color/white">
 
-    <TextView
-        android:id="@+id/contactFullName"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@color/material_dynamic_neutral_variant60"
-        android:text="Xxxxxx XXXXXXXX"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/entrepriseContact"
-        android:layout_marginEnd="8dp"/>
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/entrepriseContact"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#2196F3"
-        android:text="Xxxxxxx"
-        app:layout_constraintStart_toStartOf="@id/contactFullName"
-        app:layout_constraintEnd_toEndOf="@id/contactFullName"
-        app:layout_constraintTop_toBottomOf="@id/contactFullName"
-        app:layout_constraintBottom_toTopOf="@+id/telephoneContact"
-        android:layout_marginEnd="8dp"/>
+        <TextView
+            android:id="@+id/contactFullName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/material_dynamic_neutral_variant60"
+            android:text="Xxxxxx XXXXXXXX"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/entrepriseContact"
+            android:layout_marginEnd="8dp"/>
 
-    <TextView
-        android:autoLink="phone"
-        android:id="@+id/telephoneContact"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#FF0000"
-        android:text="XXXXXXXXXXXXX"
-        app:layout_constraintStart_toStartOf="@id/entrepriseContact"
-        app:layout_constraintEnd_toEndOf="@id/entrepriseContact"
-        app:layout_constraintTop_toBottomOf="@id/entrepriseContact"
-        app:layout_constraintBottom_toTopOf="@+id/emailContact"
-        android:layout_marginEnd="8dp"/>
+        <TextView
+            android:id="@+id/entrepriseContact"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#2196F3"
+            android:text="Xxxxxxx"
+            app:layout_constraintStart_toStartOf="@id/contactFullName"
+            app:layout_constraintEnd_toEndOf="@id/contactFullName"
+            app:layout_constraintTop_toBottomOf="@id/contactFullName"
+            app:layout_constraintBottom_toTopOf="@+id/telephoneContact"
+            android:layout_marginEnd="8dp"/>
 
-    <TextView
-        android:id="@+id/emailContact"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#4CAF50"
-        android:text="xxxx.xxxxx@xxxxxx.xx"
-        app:layout_constraintStart_toStartOf="@id/telephoneContact"
-        app:layout_constraintTop_toBottomOf="@id/telephoneContact"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:autoLink="phone"
+            android:id="@+id/telephoneContact"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#FF0000"
+            android:text="XXXXXXXXXXXXX"
+            app:layout_constraintStart_toStartOf="@id/entrepriseContact"
+            app:layout_constraintEnd_toEndOf="@id/entrepriseContact"
+            app:layout_constraintTop_toBottomOf="@id/entrepriseContact"
+            app:layout_constraintBottom_toTopOf="@+id/emailContact"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/emailContact"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#4CAF50"
+            android:text="xxxx.xxxxx@xxxxxx.xx"
+            app:layout_constraintStart_toStartOf="@id/telephoneContact"
+            app:layout_constraintTop_toBottomOf="@id/telephoneContact"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="8dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

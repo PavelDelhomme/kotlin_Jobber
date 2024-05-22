@@ -6,14 +6,12 @@ import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,6 +54,10 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     private lateinit var spinnerState: Spinner
     private lateinit var buttonConfirmChangeState: Button
     private lateinit var buttonEditCandidature: ImageButton
+    companion object {
+        private const val STATE_CHANGE_REQUEST = 1
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,8 +66,9 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
         dataRepository = DataRepository(this)
         candidatureId = intent.getStringExtra("CANDIDATURE_ID")
-
-        if (candidatureId == null) {
+        if (candidatureId != null) {
+            loadCandidatureDetails(candidatureId!!)
+        } else {
             Toast.makeText(this, "Candidature non trouvée", Toast.LENGTH_LONG).show()
             finish()
             return
@@ -93,6 +96,9 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        findViewById<Button>(R.id.buttonChangeState).setOnClickListener {
+            showStateChangeDialog()
+        }
     }
 
     private fun displayCandidatureDetails() {
@@ -146,45 +152,21 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         spinnerState = findViewById(R.id.spinnerState)
         buttonConfirmChangeState = findViewById(R.id.buttonConfirmChangeState)
 
-        val states = CandidatureState.values().map { it.name }
+        val states = CandidatureState.entries.map { it.name }
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, states)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerState.adapter = adapter
 
-        findViewById<Button>(R.id.buttonChangeState).setOnClickListener {
-            spinnerState.visibility = View.VISIBLE
-            buttonConfirmChangeState.visibility = View.VISIBLE
-        }
         buttonConfirmChangeState.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("Confirmation")
-                .setMessage("Voulez-vous vraiment changer l'état de cette candidature ?")
-                .setPositiveButton("Oui") { dialog, _ ->
-                    changeStateManually()
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Non") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .create()
-                .show()
+            val selectedState = CandidatureState.valueOf(spinnerState.selectedItem.toString())
+            candidature.state = selectedState
+            candidature.etatManuel = true
+            dataRepository.saveCandidature(candidature)
+            displayCandidatureDetails()
         }
-    }
-    private fun changeStateManually() {
-        val selectedState = CandidatureState.valueOf(spinnerState.selectedItem.toString())
-        candidature.state = selectedState
-        candidature.etatManuel = true
-
-        dataRepository.saveCandidature(candidature)
-
         val intent = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-
-        spinnerState.visibility = View.GONE
-        buttonConfirmChangeState.visibility = View.GONE
-
-        displayCandidatureDetails()
     }
+
 
     private fun setupContactRecyclerView() {
         val contacts = dataRepository.loadContactsForEntreprise(candidature.entrepriseNom)
@@ -432,5 +414,31 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
         finish()
     }
+
+    private fun loadCandidatureDetails(candidatureId: String) {
+        candidature = dataRepository.getCandidatureById(candidatureId) ?: run {
+            Toast.makeText(this, "Candidature non trouvée.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+        displayCandidatureDetails()
+    }
+    private fun showStateChangeDialog() {
+        val intent = Intent(this, StateChangeActivity::class.java)
+        startActivityForResult(intent, STATE_CHANGE_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == STATE_CHANGE_REQUEST && resultCode == RESULT_OK) {
+            data?.getStringExtra("selectedState")?.let { newState ->
+                candidature.state = CandidatureState.valueOf(newState.replace(" ", "_").toUpperCase(Locale.ROOT))
+                candidature.etatManuel = true
+                dataRepository.saveCandidature(candidature)
+                displayCandidatureDetails()
+            }
+        }
+    }
+
 
 }

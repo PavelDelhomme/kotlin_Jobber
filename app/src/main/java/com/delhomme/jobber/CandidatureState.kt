@@ -11,6 +11,6 @@ enum class CandidatureState(val priority: Int) {
     AUCUNE_REPONSE(8),
     NON_RETENU(9),
     NON_RETENU_APRES_ENTRETIEN(10),
-    NON_RETENU_SANS_ENTRETIEN(11), // Ajoutez cet état
+    NON_RETENU_SANS_ENTRETIEN(11),
     ERREUR(12)
 }
