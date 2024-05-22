@@ -12,5 +12,6 @@ data class Entretien(
     val type: String, // (RH, technique, autre)
     val mode: String, // (présentiel, visioconférence, téléphone)
     val notes_pre_entretien: String? = null,
+    var archivee: Boolean = false,
     val notes_post_entretien: String? = null,
 )

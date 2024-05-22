@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 
 class SwipeCallback(
-    private val context: Context,
+    context: Context,
     private val onSwipedLeft: (Int) -> Unit,
     private val onSwipedRight: (Int) -> Unit
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {

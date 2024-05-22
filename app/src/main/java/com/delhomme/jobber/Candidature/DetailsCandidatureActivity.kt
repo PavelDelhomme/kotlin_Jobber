@@ -99,6 +99,20 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         findViewById<Button>(R.id.buttonChangeState).setOnClickListener {
             showStateChangeDialog()
         }
+        buttonConfirmChangeState.setOnClickListener {
+            val selectedStateString = spinnerState.selectedItem.toString()
+            try {
+                val selectedState = CandidatureState.valueOf(selectedStateString.toUpperCase(Locale.ROOT).replace(" ", "_"))
+                candidature.state = selectedState
+                dataRepository.saveCandidature(candidature)
+                LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("com.jobber.CANDIDATURE_LIST_UPDATED"))
+                reloadCandidatureDetails()
+                Toast.makeText(this, "État mis à jour", Toast.LENGTH_SHORT).show()
+            } catch (e: IllegalArgumentException) {
+                Toast.makeText(this, "Invalid state selected", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
     private fun displayCandidatureDetails() {
@@ -440,5 +454,10 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         }
     }
 
-
+    fun reloadCandidatureDetails() {
+        candidature = dataRepository.getCandidatureById(candidatureId!!)!!
+        if (candidature != null) {
+            displayCandidatureDetails()
+        }
+    }
 }

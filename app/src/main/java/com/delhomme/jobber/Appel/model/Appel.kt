@@ -10,5 +10,6 @@ data class Appel(
     val entrepriseNom: String?,
     var date_appel: Date,
     var objet: String,
+    var archivee: Boolean = false,
     var notes: String,
 )

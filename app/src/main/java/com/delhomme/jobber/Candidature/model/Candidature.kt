@@ -15,6 +15,7 @@ data class Candidature(
     var state: CandidatureState,
     val notes: String,
     val retourPostEntretien: Boolean = false,
+    var archivee: Boolean = false,
     val entretiens: MutableList<String> = mutableListOf(),
     val appels: MutableList<String> = mutableListOf(),
     var relances: MutableList<String> = mutableListOf(),

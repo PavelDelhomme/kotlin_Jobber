@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorState1">#E3F2FD</color> <!-- Bleu clair -->
+    <color name="colorState2">#FFCCBC</color> <!-- Orange clair -->
+    <color name="colorState3">#C8E6C9</color> <!-- Vert clair -->
+    <color name="colorState4">#FFF9C4</color> <!-- Jaune clair -->
+    <color name="colorState5">#D1C4E9</color> <!-- Mauve clair -->
+    <color name="colorState6">#FFAB91</color> <!-- Orange saumon -->
+    <color name="colorState7">#B2EBF2</color> <!-- Cyan clair -->
+    <color name="colorState8">#F8BBD0</color> <!-- Rose clair -->
+    <color name="colorState9">#D7CCC8</color> <!-- Brun très clair -->
+    <color name="colorState10">#BCAAA4</color> <!-- Brun clair -->
+    <color name="colorState11">#FFCDD2</color> <!-- Rouge clair -->
+    <color name="colorState12">#CFD8DC</color> <!-- Bleu-gris clair -->
+    <!-- Couleurs existantes -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -8,5 +21,4 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF1100</color>
-    <color name="blue">#01579B</color>
 </resources>

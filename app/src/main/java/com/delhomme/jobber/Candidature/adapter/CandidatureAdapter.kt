@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.CandidatureState
@@ -32,6 +33,8 @@ class CandidatureAdapter(
         private val notes: TextView = view.findViewById(R.id.tvNotesCandidature)
 
         fun bind(candidature: Candidature, dataRepository: DataRepository, clickListener: (Candidature) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
+            val cardView: CardView = itemView.findViewById(R.id.cardView2)
+            cardView.setBackgroundColor(itemView.context.resources.getColor(getStateColor(candidature.state), null))
             val entrepriseNom = dataRepository.getEntrepriseByNom(candidature.entrepriseNom)?.nom ?: "Unknown Entreprise"
 
             nomPoste.text = candidature.titre_offre
@@ -59,6 +62,23 @@ class CandidatureAdapter(
 
             itemView.setOnClickListener { clickListener(candidature) }
         }
+
+        private fun getStateColor(state: CandidatureState): Int {
+            return when(state) {
+                CandidatureState.CANDIDATEE_ET_EN_ATTENTE -> R.color.colorState1
+                CandidatureState.EN_ATTENTE_APRES_ENTRETIEN -> R.color.colorState2
+                CandidatureState.EN_ATTENTE_D_UN_ENTRETIEN -> R.color.colorState3
+                CandidatureState.FAIRE_UN_RETOUR_POST_ENTRETIEN -> R.color.colorState4
+                CandidatureState.A_RELANCEE_APRES_ENTRETIEN -> R.color.colorState5
+                CandidatureState.A_RELANCEE -> R.color.colorState6
+                CandidatureState.RELANCEE_ET_EN_ATTENTE -> R.color.colorState7
+                CandidatureState.AUCUNE_REPONSE -> R.color.colorState8
+                CandidatureState.NON_RETENU -> R.color.colorState9
+                CandidatureState.ERREUR -> R.color.colorState10
+                CandidatureState.NON_RETENU_APRES_ENTRETIEN -> R.color.colorState11
+                CandidatureState.NON_RETENU_SANS_ENTRETIEN -> R.color.colorState12
+            }
+        }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_candidature, parent, false)
@@ -76,4 +96,12 @@ class CandidatureAdapter(
         notifyDataSetChanged()
         Log.d("CandidatureAdapter", "Candidatures updated: ${newList.size}")
     }
+
+    fun removeItem(position: Int) {
+        if (position < itemCount) {
+            candidatures = candidatures.toMutableList().also { it.removeAt(position) }
+            notifyItemRemoved(position)
+        }
+    }
+
 }

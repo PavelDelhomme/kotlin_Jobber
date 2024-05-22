@@ -46,6 +46,22 @@ class DataRepository(val context: Context) {
     private var notifications: List<Notification>? = null
     private var events: List<Event>? = null
 
+    val stateColors = arrayOf(
+        "#E3F2FD", // CANDIDATEE_ET_EN_ATTENTE
+        "#FFCCBC", // EN_ATTENTE_APRES_ENTRETIEN
+        "#C8E6C9", // EN_ATTENTE_D_UN_ENTRETIEN
+        "#FFF9C4", // FAIRE_UN_RETOUR_POST_ENTRETIEN
+        "#D1C4E9", // A_RELANCEE_APRES_ENTRETIEN
+        "#FFAB91", // A_RELANCEE
+        "#B2EBF2", // RELANCEE_ET_EN_ATTENTE
+        "#F8BBD0", // AUCUNE_REPONSE
+        "#D7CCC8", // NON_RETENU
+        "#BCAAA4", // ERREUR
+        "#FFCDD2", // NON_RETENU_APRES_ENTRETIEN
+        "#CFD8DC"  // NON_RETENU_SANS_ENTRETIEN
+    )
+
+
     init {
         loadInitialData()
         checkAndUpdateCandidatureStates()
@@ -62,7 +78,10 @@ class DataRepository(val context: Context) {
         events = loadEvents()
     }
 
-    fun getCandidatures() = candidatures ?: emptyList()
+    fun getCandidatures(): List<Candidature> {
+        return getAllCandidatures().filterNot { it.archivee }
+    }
+    fun getAllCandidatures() = candidatures ?: emptyList()
     fun getEntreprises() = entreprises ?: emptyList()
     fun getContacts() = contacts ?: emptyList()
     fun getAppels() = appels ?: emptyList()
@@ -600,12 +619,7 @@ class DataRepository(val context: Context) {
         return newContact
     }
 
-    fun editCandidature(
-        candidatureId: String, newTitre: String, newEtat: CandidatureState, newNotes: String,
-        newPlateforme: String, newTypePoste: String, newLieuPoste: String, newEntrepriseNom: String,
-        newDate: Date, newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>,
-        newRelances: MutableList<String>
-    ) {
+    fun editCandidature(candidatureId: String, newTitre: String, newEtat: CandidatureState, newNotes: String, newPlateforme: String, newTypePoste: String, newLieuPoste: String, newEntrepriseNom: String, newDate: Date, newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>, newRelances: MutableList<String>) {
         val candidatures = loadCandidatures().toMutableList()
         val index = candidatures.indexOfFirst { it.id == candidatureId }
         if (index != -1) {
@@ -632,11 +646,7 @@ class DataRepository(val context: Context) {
         }
     }
 
-    fun editEntreprise(
-        entrepriseNom: String, newName: String, newContactIds: MutableList<String>,
-        newRelancesIds: MutableList<String>, newEntretiensIds: MutableList<String>,
-        newCandidaturesIds: MutableList<String>
-    ) {
+    fun editEntreprise(entrepriseNom: String, newName: String, newContactIds: MutableList<String>, newRelancesIds: MutableList<String>, newEntretiensIds: MutableList<String>, newCandidaturesIds: MutableList<String>) {
         val entreprises = loadEntreprises().toMutableList()
         val index = entreprises.indexOfFirst { it.nom == entrepriseNom }
         if (index != -1) {
@@ -654,10 +664,7 @@ class DataRepository(val context: Context) {
         }
     }
 
-    fun editRelance(
-        relanceId: String, newDate: Date, newPlateformeUtilise: String, newEntrepriseNom: String,
-        newContactId: String?, newCandidatureId: String, newNotes: String?
-    ) {
+    fun editRelance(relanceId: String, newDate: Date, newPlateformeUtilise: String, newEntrepriseNom: String, newContactId: String?, newCandidatureId: String, newNotes: String?) {
         val relances = loadRelances().toMutableList()
         val index = relances.indexOfFirst { it.id == relanceId }
         if (index != -1) {
@@ -677,10 +684,7 @@ class DataRepository(val context: Context) {
     }
 
     // TODO : Implement editAppel method into EditAppelActivity
-    fun editAppel(
-        appelId: String, newCandidatureId: String, newContactId: String?, newEntrepriseNom: String,
-        newDateAppel: Date, newObjet: String, newNotes: String
-    ) {
+    fun editAppel(appelId: String, newCandidatureId: String, newContactId: String?, newEntrepriseNom: String, newDateAppel: Date, newObjet: String, newNotes: String) {
         val appels = loadAppels().toMutableList()
         val index = appels.indexOfFirst { it.id == appelId }
         if (index != -1) {
@@ -699,16 +703,7 @@ class DataRepository(val context: Context) {
         }
     }
 
-    fun editContact(
-        contactId: String,
-        newNom: String,
-        newPrenom: String,
-        newEmail: String,
-        newTelephone: String,
-        newEntrepriseNom: String,
-        newAppelsIds: MutableList<String>,
-        newCandidatureIds: MutableList<String>
-    ) {
+    fun editContact(contactId: String, newNom: String, newPrenom: String, newEmail: String, newTelephone: String, newEntrepriseNom: String, newAppelsIds: MutableList<String>, newCandidatureIds: MutableList<String>) {
         val contacts = loadContacts().toMutableList()
         val index = contacts.indexOfFirst { it.id == contactId }
         if (index != -1) {
@@ -728,17 +723,7 @@ class DataRepository(val context: Context) {
         }
     }
 
-    fun editEntretien(
-        entretienId: String,
-        newEntrepriseNom: String,
-        newContactId: String?,
-        newCandidatureId: String,
-        newDateEntretien: Date,
-        newType: String,
-        newMode: String,
-        newNotesPreEntretien: String?,
-        newNotesPostEntretien: String?
-    ) {
+    fun editEntretien(entretienId: String, newEntrepriseNom: String, newContactId: String?, newCandidatureId: String, newDateEntretien: Date, newType: String, newMode: String, newNotesPreEntretien: String?, newNotesPostEntretien: String?) {
         val entretiens = loadEntretiens().toMutableList()
         val index = entretiens.indexOfFirst { it.id == entretienId }
         if (index != -1) {
@@ -933,37 +918,28 @@ class DataRepository(val context: Context) {
         }
     }
 
-    private fun generate_graph(title: String, chartData: JSONObject, chartId: String, chartType: String): String {
+    private fun generate_graph(title: String, chartData: JSONObject, chartId: String, chartType: String, options: JSONObject): String {
         return """
-                <html>
-                <head>
-                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                </head>
-                <body>
-                    <h2>$title</h2>
-                    <canvas id="$chartId"></canvas>
-                    <script>
-                        var ctx = document.getElementById('$chartId').getContext('2d');
-                        var myChart = new Chart(ctx, {
-                            type: '$chartType,
-                            data: $chartData,
-                            options: {
-                                responsive: true,
-                                scales: {
-                                    yAxes: [{
-                                        ticks: {
-                                            beginAtZero: true,
-                                            precision: 0 // This ensures the y-axis displays integer values
-                                        }
-                                    }]
-                                }
-                            }
-                        });
-                    </script>
-                </body>
-                </html>
-            """
+    <html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <h2>$title</h2>
+        <canvas id="$chartId"></canvas>
+        <script>
+            var ctx = document.getElementById('$chartId').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: '$chartType',
+                data: $chartData,
+                options: $options
+            });
+        </script>
+    </body>
+    </html>
+    """
     }
+
 
     fun generateGlobalData(dayOffset: Int = 0): String {
         val candidatures = loadCandidatures()
@@ -1035,13 +1011,148 @@ class DataRepository(val context: Context) {
             })
         }
 
+        val options = JSONObject().apply {
+            put("responsive", true)
+            put("tooltips", JSONObject().apply {
+                put("mode", "index")
+                put("intersect", false)
+            })
+            put("scales", JSONObject().apply {
+                put("yAxes", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("ticks", JSONObject().apply {
+                            put("beginAtZero", true)
+                            put("stepSize", 1)
+                        })
+                    })
+                })
+            })
+        }
+
         val title = "Activité sur $startDate à $endDate"
         val graphId = "global_data_chart"
-
-        return generate_graph(title, chartData, graphId, "bar")
+        return generate_graph(title, chartData, graphId, "bar", options)
     }
 
+    fun getCandidaturesLast7Days(dayOffset: Int): String {
+        val now = Calendar.getInstance()
+        now.add(Calendar.DAY_OF_YEAR, dayOffset)
+        val end = Calendar.getInstance()
+        end.time = now.time
+        end.add(Calendar.DAY_OF_YEAR, -6)
 
+        val candidatures = loadCandidatures()
+        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val counts = mutableMapOf<String, Int>()
+
+        for (date in 0..6) {
+            val dateString = format.format(end.time)
+            counts[dateString] = candidatures.count {
+                format.format(it.date_candidature) == dateString
+            }
+            end.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        counts.forEach { (date, count) ->
+            labels.put(date)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Candidatures des 7 derniers jours")
+                    put("backgroundColor", "#4BC0C0")
+                    put("data", data)
+                    put("borderColor", "#007bff")
+                    put("fill", false)
+                })
+            })
+        }
+
+        val title = "Candidatures des 7 derniers jours"
+        val graphId = "candidaturesLast7DaysChart"
+        val options = JSONObject().apply {
+            put("responsive", true)
+            put("tooltips", JSONObject().apply {
+                put("mode", "index")
+                put("intersect", false)
+            })
+            put("hover", JSONObject().apply {
+                put("mode", "nearest")
+                put("intersect", false)
+            })
+            put("scales", JSONObject().apply {
+                put("yAxes", JSONObject().apply {
+                    put("ticks", JSONObject().apply {
+                        put("beginAtZero", true)
+                        put("stepSize", 1)
+                    })
+                })
+            })
+        }
+
+        return generate_graph(title, chartData, graphId, "line", options)
+    }
+
+    fun getEntretiensLast7Days(dayOffset: Int): String {
+        val now = Calendar.getInstance()
+        now.add(Calendar.DAY_OF_YEAR, dayOffset)
+        val end = Calendar.getInstance()
+        end.time = now.time
+        end.add(Calendar.DAY_OF_YEAR, -6)
+
+        val entretiens = loadEntretiens()
+        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val counts = mutableMapOf<String, Int>()
+
+        for (date in 0..6) {
+            val dateString = format.format(end.time)
+            counts[dateString] = entretiens.count {
+                format.format(it.date_entretien) == dateString
+            }
+            end.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        counts.forEach { (date, count) ->
+            labels.put(date)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Entretiens des 7 derniers jours")
+                    put("backgroundColor", "#4BC0C0")
+                    put("data", data)
+                })
+            })
+        }
+
+        val options = JSONObject().apply {
+            put("responsive", true)
+            put("scales", JSONObject().apply {
+                put("yAxes", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("ticks", JSONObject().apply {
+                            put("beginAtZero", true)
+                            put("stepSize", 1)  // Ensure the step size is one to avoid decimal values.
+                        })
+                    })
+                })
+            })
+        }
+
+        val title = "Entretiens des 7 derniers jours"
+        val graphId = "entretiensLast7DaysChart"
+        return generate_graph(title, chartData, graphId, "bar", options)
+    }
 
     fun getAppelsLast7Days(): List<Appel> {
         val now = Calendar.getInstance()
@@ -1057,6 +1168,62 @@ class DataRepository(val context: Context) {
         start.add(Calendar.DAY_OF_YEAR, -7)
         return loadRelances().filter { it.date_relance in start.time..now.time }
     }
+    fun getRelancesLast7DaysDatas(dayOffset: Int): String {
+        val now = Calendar.getInstance()
+        now.add(Calendar.DAY_OF_YEAR, dayOffset)
+        val end = Calendar.getInstance()
+        end.time = now.time
+        end.add(Calendar.DAY_OF_YEAR, -6)
+
+        val relances = loadRelances()
+        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val counts = mutableMapOf<String, Int>()
+
+        for (date in 0..6) {
+            val dateString = format.format(end.time)
+            counts[dateString] = relances.count {
+                format.format(it.date_relance) == dateString
+            }
+            end.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        counts.forEach { (date, count) ->
+            labels.put(date)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Relances des 7 derniers jours")
+                    put("backgroundColor", "#4BE0C0")
+                    put("data", data)
+                })
+            })
+        }
+
+        val options = JSONObject().apply {
+            put("responsive", true)
+            put("scales", JSONObject().apply {
+                put("yAxes", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("tricks", JSONObject().apply {
+                            put("beginAtZero", true)
+                            put("stepSize", 1)
+                        })
+                    })
+                })
+            })
+        }
+
+        val title = "Relances des 7 derniers jours"
+        val graphId = "relancesLast7DaysChart"
+        return generate_graph(title, chartData, graphId, "line", options)
+    }
+
 
     fun getUpcomingInterviews(days: Int): List<Entretien> {
         val now = Calendar.getInstance()
@@ -1126,14 +1293,17 @@ class DataRepository(val context: Context) {
 
     fun getCandidaturesPerCompany(): String {
         val candidatures = loadCandidatures()
-        val candidaturesCount =
-            candidatures.groupBy { it.entrepriseNom }.mapValues { it.value.size }
+        val candidaturesCount = candidatures.groupBy { it.entrepriseNom }.mapValues { it.value.size }
 
         val labels = JSONArray()
         val data = JSONArray()
-        for ((company, count) in candidaturesCount) {
+        val backgroundColors = JSONArray()
+        val colors = arrayOf("#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF")
+
+        candidaturesCount.forEach { (company, count) ->
             labels.put(company)
             data.put(count)
+            backgroundColors.put(colors[data.length() % colors.size]) // Cycle through colors
         }
 
         val chartData = JSONObject().apply {
@@ -1141,32 +1311,28 @@ class DataRepository(val context: Context) {
             put("datasets", JSONArray().apply {
                 put(JSONObject().apply {
                     put("label", "Candidatures par entreprise")
-                    put("backgroundColor", "#FF6384")
+                    put("backgroundColor", backgroundColors)
                     put("data", data)
                 })
             })
         }
+        val options = JSONObject().apply {
+            put("responsive", true)
+            put("scales", JSONObject().apply {
+                put("yAxes", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("ticks", JSONObject().apply {
+                            put("beginAtZero", true)
+                            put("stepSize", 1)
+                        })
+                    })
+                })
+            })
+        }
 
-        return """
-        <html>
-        <head>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        </head>
-        <body>
-            <canvas id="myChart"></canvas>
-            <script>
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: $chartData,
-                    options: {
-                        responsive: true,
-                    }
-                });
-            </script>
-        </body>
-        </html>
-    """
+        val title = "Candidatures par entreprise"
+        val graphId = "candidaturesPerCompanyChart"
+        return generate_graph(title, chartData, graphId, "bar", options)
     }
 
     fun getCandidaturesPerLocation(): String {
@@ -1191,37 +1357,29 @@ class DataRepository(val context: Context) {
             })
         }
 
-        return """
-        <html>
-        <head>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        </head>
-        <body>
-            <canvas id="myChart"></canvas>
-            <script>
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: $chartData,
-                    options: {
-                        responsive: true,
-                    }
-                });
-            </script>
-        </body>
-        </html>
-    """
+        val options = JSONObject().apply {
+            put("responsive", true)
+        }
+
+        val title = "Candidatures par lieu de poste"
+        val graphId = "candidaturesPerLocationChart"
+        return generate_graph(title, chartData, graphId, "pie", options)
     }
 
     fun getCandidaturesPerState(): String {
+
         val candidatures = loadCandidatures()
         val candidaturesCount = candidatures.groupBy { it.state }.mapValues { it.value.size }
 
         val labels = JSONArray()
         val data = JSONArray()
+        val backgroundColors = JSONArray()
+
         for ((state, count) in candidaturesCount) {
-            labels.put(state)
+            labels.put(state.toString())
             data.put(count)
+            val colorIndex = CandidatureState.values().indexOf(state)
+            backgroundColors.put(stateColors[colorIndex])
         }
 
         val chartData = JSONObject().apply {
@@ -1229,33 +1387,21 @@ class DataRepository(val context: Context) {
             put("datasets", JSONArray().apply {
                 put(JSONObject().apply {
                     put("label", "Candidatures par état")
-                    put("backgroundColor", "#FFCE56")
+                    put("backgroundColor", backgroundColors)
                     put("data", data)
                 })
             })
         }
 
-        return """
-        <html>
-        <head>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        </head>
-        <body>
-            <canvas id="myChart"></canvas>
-            <script>
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: $chartData,
-                    options: {
-                        responsive: true,
-                    }
-                });
-            </script>
-        </body>
-        </html>
-    """
+        val options = JSONObject().apply {
+            put("responsive", true)
+        }
+
+        val title = "Candidatures par état"
+        val graphId = "candidaturesPerStateChart"
+        return generate_graph(title, chartData, graphId, "pie", options)
     }
+
 
     fun getCandidaturesPerPlateforme(): String {
         val candidatures = loadCandidatures()
@@ -1268,39 +1414,46 @@ class DataRepository(val context: Context) {
             data.put(count)
         }
 
-        val chartData = JSONObject().apply {
+        val charData = JSONObject().apply {
             put("labels", labels)
             put("datasets", JSONArray().apply {
                 put(JSONObject().apply {
-                    put("label", "Candidatures par plateforme")
-                    put("backgroundColor", "#4BC0C0")
+                    put("label", "Candidature par plateforme")
+                    put("backgroundColor", JSONArray().apply {
+                        put("#FF6384")
+                        put("#36A2EB")
+                        put("#FFCE56")
+                        put("#4BC0C0")
+                        put("#9966FF")
+                        put("#FF9F44")
+                        put("#FF9740")
+                        put("#FF9940")
+                        put("#F89F40")
+                        put("#FF9F40")
+                        put("#FFAF40")
+                        put("#FB9F40")
+                        put("#FF9F40")
+                        put("#FFDF40")
+                        put("#FF9940")
+                        put("#FF9FF0")
+                        put("#FF9F40")
+                        put("#2F9140")
+                        put("#F69FB0")
+                        put("#FF9A40")
+                    })
                     put("data", data)
                 })
             })
         }
 
-        return """
-        <html>
-        <head>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        </head>
-        <body>
-            <canvas id="myChart"></canvas>
-            <script>
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: $chartData,
-                    options: {
-                        responsive: true,
-                    }
-                });
-            </script>
-        </body>
-        </html>
-    """
+        val options = JSONObject().apply {
+            put("responsive", true)
+        }
+        val title = "Candidatures par plateforme"
+        val graphId = "candidaturesPerPlateformeChart"
+        val htmlData = generate_graph(title, charData, graphId, "pie", options)
+        return htmlData
     }
-
     fun getCandidaturesPerTypePoste(): String {
         val candidatures = loadCandidatures()
         val candidaturesCount = candidatures.groupBy { it.type_poste }.mapValues { it.value.size }
@@ -1317,32 +1470,156 @@ class DataRepository(val context: Context) {
             put("datasets", JSONArray().apply {
                 put(JSONObject().apply {
                     put("label", "Candidatures par type de poste")
-                    put("backgroundColor", "#9966FF")
+                    put("backgroundColor", JSONArray().apply {
+                        // Ajouter des couleurs pour chaque type de poste si nécessaire
+                        put("#9966FF")
+                        put("#4BC0C0")
+                        put("#FF6384")
+                        put("#36A2EB")
+                        put("#FFCE56")
+                    })
                     put("data", data)
                 })
             })
         }
 
-        return """
-        <html>
-        <head>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        </head>
-        <body>
-            <canvas id="myChart"></canvas>
-            <script>
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: $chartData,
-                    options: {
-                        responsive: true,
-                    }
-                });
-            </script>
-        </body>
-        </html>
-    """
+        val options = JSONObject().apply {
+            put("responsive", true)
+        }
+
+        val title = "Candidatures par type de poste"
+        val graphId = "candidaturesPerTypePosteChart"
+        val htmlData = generate_graph(title, chartData, graphId, "pie", options)
+        return htmlData
+    }
+
+    fun getRelancesPerPlateforme(): String {
+        val relances = loadRelances()
+        val relancesCount = relances.groupBy { it.plateformeUtilisee }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((plateforme, count) in relancesCount) {
+            labels.put(plateforme)
+            data.put(count)
+        }
+
+        val charData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Relances par plateforme")
+                    put("backgroundColor", JSONArray().apply {
+                        put("#FF6384")
+                        put("#36A2EB")
+                        put("#FFCE56")
+                        put("#4BC0C0")
+                        put("#9966FF")
+                        put("#FF9F44")
+                        put("#FF9740")
+                        put("#FF9940")
+                        put("#F89F40")
+                        put("#FF9F40")
+                        put("#FFAF40")
+                        put("#FB9F40")
+                        put("#FF9F40")
+                        put("#FFDF40")
+                        put("#FF9940")
+                        put("#FF9FF0")
+                        put("#FF9F40")
+                        put("#2F9140")
+                        put("#F69FB0")
+                        put("#FF9A40")
+                    })
+                    put("data", data)
+                })
+            })
+        }
+
+        val options = JSONObject().apply {
+            put("responsive", true)
+        }
+        val title = "Relances par plateforme"
+        val graphId = "RelancesPerPlateformeChart"
+        val htmlData = generate_graph(title, charData, graphId, "pie", options)
+        return htmlData
+    }
+
+    fun getEntretiensPerTypeDatas(): String {
+        val entretiens = loadEntretiens()
+        val entretiensCount = entretiens.groupBy { it.type }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((typeEntretien, count) in entretiensCount) {
+            labels.put(typeEntretien)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Entretien par type")
+                    put("backgroundColor", JSONArray().apply {
+                        // Ajouter des couleurs pour chaque type de poste si nécessaire
+                        put("#9966FF")
+                        put("#4BC0C0")
+                        put("#FF6384")
+                        put("#36A2EB")
+                        put("#FFCE56")
+                    })
+                    put("data", data)
+                })
+            })
+        }
+
+        val options = JSONObject().apply {
+            put("responsive", true)
+        }
+
+        val title = "Entretiens par type"
+        val graphId = "EntretienssPerTypeChart"
+        val htmlData = generate_graph(title, chartData, graphId, "pie", options)
+        return htmlData
+    }
+    fun getEntretiensPerStyleDatas(): String {
+        val entretiens = loadEntretiens()
+        val entretiensCount = entretiens.groupBy { it.mode }.mapValues { it.value.size }
+
+        val labels = JSONArray()
+        val data = JSONArray()
+        for ((typeEntretien, count) in entretiensCount) {
+            labels.put(typeEntretien)
+            data.put(count)
+        }
+
+        val chartData = JSONObject().apply {
+            put("labels", labels)
+            put("datasets", JSONArray().apply {
+                put(JSONObject().apply {
+                    put("label", "Entretien par mode")
+                    put("backgroundColor", JSONArray().apply {
+                        // Ajouter des couleurs pour chaque type de poste si nécessaire
+                        put("#9966FF")
+                        put("#4BC0C0")
+                        put("#FF6384")
+                        put("#36A2EB")
+                        put("#FFCE56")
+                    })
+                    put("data", data)
+                })
+            })
+        }
+
+        val options = JSONObject().apply {
+            put("responsive", true)
+        }
+
+        val title = "Entretiens par mode"
+        val graphId = "EntretienssPerModeChart"
+        val htmlData = generate_graph(title, chartData, graphId, "pie", options)
+        return htmlData
     }
 
     fun sendNotification(context: Context, title: String, message: String) {
@@ -1518,5 +1795,12 @@ class DataRepository(val context: Context) {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
+    fun archiveCandidature(candidatureId: String) {
+        val candidature = getCandidatureById(candidatureId)
+        candidature?.let {
+            it.archivee = true
+            saveCandidature(it)
+        }
+    }
 
 }

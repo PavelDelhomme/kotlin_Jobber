@@ -66,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Aucuns appels pour la candidature"
-            android:layout_below="@id/btnAddContact"/>
+            android:layout_below="@id/tvAppels"/>
 
 
         <Button
@@ -94,7 +94,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Aucuns appels pour la candidature"
-            android:layout_below="@id/btnAddContact"/>
+            android:layout_below="@id/btnAddAppel"/>
 
 
         <Button
@@ -122,7 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Aucuns appels pour la candidature"
-            android:layout_below="@id/btnAddContact"/>
+            android:layout_below="@id/btnAddEntretien"/>
 
 
         <Button
