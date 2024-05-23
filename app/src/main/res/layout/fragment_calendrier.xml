@@ -21,7 +21,7 @@
 
         <TextView
             android:id="@+id/currentDay"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="18sp"
@@ -35,29 +35,11 @@
             android:text="Next" />
     </LinearLayout>
 
-    <!-- Container for hours and events -->
-    <LinearLayout
-        android:id="@+id/layoutHoursEvents"
+    <!-- RecyclerView for displaying events -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/eventsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerLayout"
-        android:orientation="horizontal"
-        android:weightSum="3">
-        <!-- Column for hours -->
-        <FrameLayout
-            android:id="@+id/hoursColumn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="3dp"
-            android:layout_marginEnd="3dp">
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/hoursRecyclerView"
-                android:layout_width="381dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="20dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/hour_item_layout" />
-        </FrameLayout>
-
-    </LinearLayout>
+        tools:listitem="@layout/item_event" />
 </RelativeLayout>

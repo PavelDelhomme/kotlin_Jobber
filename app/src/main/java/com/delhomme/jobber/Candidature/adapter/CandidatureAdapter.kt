@@ -54,6 +54,7 @@ class CandidatureAdapter(
                 CandidatureState.ERREUR -> "⚠️ Erreur"
                 CandidatureState.NON_RETENU_APRES_ENTRETIEN -> "❌️ Non retenue après entretien"
                 CandidatureState.NON_RETENU_SANS_ENTRETIEN -> "❌ Non retenue"
+                CandidatureState.ACCEPTEE -> "✅ Acceptée"
             }
 
             typePoste.text = candidature.type_poste
@@ -81,6 +82,7 @@ class CandidatureAdapter(
                 CandidatureState.ERREUR -> R.color.colorState10
                 CandidatureState.NON_RETENU_APRES_ENTRETIEN -> R.color.colorState11
                 CandidatureState.NON_RETENU_SANS_ENTRETIEN -> R.color.colorState12
+                CandidatureState.ACCEPTEE -> R.color.colorState13
             }
         }
     }

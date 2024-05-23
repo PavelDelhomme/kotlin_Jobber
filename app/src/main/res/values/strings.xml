@@ -50,7 +50,9 @@
         <item>Aucune réponse</item>
         <item>À relancer</item>
         <item>Erreur</item>
+        <item>Acceptée</item>  <!-- Nouvel état ajouté -->
     </string-array>
+
 
     <array name="type_poste_options">
         <item>Type d\'emploi</item>

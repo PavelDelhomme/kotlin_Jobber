@@ -54,6 +54,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     private lateinit var relanceAdapter: RelanceAdapter
 
     private lateinit var spinnerState: Spinner
+    private lateinit var stateMap: Map<String, CandidatureState>
     private lateinit var buttonConfirmChangeState: Button
     private lateinit var buttonEditCandidature: ImageButton
     companion object {
@@ -89,6 +90,9 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
         findViewById<ImageButton>(R.id.button_mark_as_rejected).setOnClickListener {
             markAsRejected()
+        }
+        findViewById<ImageButton>(R.id.button_mark_as_accepted).setOnClickListener {
+            markAsAccepted()
         }
 
         findViewById<ImageButton>(R.id.btnEditCandidature).setOnClickListener {
@@ -143,6 +147,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             CandidatureState.ERREUR -> "⚠️ Erreur"
             CandidatureState.NON_RETENU_APRES_ENTRETIEN -> "❌️ Non retenue après entretien"
             CandidatureState.NON_RETENU_SANS_ENTRETIEN -> "❌ Non retenue"
+            CandidatureState.ACCEPTEE -> "✅ Acceptée"
         }
         findViewById<TextView>(R.id.tvEtatCandidature).text = stateWithEmoji
     }
@@ -186,29 +191,34 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
 
     private fun setupStateSpinner() {
-        spinnerState = findViewById(R.id.spinnerState)
-
-        val stateOptions = CandidatureState.values().filter { it != CandidatureState.ERREUR }.map { it.name.replace("_", "").capitalize(Locale.ROOT) }
-
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, stateOptions).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        stateMap = CandidatureState.values().associate {
+            it.name.replace("_", " ").capitalize(Locale.ROOT) to it
         }
-        spinnerState.adapter = adapter
 
-        val currentStateIndex = stateOptions.indexOf(candidature.state.name.replace("_", "").capitalize(Locale.ROOT))
-        spinnerState.setSelection(currentStateIndex)
+        spinnerState = findViewById(R.id.spinnerState)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, stateMap.keys.toList())
+        spinnerState.adapter = adapter
 
         spinnerState.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val selectedState = CandidatureState.valueOf(stateOptions[position].toUpperCase(Locale.ROOT).replace(" ", "_"))
-                candidature.state = selectedState
-                dataRepository.saveCandidature(candidature)
-                displayCandidatureDetails()
+                val selectedStateName = parent.getItemAtPosition(position) as String
+                val selectedState = stateMap[selectedStateName]
+                selectedState?.let {
+                    candidature.state = it
+                    dataRepository.saveCandidature(candidature)
+                    displayCandidatureDetails()
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
+        }
+
+        val currentStateName = stateMap.entries.find { it.value ==  candidature.state }?.key
+        currentStateName?.let {
+            val currentIndex = stateMap.keys.toList().indexOf(it)
+            spinnerState.setSelection(currentIndex)
         }
     }
 
@@ -459,6 +469,17 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun markAsAccepted() {
+        candidature.state = CandidatureState.ACCEPTEE
+        candidature.etatManuel = true
+        dataRepository.saveCandidature(candidature)
+        //dataRepository.updateCandidatureState(candidature)
+        val intent = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        displayCandidatureDetails()
+        finish()
+    }
+
     private fun loadCandidatureDetails(candidatureId: String) {
         candidature = dataRepository.getCandidatureById(candidatureId) ?: run {
             Toast.makeText(this, "Candidature non trouvée.", Toast.LENGTH_SHORT).show()
@@ -472,17 +493,6 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         startActivityForResult(intent, STATE_CHANGE_REQUEST)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == STATE_CHANGE_REQUEST && resultCode == RESULT_OK) {
-            data?.getStringExtra("selectedState")?.let { newState ->
-                candidature.state = CandidatureState.valueOf(newState.replace(" ", "_").toUpperCase(Locale.ROOT))
-                candidature.etatManuel = true
-                dataRepository.saveCandidature(candidature)
-                displayCandidatureDetails()
-            }
-        }
-    }
 
     fun reloadCandidatureDetails() {
         candidature = dataRepository.getCandidatureById(candidatureId!!)!!

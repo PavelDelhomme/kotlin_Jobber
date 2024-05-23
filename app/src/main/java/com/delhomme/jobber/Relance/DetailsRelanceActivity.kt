@@ -25,6 +25,7 @@ class DetailsRelanceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_details_relance)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+
         dataRepository = DataRepository(this)
         relanceId = intent.getStringExtra("RELANCE_ID")
 

@@ -1,8 +1,9 @@
 package com.delhomme.jobber.Entretien
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.DataRepository
@@ -29,10 +30,14 @@ class DetailsEntretienActivity : AppCompatActivity() {
             val entretien = dataRepository.getEntretienById(it)
             entretien?.let { bindData(it) }
         }
+        findViewById<ImageButton>(R.id.btnEditEntretien).setOnClickListener {
+            val intent = Intent(this, EditEntretienActivity::class.java)
 
-        findViewById<Button>(R.id.btnReturn).setOnClickListener {
-            finish()
+            intent.putExtra("ENTRETIEN_ID", entretienId)
+
+            startActivity(intent)
         }
+
     }
 
     private fun bindData(entretien: Entretien) {
@@ -45,6 +50,7 @@ class DetailsEntretienActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvEntretienType).text = entretien.type
         findViewById<TextView>(R.id.tvEntretienMode).text = entretien.mode
         findViewById<TextView>(R.id.tvEntretienNotes).text = entretien.notes_pre_entretien ?: "Aucune note"
+        findViewById<TextView>(R.id.tvEntretienNotesPost).text = entretien.notes_post_entretien ?: "Aucune note"
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

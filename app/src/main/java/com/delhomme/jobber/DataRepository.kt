@@ -64,6 +64,7 @@ class DataRepository(val context: Context) {
 
     init {
         loadInitialData()
+        generateDefaultEvents()
         checkAndUpdateCandidatureStates()
     }
 
@@ -76,6 +77,7 @@ class DataRepository(val context: Context) {
         relances = loadRelances()
         notifications = loadNotifications()
         evenements = loadEvents()
+        Log.d("DataRepository", "DataRepository events loader : $evenements")
     }
 
     fun getCandidatures(): List<Candidature> {
@@ -623,6 +625,10 @@ class DataRepository(val context: Context) {
         saveContact(newContact)
         addContactToEntreprise(newContact.id, entrepriseNom)
         return newContact
+    }
+
+    fun getContactsForEntreprise(entrepriseNom: String): List<Contact>? {
+        return contacts?.filter { it.entrepriseNom == entrepriseNom }
     }
 
     fun editCandidature(candidatureId: String, newTitre: String, newEtat: CandidatureState, newNotes: String, newPlateforme: String, newTypePoste: String, newLieuPoste: String, newEntrepriseNom: String, newDate: Date, newEntretiens: MutableList<String>, newAppelsIds: MutableList<String>, newRelances: MutableList<String>) {
@@ -1675,6 +1681,77 @@ class DataRepository(val context: Context) {
             color = "#808080"
         )
         saveEvent(newEvenement)
+    }
+    fun createEventForRelance(relance: Relance, candidature: Candidature) {
+        val newEvenement = Evenement(
+            id = UUID.randomUUID().toString(),
+            title = "Relance: ${candidature.titre_offre}",
+            description = "Relance concernant ${candidature.titre_offre} at ${candidature.entrepriseNom}",
+            startTime = relance.date_relance.time,
+            endTime = relance.date_relance.time + 600000, // assuming 10 min duration
+            type = EventType.Relance,
+            relatedId = relance.id,
+            entrepriseId = candidature.entrepriseNom,
+            color = "#809970"
+        )
+        saveEvent(newEvenement)
+    }
+
+    fun createEventForEntretien(entretien: Entretien, candidature: Candidature) {
+        val newEvenement = Evenement(
+            id = UUID.randomUUID().toString(),
+            title = "Entretien chez ${entretien.entrepriseNom} pour ${candidature.titre_offre} ",
+            description = "Entretien concernant ${candidature.titre_offre} at ${candidature.entrepriseNom}",
+            startTime = entretien.date_entretien.time,
+            endTime = entretien.date_entretien.time + 600000, // assuming 10 min duration
+            type = EventType.Entretien,
+            relatedId = entretien.id,
+            entrepriseId = candidature.entrepriseNom,
+            color = "#8D9970"
+        )
+        saveEvent(newEvenement)
+    }
+
+    fun createEventForCandidature(candidature: Candidature) {
+        val newEvenement = Evenement(
+            id = UUID.randomUUID().toString(),
+            title = "Candidature: ${candidature.titre_offre} pour ${candidature.entrepriseNom}",
+            description = "Candidature concernant ${candidature.titre_offre} at ${candidature.entrepriseNom}",
+            startTime = candidature.date_candidature.time,
+            endTime = candidature.date_candidature.time + 600000, // assuming 10 min duration
+            type = EventType.Candidature,
+            relatedId = candidature.id,
+            entrepriseId = candidature.entrepriseNom,
+            color = "#809FF0"
+        )
+        saveEvent(newEvenement)
+    }
+    private fun generateDefaultEvents() {
+        evenements = evenements ?: loadEvents()
+
+        candidatures?.forEach { candidature ->
+            if (evenements!!.none { it.relatedId == candidature.id && it.type == EventType.Candidature }) {
+                createEventForCandidature(candidature)
+            }
+        }
+
+        appels?.forEach { appel ->
+            if (evenements!!.none { it.relatedId == appel.id && it.type == EventType.Appel }) {
+                appel.candidature_id?.let { getCandidatureById(it) }?.let { createEventForAppel(appel, it) }
+            }
+        }
+
+        relances?.forEach { relance ->
+            if (evenements!!.none { it.relatedId == relance.id && it.type == EventType.Relance }) {
+                relance.candidatureId?.let { getCandidatureById(it) }?.let { createEventForRelance(relance, it) }
+            }
+        }
+
+        entretiens?.forEach { entretien ->
+            if (evenements!!.none { it.relatedId == entretien.id && it.type == EventType.Entretien }) {
+                entretien.candidature_id?.let { getCandidatureById(it) }?.let { createEventForEntretien(entretien, it) }
+            }
+        }
     }
 
     fun deleteEvent(evenement: Evenement) {

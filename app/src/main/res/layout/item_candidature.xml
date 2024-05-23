@@ -65,6 +65,7 @@
             android:text="Xxxxxxx"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textColor="#1B5E20"
             android:textSize="8sp"
             app:layout_constraintTop_toBottomOf="@id/etat"
             app:layout_constraintEnd_toEndOf="parent"/>
@@ -73,6 +74,7 @@
             android:id="@+id/plateforme"
             android:layout_width="98dp"
             android:layout_height="15dp"
+            android:textColor="#1B5E20"
             android:text="Xxxxxxx"
             android:textSize="8sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,6 +85,7 @@
             android:text="Xxxxxxx"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textColor="#1B5E20"
             android:textSize="9sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/plateforme"

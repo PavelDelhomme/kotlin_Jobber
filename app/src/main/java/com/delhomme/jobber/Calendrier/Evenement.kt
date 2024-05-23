@@ -1,6 +1,6 @@
 package com.delhomme.jobber.Calendrier
 
-data class Event(
+data class Evenement(
     val id: String,
     var title: String,
     var description: String,

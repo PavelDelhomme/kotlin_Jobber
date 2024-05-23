@@ -12,5 +12,6 @@ enum class CandidatureState(val priority: Int) {
     NON_RETENU(9),
     NON_RETENU_APRES_ENTRETIEN(10),
     NON_RETENU_SANS_ENTRETIEN(11),
-    ERREUR(12)
+    ACCEPTEE(12),  // Nouvel état pour une réponse positive
+    ERREUR(13)
 }
