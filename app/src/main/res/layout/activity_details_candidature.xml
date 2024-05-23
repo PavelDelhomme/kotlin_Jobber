@@ -20,6 +20,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@android:drawable/ic_menu_edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_margin="8dp" />
@@ -28,6 +29,7 @@
             android:id="@+id/button_mark_as_rejected"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             app:layout_constraintTop_toBottomOf="@id/btnEditCandidature"
             app:layout_constraintEnd_toEndOf="parent"
@@ -36,8 +38,10 @@
             android:id="@+id/button_mark_as_accepted"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+
             android:src="@android:drawable/checkbox_on_background"
-            app:layout_constraintTop_toBottomOf="@id/btnEditCandidature"
+            app:layout_constraintTop_toBottomOf="@id/button_mark_as_rejected"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_margin="8dp" />
 
@@ -63,7 +67,6 @@
                 android:text="Job Title Placeholder"
                 android:gravity="center" />
         </androidx.cardview.widget.CardView>
-
         <!-- CardView for Company and Date/State Details -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cvCandidatureDetails"
@@ -71,10 +74,11 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="8dp"
             app:cardElevation="4dp"
-            app:layout_constraintTop_toBottomOf="@id/button_mark_as_rejected"
+            app:layout_constraintTop_toBottomOf="@id/cvJobTitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp">
+            app:layout_constraintEnd_toStartOf="@id/btnEditCandidature"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -129,6 +133,7 @@
                     android:text="Plateforme" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cvNotes"

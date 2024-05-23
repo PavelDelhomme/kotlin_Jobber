@@ -13,6 +13,12 @@
     <color name="colorOnSurface">#000000</color> <!-- Noir sur surfaces -->
     <color name="colorOnError">#FFFFFF</color> <!-- Blanc sur erreurs -->
 
+    <color name="teal_700">#00796B</color> <!-- Vous pouvez ajuster ces valeurs pour mieux correspondre au thème de nuit -->
+    <color name="teal_200">#80CBC4</color>
+    <color name="white">#FFFFFF</color>
+    <color name="purple_700">#6A1B9A</color>
+    <color name="purple_200">#CE93D8</color>
+    <color name="black">#000000</color>
     <!-- Nouvelles couleurs ajoutées pour plus de diversité -->
     <color name="deep_blue">#303F9F</color> <!-- Bleu profond -->
     <color name="light_blue">#03A9F4</color> <!-- Bleu clair vif -->

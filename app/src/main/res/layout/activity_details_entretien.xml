@@ -42,7 +42,7 @@
                 android:padding="16dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/color"
+                android:textColor="@color/deep_blue"
                 android:text="Date de l'entretien"
                 android:gravity="center" />
         </androidx.cardview.widget.CardView>

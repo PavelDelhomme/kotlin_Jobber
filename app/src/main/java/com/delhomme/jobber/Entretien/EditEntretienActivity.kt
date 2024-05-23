@@ -15,6 +15,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
+import java.time.Duration
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -151,18 +152,25 @@ class EditEntretienActivity : AppCompatActivity() {
 
 
         if (entretienId != null) {
-            val entretien = dataRepository.getEntretienById(entretienId!!)!!
+            val updatedEntretien = dataRepository.getEntretienById(entretienId!!)!!
             dataRepository.editEntretien(
-                entretien.id,
+                updatedEntretien.id,
                 entreprise.nom,
                 contact.id,
-                entretien.candidature_id,
+                updatedEntretien.candidature_id,
                 dateEntretien,
                 typeEntretien,
                 modeEntretien,
                 notesPreEntretien,
                 notesPostEntretien
             )
+
+            val event = dataRepository.findEventByEntretienId(updatedEntretien.id)
+            event?.let {
+                it.startTime = updatedEntretien.date_entretien.time
+                it.endTime = updatedEntretien.date_entretien.time + Duration.ofMinutes(10).toMillis()
+                dataRepository.saveEvent(it)
+            }
             Toast.makeText(this, "Entretien mis à jour avec succès.", Toast.LENGTH_SHORT).show()
             LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("ENTRETIENS_UPDATED"))
             finish()

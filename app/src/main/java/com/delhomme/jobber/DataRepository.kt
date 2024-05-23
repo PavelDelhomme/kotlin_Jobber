@@ -1772,4 +1772,7 @@ class DataRepository(val context: Context) {
         }
     }
 
+    fun findEventByEntretienId(entretienId: String): Evenement? {
+        return evenements?.find { it.relatedId == entretienId && it.type == EventType.Entretien }
+    }
 }
