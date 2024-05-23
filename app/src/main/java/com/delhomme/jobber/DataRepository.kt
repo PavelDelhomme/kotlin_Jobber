@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.Appel.model.Appel
-import com.delhomme.jobber.Calendrier.Event
+import com.delhomme.jobber.Calendrier.Evenement
 import com.delhomme.jobber.Calendrier.EventType
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.Contact.model.Contact
@@ -44,7 +44,7 @@ class DataRepository(val context: Context) {
     private var entretiens: List<Entretien>? = null
     private var relances: List<Relance>? = null
     private var notifications: List<Notification>? = null
-    private var events: List<Event>? = null
+    private var evenements: List<Evenement>? = null
 
     val stateColors = arrayOf(
         "#E3F2FD", // CANDIDATEE_ET_EN_ATTENTE
@@ -75,7 +75,7 @@ class DataRepository(val context: Context) {
         entretiens = loadEntretiens()
         relances = loadRelances()
         notifications = loadNotifications()
-        events = loadEvents()
+        evenements = loadEvents()
     }
 
     fun getCandidatures(): List<Candidature> {
@@ -110,7 +110,7 @@ class DataRepository(val context: Context) {
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent_entreprise_list)
             }
         }
-        val existingEvent = events?.find { it.relatedId == candidature.id }
+        val existingEvent = evenements?.find { it.relatedId == candidature.id }
         if (existingEvent != null) {
             existingEvent.title = "Candidature : ${candidature.titre_offre}"
             existingEvent.description = "Candidature pour ${candidature.entrepriseNom} à ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)}"
@@ -119,7 +119,7 @@ class DataRepository(val context: Context) {
             saveEvent(existingEvent)
         } else {
             // Create a new event
-            val newEvent = Event(
+            val newEvenement = Evenement(
                 id = UUID.randomUUID().toString(),
                 title = "Candidature: ${candidature.titre_offre}",
                 description = "Candidature for ${candidature.entrepriseNom} at ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)}",
@@ -130,7 +130,7 @@ class DataRepository(val context: Context) {
                 entrepriseId = candidature.entrepriseNom,
                 color = "#FFFF00"
             )
-            saveEvent(newEvent)
+            saveEvent(newEvenement)
         }
 
         candidatures = mutableCandidature
@@ -166,50 +166,56 @@ class DataRepository(val context: Context) {
             relances.add(relance)
             val entreprise = getEntrepriseByNom(relance.entrepriseNom)
             entreprise?.let {
-                if (it.relanceIds == null) {
-                    it.relanceIds = mutableListOf()
-                }
-                it.relanceIds.add(relance.id)
+                it.relanceIds = (it.relanceIds ?: mutableListOf()).apply { add(relance.id) }
                 saveEntreprise(it)
             }
             val candidature = getCandidatureById(relance.candidatureId)
             candidature?.let {
-                if (it.relances == null) {
-                    it.relances = mutableListOf()
-                }
-                it.relances.add(relance.id)
+                it.relances = (it.relances ?: mutableListOf()).apply { add(relance.id) }
                 saveCandidature(it)
-                updateCandidatureState(it)
-
-                val existingEvent = events?.find { it.relatedId == relance.id }
-                if (existingEvent != null) {
-                    existingEvent.title = "Relance pour : ${candidature.titre_offre}"
-                    existingEvent.description = "Relance pour ${relance.entrepriseNom} à ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)}"
-                    relance.date_relance.also { existingEvent.startTime = it.time }
-                    existingEvent.endTime = relance.date_relance.time + 10 * 60 * 1000
-                    saveEvent(existingEvent)
-                } else {
-                    // Create a new event
-                    val newEvent = Event(
-                        id = UUID.randomUUID().toString(),
-                        title = "Candidature: ${candidature.titre_offre}",
-                        description = "Relance for ${relance.entrepriseNom} at ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)}",
-                        startTime = relance.date_relance.time,
-                        endTime = relance.date_relance.time + 10 * 60 * 1000, // 10 minutes duration
-                        type = EventType.Relance,
-                        relatedId = relance.id,
-                        entrepriseId = relance.entrepriseNom,
-                        color = "#FFFF00"
-                    )
-                    saveEvent(newEvent)
-                }
-
             }
-        }
+
+            if (relance.plateformeUtilisee == "Téléphone") {
+                val appel = if (relance.contactId!!.isNotEmpty()) {
+                    Appel(date_appel = Date(), objet = "Suivi relance", notes = "Appel suite à relance", entrepriseNom = relance.entrepriseNom, contact_id = relance.contactId, candidature_id = relance.candidatureId)
+                } else {
+                    Appel(date_appel = Date(), objet = "Suivi relance", notes = "Appel suite à relance", entrepriseNom = relance.entrepriseNom, contact_id = "", candidature_id = relance.candidatureId)
+                }
+                saveAppel(appel)
+            }
+            handleEventForRelance(relance, candidature)
+            }
         val jsonString = gson.toJson(relances)
         sharedPreferences.edit().putString("relances", jsonString).apply()
     }
 
+    fun handleEventForRelance(relance: Relance, candidature: Candidature?) {
+        candidature?.let { cand ->
+            val events = loadEvents()
+            val existingEvent = events.find { it.relatedId == relance.id }
+
+            if (existingEvent != null) {
+                existingEvent.title = "Relance pour : ${candidature.titre_offre}"
+                existingEvent.description = "Relance pour ${relance.entrepriseNom} à ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)}"
+                existingEvent.startTime = relance.date_relance.time
+                existingEvent.endTime = relance.date_relance.time + 10 * 60 * 1000 // 10 min
+                saveEvent(existingEvent)
+            } else {
+                val newEvenement = Evenement(
+                    id = UUID.randomUUID().toString(),
+                    title = "Relance pour ${relance.entrepriseNom} à ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)}",
+                    startTime = relance.date_relance.time,
+                    endTime = relance.date_relance.time + 10 * 60 * 1000,
+                    type = EventType.Relance,
+                    relatedId = relance.id,
+                    entrepriseId = relance.entrepriseNom,
+                    description = "",
+                    color = "#FFFF00"
+                )
+                saveEvent(newEvenement)
+            }
+        }
+    }
 
     fun saveEntretien(entretien: Entretien) {
         val entretiens = loadEntretiens().toMutableList()
@@ -237,9 +243,9 @@ class DataRepository(val context: Context) {
             }
         }
 
-        val newEvent = candidature?.entrepriseNom?.let {
+        val newEvenement = candidature?.entrepriseNom?.let {
             candidature?.id?.let { it1 ->
-                Event(
+                Evenement(
                     id = UUID.randomUUID().toString(),
                     title = "Candidature: ${candidature?.titre_offre}",
                     description = "Candidature for ${candidature?.entrepriseNom} at ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)}",
@@ -252,8 +258,8 @@ class DataRepository(val context: Context) {
                 )
             }
         }
-        if (newEvent != null) {
-            saveEvent(newEvent)
+        if (newEvenement != null) {
+            saveEvent(newEvenement)
         }
 
 
@@ -288,7 +294,7 @@ class DataRepository(val context: Context) {
             updateCandidatureState(it)
         }
         if (candidature != null) {
-            val event = events?.find { it.relatedId == appel.id }
+            val event = evenements?.find { it.relatedId == appel.id }
             if (event != null) {
                 updateEvent(event, appel, candidature)
             } else {
@@ -1584,10 +1590,10 @@ class DataRepository(val context: Context) {
         }
     }
 
-    private fun loadEvents(): List<Event> {
-        val eventsJson = sharedPreferences.getString("events", null)
+    private fun loadEvents(): List<Evenement> {
+        val eventsJson = sharedPreferences.getString("evenements", null)
         return if (eventsJson != null) {
-            val type = object : TypeToken<List<Event>>() {}.type
+            val type = object : TypeToken<List<Evenement>>() {}.type
             gson.fromJson(eventsJson, type)
         } else {
             emptyList()
@@ -1605,26 +1611,26 @@ class DataRepository(val context: Context) {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
-    fun saveEvent(event: Event) {
-        val mutableEvents = events?.toMutableList() ?: mutableListOf()
-        mutableEvents.add(event)
-        events = mutableEvents
-        val jsonString = gson.toJson(events)
-        sharedPreferences.edit().putString("events", jsonString).apply()
+    fun saveEvent(evenement: Evenement) {
+        val mutableEvents = evenements?.toMutableList() ?: mutableListOf()
+        mutableEvents.add(evenement)
+        evenements = mutableEvents
+        val jsonString = gson.toJson(evenements)
+        sharedPreferences.edit().putString("evenements", jsonString).apply()
 
         val intent = Intent("com.jobber.EVENTS_LIST_UPDATED")
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
     private fun saveEvents() {
-        val jsonString = gson.toJson(events)
-        sharedPreferences.edit().putString("events", jsonString).apply()
+        val jsonString = gson.toJson(evenements)
+        sharedPreferences.edit().putString("evenements", jsonString).apply()
     }
-    fun getEvents(): List<Event> {
-        return events ?: emptyList()
+    fun getEvents(): List<Evenement> {
+        return evenements ?: emptyList()
     }
 
-    fun getEventsOn(date: Date): List<Event> {
+    fun getEventsOn(date: Date): List<Evenement> {
         val startOfDay = Calendar.getInstance().apply {
             time = date
             set(Calendar.HOUR_OF_DAY, 0)
@@ -1641,23 +1647,23 @@ class DataRepository(val context: Context) {
             set(Calendar.MILLISECOND, 999)
         }.timeInMillis
 
-        return events?.filter {
+        return evenements?.filter {
             it.startTime >= startOfDay && it.startTime <= endOfDay
         } ?: emptyList()
     }
 
-    fun updateEvent(event: Event, appel: Appel, candidature: Candidature) {
-        event.title = "Appel : ${appel.objet}"
-        event.description =
+    fun updateEvent(evenement: Evenement, appel: Appel, candidature: Candidature) {
+        evenement.title = "Appel : ${appel.objet}"
+        evenement.description =
             "Appel concernant ${candidature.titre_offre} chez ${candidature.entrepriseNom}"
-        event.startTime = appel.date_appel.time
-        event.endTime = appel.date_appel.time + 600000
-        event.color = "#808080"
-        saveEvent(event)
+        evenement.startTime = appel.date_appel.time
+        evenement.endTime = appel.date_appel.time + 600000
+        evenement.color = "#808080"
+        saveEvent(evenement)
     }
 
     fun createEventForAppel(appel: Appel, candidature: Candidature) {
-        val newEvent = Event(
+        val newEvenement = Evenement(
             id = UUID.randomUUID().toString(),
             title = "Appel: ${appel.objet}",
             description = "Call regarding ${candidature.titre_offre} at ${candidature.entrepriseNom}",
@@ -1668,13 +1674,13 @@ class DataRepository(val context: Context) {
             entrepriseId = candidature.entrepriseNom,
             color = "#808080"
         )
-        saveEvent(newEvent)
+        saveEvent(newEvenement)
     }
 
-    fun deleteEvent(event: Event) {
-        val mutableEvents = events?.toMutableList() ?: mutableListOf()
-        mutableEvents.remove(event)
-        events = mutableEvents
+    fun deleteEvent(evenement: Evenement) {
+        val mutableEvents = evenements?.toMutableList() ?: mutableListOf()
+        mutableEvents.remove(evenement)
+        evenements = mutableEvents
         saveEvents()
 
         val intent = Intent("com.jobber.EVENTS_LIST_UPDATED")

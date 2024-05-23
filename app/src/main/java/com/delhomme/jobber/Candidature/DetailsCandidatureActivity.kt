@@ -6,6 +6,8 @@ import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageButton
@@ -81,6 +83,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         }
 
         setupRecyclerView()
+        setupStateSpinner()
         displayCandidatureDetails()
         setupButtons()
 
@@ -96,7 +99,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        findViewById<Button>(R.id.buttonChangeState).setOnClickListener {
+        findViewById<Button>(R.id.buttonConfirmChangeState).setOnClickListener {
             showStateChangeDialog()
         }
         buttonConfirmChangeState.setOnClickListener {
@@ -181,6 +184,33 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
+
+    private fun setupStateSpinner() {
+        spinnerState = findViewById(R.id.spinnerState)
+
+        val stateOptions = CandidatureState.values().filter { it != CandidatureState.ERREUR }.map { it.name.replace("_", "").capitalize(Locale.ROOT) }
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, stateOptions).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        spinnerState.adapter = adapter
+
+        val currentStateIndex = stateOptions.indexOf(candidature.state.name.replace("_", "").capitalize(Locale.ROOT))
+        spinnerState.setSelection(currentStateIndex)
+
+        spinnerState.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val selectedState = CandidatureState.valueOf(stateOptions[position].toUpperCase(Locale.ROOT).replace(" ", "_"))
+                candidature.state = selectedState
+                dataRepository.saveCandidature(candidature)
+                displayCandidatureDetails()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+        }
+    }
 
     private fun setupContactRecyclerView() {
         val contacts = dataRepository.loadContactsForEntreprise(candidature.entrepriseNom)

@@ -58,7 +58,11 @@ class CandidatureAdapter(
 
             typePoste.text = candidature.type_poste
             plateforme.text = candidature.plateforme
-            notes.text = candidature.notes
+            if (candidature.notes == "") {
+                notes.text = "Pas de notes sur la candidature"
+            } else {
+                notes.text = candidature.notes
+            }
 
             itemView.setOnClickListener { clickListener(candidature) }
         }

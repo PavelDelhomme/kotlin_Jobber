@@ -13,7 +13,7 @@ data class Candidature(
     val type_poste: String,
     val lieuPoste: String,
     var state: CandidatureState,
-    val notes: String,
+    var notes: String,
     val retourPostEntretien: Boolean = false,
     var archivee: Boolean = false,
     val entretiens: MutableList<String> = mutableListOf(),

@@ -17,6 +17,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.delhomme.jobber.Candidature.adapter.CandidatureAdapter
 import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.DataRepository
@@ -44,6 +45,7 @@ class FragmentCandidatures : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val emptyView = view.findViewById<TextView>(R.id.empty_view_candidatures)
 
@@ -58,8 +60,13 @@ class FragmentCandidatures : Fragment() {
         )
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
-
         updateUI(recyclerView, emptyView)
+
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = true
+            updateCandidatures()
+            swipeRefreshLayout.isRefreshing = false
+        }
 
         view.findViewById<Button>(R.id.btnAddCandidature).setOnClickListener {
             startActivity(Intent(activity, AddCandidatureActivity::class.java))
@@ -141,5 +148,10 @@ class FragmentCandidatures : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(updateReceiver)
+    }
+
+    private fun updateCandidatures() {
+        adapter.updateCandidatures(dataRepository.getCandidatures())
+        adapter.notifyDataSetChanged()
     }
 }
