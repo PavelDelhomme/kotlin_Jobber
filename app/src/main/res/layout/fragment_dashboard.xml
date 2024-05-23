@@ -50,37 +50,51 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <WebView
-            android:id="@+id/webViewRelancePer7Days"
+            android:id="@+id/webViewAppelPer7Days"
             android:layout_width="0dp"
             android:layout_height="400dp"
-            android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/webViewCandidaturePer7Days"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <WebView
-            android:id="@+id/webViewAppelPer7Days"
+            android:id="@+id/webViewEntretiensPer7Days"
             android:layout_width="0dp"
             android:layout_height="400dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/webViewRelancePer7Days"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <WebView
-            android:id="@+id/webViewEntretienPer7Days"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
-            android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/webViewAppelPer7Days"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
         <WebView
+            android:id="@+id/webViewCandidaturePerPlateforme"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            app:layout_constraintTop_toBottomOf="@id/webViewEntretiensPer7Days"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+        <WebView
+            android:id="@+id/webViewCandidaturePerTypePoste"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            app:layout_constraintTop_toBottomOf="@id/webViewCandidaturePerPlateforme"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+        <WebView
+            android:id="@+id/webViewCandidaturePerEntreprise"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            app:layout_constraintTop_toBottomOf="@id/webViewCandidaturePerTypePoste"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <WebView
             android:id="@+id/webViewCandidaturePerLocation"
             android:layout_width="0dp"
             android:layout_height="400dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/webViewEntretienPer7Days"
+            app:layout_constraintTop_toBottomOf="@id/webViewCandidaturePerEntreprise"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -88,13 +102,11 @@
             android:id="@+id/webViewCandidaturePerState"
             android:layout_width="0dp"
             android:layout_height="400dp"
-            android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/webViewCandidaturePerLocation"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-
         <WebView
-            android:id="@+id/webViewCandidaturePerPlateforme"
+            android:id="@+id/webViewEntretiensPerType"
             android:layout_width="0dp"
             android:layout_height="400dp"
             app:layout_constraintTop_toBottomOf="@id/webViewCandidaturePerState"
@@ -105,27 +117,18 @@
             android:id="@+id/webViewRelancePerPlateforme"
             android:layout_width="0dp"
             android:layout_height="400dp"
-            app:layout_constraintTop_toBottomOf="@id/webViewCandidaturePerState"
+            app:layout_constraintTop_toBottomOf="@id/webViewEntretiensPerType"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <WebView
-            android:id="@+id/webViewCandidaturePerTypePoste"
+            android:id="@+id/webViewEntretiensPerStyle"
             android:layout_width="0dp"
             android:layout_height="400dp"
-            android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/webViewRelancePerPlateforme"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <WebView
-            android:id="@+id/webViewCandidaturePerEntreprise"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/webViewCandidaturePerTypePoste"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
