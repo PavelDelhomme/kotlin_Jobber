@@ -1635,7 +1635,6 @@ class DataRepository(val context: Context) {
     fun getEvents(): List<Evenement> {
         return evenements ?: emptyList()
     }
-
     fun getEventsOn(date: Date): List<Evenement> {
         val startOfDay = Calendar.getInstance().apply {
             time = date
@@ -1655,7 +1654,7 @@ class DataRepository(val context: Context) {
 
         return evenements?.filter {
             it.startTime >= startOfDay && it.startTime <= endOfDay
-        } ?: emptyList()
+        }?.sortedBy { it.startTime } ?: emptyList()
     }
 
     fun updateEvent(evenement: Evenement, appel: Appel, candidature: Candidature) {
@@ -1774,5 +1773,53 @@ class DataRepository(val context: Context) {
 
     fun findEventByEntretienId(entretienId: String): Evenement? {
         return evenements?.find { it.relatedId == entretienId && it.type == EventType.Entretien }
+    }
+
+    fun getSortedEventsByStartDate(): List<Evenement> {
+        return evenements?.sortedBy { it.startTime } ?: emptyList()
+    }
+
+    fun searchCandidatures(query: String?): List<Candidature> = loadCandidatures().filter {
+        it.titre_offre.contains(query ?: "", ignoreCase = true)
+                || it.notes?.contains(query ?: "", ignoreCase = true) == true
+    }
+    fun searchContacts(query: String?): List<Contact> = loadContacts().filter {
+        it.getFullName().contains(query ?: "", ignoreCase = true)
+                || it.email?.contains(query ?: "", ignoreCase = true) == true
+                || it.entrepriseNom.contains(query ?: "", ignoreCase = true)
+    }
+    fun searchAppels(query: String?): List<Appel> = loadAppels().filter {
+        it.objet.contains(query ?: "", ignoreCase = true)
+                || it.notes?.contains(query ?: "", ignoreCase = true) == true
+    }
+    fun searchEntretiens(query: String?): List<Entretien> = loadEntretiens().filter {
+        it.entrepriseNom.contains(query ?: "", ignoreCase = true)
+                || (it.notes_post_entretien?.contains(query ?: "", ignoreCase = true) ?: false)
+                || it.type.contains(query ?: "", ignoreCase = true)
+                || it.mode.contains(query ?: "", ignoreCase = true)
+                || (it.notes_pre_entretien?.contains(query ?: "", ignoreCase = true) ?: false)
+    }
+
+    fun searchRelances(query: String?): List<Relance> = loadRelances().filter {
+        it.entrepriseNom.contains(query ?: "", ignoreCase = true)
+                || it.notes?.contains(query ?: "", ignoreCase = true) == true
+                || it.plateformeUtilisee.contains(query ?: "", ignoreCase = true)
+    }
+
+    fun searchEvenements(query: String?): List<Evenement> = loadEvents().filter {
+        it.description.contains(query ?: "", ignoreCase = true)
+                || it.type.toString().contains(query ?: "", ignoreCase = true)
+                || it.title.contains(query ?: "", ignoreCase = true)
+    }
+
+    fun search(query: String?): List<Any> {
+        return listOf(
+            searchCandidatures(query),
+            searchContacts(query),
+            searchAppels(query),
+            searchEntretiens(query),
+            searchRelances(query),
+            searchEvenements(query),
+        ).flatten()
     }
 }

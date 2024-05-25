@@ -1,7 +1,6 @@
 package com.delhomme.jobber.Calendrier
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,18 +58,11 @@ class FragmentCalendrier : Fragment() {
         currentDayTextView.text = dateFormat.format(currentDate.time)
     }
     private fun setupDayView() {
-        Log.d("FragmentCalendrier", "Tous les évènement : ${DataRepository(requireContext()).getEvents().size}")
-        Log.d("FragmentCalendrier", "Tous les évènement : ${DataRepository(requireContext()).getEvents()}")
         val events = DataRepository(requireContext()).getEventsOn(currentDate.time)
-        Log.d("FragmentCalendrier", "Nombre d'événements récupérés : ${events.size}")
-        events.forEach { event ->
-            Log.d("FragmentCalendrier", "Événement : ${event.title}, Début : ${event.startTime}, Fin : ${event.endTime}")
-        }
         eventsRecyclerView.layoutManager = LinearLayoutManager(context)
         eventsRecyclerView.adapter = EventsAdapter(events)
         scrollToNearestEvent(events)
     }
-
 
     private fun scrollToNearestEvent(events: List<Evenement>) {
         val nearestIndex = findNearestEventIndex(events)
@@ -83,4 +75,5 @@ class FragmentCalendrier : Fragment() {
         val now = System.currentTimeMillis()
         return events.indexOfFirst { it.startTime > now }
     }
+
 }

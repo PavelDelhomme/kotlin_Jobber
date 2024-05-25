@@ -7,11 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -32,6 +32,7 @@ import com.delhomme.jobber.Entretien.FragmentEntretiens
 import com.delhomme.jobber.Notification.FragmentNotifications
 import com.delhomme.jobber.Notification.NotificationReceiver
 import com.delhomme.jobber.Relance.FragmentRelances
+import com.delhomme.jobber.Search.SearchResultsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import java.util.Calendar
@@ -43,10 +44,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var dataRepository: DataRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        dataRepository = DataRepository(this)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATION_PERMISSION)
@@ -81,11 +84,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fabMenuJobber.setOnClickListener { view ->
             showPopupMenu(view)
         }
-
-        // Bouton pour tester les notifications
-        findViewById<Button>(R.id.btn_test_notification).setOnClickListener {
-            triggerTestNotification()
-        }
     }
 
     private fun showPopupMenu(view: View) {
@@ -113,12 +111,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         popup.show()
-    }
-
-    private fun triggerTestNotification() {
-        val notificationIntent = Intent(this, NotificationReceiver::class.java)
-        sendBroadcast(notificationIntent)
-        Log.d("MainActivity", "triggerTestNotification : appuyer")
     }
 
     private fun configureNotificationAlarm() {
@@ -193,5 +185,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onSupportNavigateUp(): Boolean {
         drawerLayout.openDrawer(navView)
         return true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        val searchItem = menu!!.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                performSearch(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                performSearch(newText)
+                return true
+            }
+        })
+        return true
+    }
+
+    private fun performSearch(query: String?) {
+        if (!query.isNullOrEmpty()) {
+            val results = dataRepository.search(query)
+            displayResults(results)
+        } else {
+            displayDefaultState()
+        }
+
+    }
+
+    private fun displayResults(results: List<Any>) {
+        val searchResultsFragment = SearchResultsFragment.newInstance(results)
+        replaceFragment(searchResultsFragment)
+    }
+
+    private fun displayDefaultState() {
+        // Utiliser cette méthode pour afficher l'état par défaut de k'aookucatuib
+        replaceFragment(FragmentDashboard())
     }
 }
