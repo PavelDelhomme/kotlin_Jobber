@@ -1,9 +1,12 @@
 package com.delhomme.jobber.Candidature.model
 
+import android.os.Parcelable
 import com.delhomme.jobber.CandidatureState
+import kotlinx.parcelize.Parcelize
 import java.util.Date
 import java.util.UUID
 
+@Parcelize
 data class Candidature(
     val id : String = UUID.randomUUID().toString(),
     val titre_offre: String,
@@ -20,4 +23,4 @@ data class Candidature(
     val appels: MutableList<String> = mutableListOf(),
     var relances: MutableList<String> = mutableListOf(),
     var etatManuel: Boolean = false // Ajoutez ce champ
-)
+) : Parcelable

@@ -1,8 +1,11 @@
 package com.delhomme.jobber.Appel.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.Date
 import java.util.UUID
 
+@Parcelize
 data class Appel(
     val id: String = UUID.randomUUID().toString(),
     val candidature_id: String? = null,
@@ -12,4 +15,4 @@ data class Appel(
     var objet: String,
     var archivee: Boolean = false,
     var notes: String,
-)
+) : Parcelable

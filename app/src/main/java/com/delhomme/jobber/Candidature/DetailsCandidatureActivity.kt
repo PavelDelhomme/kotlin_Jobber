@@ -68,17 +68,11 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         dataRepository = DataRepository(this)
-        candidatureId = intent.getStringExtra("CANDIDATURE_ID")
-        if (candidatureId != null) {
-            loadCandidatureDetails(candidatureId!!)
-        } else {
-            Toast.makeText(this, "Candidature non trouvée", Toast.LENGTH_LONG).show()
-            finish()
-            return
-        }
 
-        candidature = dataRepository.getCandidatureById(candidatureId!!) ?: run {
-            Toast.makeText(this, "Candidature non trouvée.", Toast.LENGTH_SHORT).show()
+        candidature = intent.getParcelableExtra<Candidature>("CANDIDATURE_KEY")!!
+
+        if (candidature == null) {
+            Toast.makeText(this, "Candidature non trouvée", Toast.LENGTH_LONG).show()
             finish()
             return
         }

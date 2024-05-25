@@ -118,7 +118,7 @@ class FragmentCandidatures : Fragment() {
 
     private fun onCandidatureClicked(candidature: Candidature) {
         val intent = Intent(activity, DetailsCandidatureActivity::class.java).apply {
-            putExtra("CANDIDATURE_ID", candidature.id)
+            putExtra("CANDIDATURE_KEY", candidature)
         }
         startActivity(intent)
     }

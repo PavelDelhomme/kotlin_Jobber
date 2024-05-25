@@ -1,5 +1,8 @@
 package com.delhomme.jobber.Calendrier
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Evenement(
     val id: String,
     var title: String,
@@ -10,4 +13,4 @@ data class Evenement(
     val relatedId: String,
     val entrepriseId: String,
     var color: String = "#FFFFFF"
-)
+) : Parcelable

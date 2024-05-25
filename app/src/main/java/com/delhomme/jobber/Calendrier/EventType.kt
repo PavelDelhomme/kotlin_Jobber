@@ -1,6 +1,10 @@
 package com.delhomme.jobber.Calendrier
 
-enum class EventType {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+enum class EventType : Parcelable {
     Candidature,
     Entretien,
     Relance,

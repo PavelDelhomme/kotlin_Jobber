@@ -1,7 +1,9 @@
 package com.delhomme.jobber.Search
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +47,11 @@ class SearchResultsFragment : Fragment() {
         results = arguments?.getSerializable("results") as List<Any>?
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_search_results, container, false)
     }
 
@@ -57,10 +63,14 @@ class SearchResultsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = SearchResultsAdapter(createSections(results ?: emptyList()), dataRepository, this::onItemClicked)
+        recyclerView.adapter = SearchResultsAdapter(
+            createSections(results ?: emptyList()),
+            dataRepository,
+            this::onItemClicked
+        )
     }
 
-    private fun createSections(items: List<Any>) : List<SearchSection> {
+    private fun createSections(items: List<Any>): List<SearchSection> {
         val candidatures = items.filterIsInstance<Candidature>()
         val contacts = items.filterIsInstance<Contact>()
         val entreprises = items.filterIsInstance<Entreprise>()
@@ -98,40 +108,69 @@ class SearchResultsFragment : Fragment() {
         }
         startActivity(intent)
     }
+
     private fun showContactDetails(contact: Contact) {
         val intent = Intent(activity, DetailsContactActivity::class.java).apply {
             putExtra("CONTACT_ID", contact.id)
         }
         startActivity(intent)
     }
+
     private fun showEntrepriseDetails(entreprise: Entreprise) {
         val intent = Intent(activity, DetailsEntrepriseActivity::class.java).apply {
             putExtra("ENTREPRISE_ID", entreprise.nom)
         }
         startActivity(intent)
     }
+
     private fun showEntretienDetails(entretien: Entretien) {
         val intent = Intent(activity, DetailsEntretienActivity::class.java).apply {
             putExtra("ENTRETIEN_ID", entretien.id)
         }
         startActivity(intent)
     }
+
     private fun showAppelDetails(appel: Appel) {
         val intent = Intent(activity, DetailsAppelActivity::class.java).apply {
             putExtra("APPEL_ID", appel.id)
         }
         startActivity(intent)
     }
+
     private fun showEvenementDetails(evenement: Evenement) {
         val intent = Intent(activity, DetailsEvenementActivity::class.java).apply {
             putExtra("EVENEMENT_ID", evenement.id)
         }
         startActivity(intent)
     }
+
     private fun showRelanceDetails(relance: Relance) {
         val intent = Intent(activity, DetailsRelanceActivity::class.java).apply {
             putExtra("RELANCE_ID", relance.id)
         }
         startActivity(intent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+        val scrollPosition = layoutManager.findFirstVisibleItemPosition()
+
+        Log.d("SearchResultsFragment", "Saving scroll position: $scrollPosition")
+        val sharedPref =
+            activity?.getSharedPreferences("JobberPreferences", Context.MODE_PRIVATE) ?: return
+        with(sharedPref.edit()) {
+            putInt("lastScrollPosition", scrollPosition)
+            apply()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val sharedPref = activity?.getSharedPreferences("JobberPreferences", Context.MODE_PRIVATE)
+        val lastScrollPosition = sharedPref?.getInt("lastScrollPosition", 0) ?: 0
+
+        Log.d("SearchResultsFragment", "Restoring scroll position: $lastScrollPosition")
+        recyclerView.layoutManager?.scrollToPosition(lastScrollPosition)
     }
 }

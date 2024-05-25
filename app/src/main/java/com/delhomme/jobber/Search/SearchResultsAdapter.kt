@@ -130,34 +130,19 @@ class SearchResultsAdapter(
         throw IllegalArgumentException("Position out of bounds")
 
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             TYPE_SECTION_HEADER -> {
                 SectionHeaderViewHolder(inflater.inflate(R.layout.item_section_header, parent, false))
             }
-            ITEM_TYPE_CANDIDATURE -> {
-                CandidatureViewHolder(inflater.inflate(R.layout.item_search_candidatures, parent, false))
-            }
-            ITEM_TYPE_CONTACT -> {
-                ContactViewHolder(inflater.inflate(R.layout.item_search_contacts, parent, false))
-            }
-            ITEM_TYPE_ENTREPRISE -> {
-                EntrepriseViewHolder(inflater.inflate(R.layout.item_search_entreprises, parent, false))
-            }
-            ITEM_TYPE_ENTRETIEN -> {
-                EntretienViewHolder(inflater.inflate(R.layout.item_search_entretiens, parent, false))
-            }
-            ITEM_TYPE_APPEL -> {
-                AppelViewHolder(inflater.inflate(R.layout.item_search_appels, parent, false))
-            }
-            ITEM_TYPE_EVENEMENT -> {
-                EvenementViewHolder(inflater.inflate(R.layout.item_search_evenements, parent, false))
-            }
-            ITEM_TYPE_RELANCE -> {
-                RelanceViewHolder(inflater.inflate(R.layout.item_search_relances, parent, false))
-            }
+            ITEM_TYPE_CANDIDATURE -> CandidatureViewHolder(inflater.inflate(R.layout.item_search_candidatures, parent, false), onClick as (Candidature) -> Unit, ::getItemAtPosition)
+            ITEM_TYPE_CONTACT -> ContactViewHolder(inflater.inflate(R.layout.item_search_contacts, parent, false), onClick as (Contact) -> Unit, ::getItemAtPosition)
+            ITEM_TYPE_ENTREPRISE -> EntrepriseViewHolder(inflater.inflate(R.layout.item_search_entreprises, parent, false), onClick as (Entreprise) -> Unit, ::getItemAtPosition)
+            ITEM_TYPE_ENTRETIEN -> EntretienViewHolder(inflater.inflate(R.layout.item_search_entretiens, parent, false), onClick as (Entretien) -> Unit, ::getItemAtPosition)
+            ITEM_TYPE_APPEL -> AppelViewHolder(inflater.inflate(R.layout.item_search_appels, parent, false), onClick as (Appel) -> Unit, ::getItemAtPosition)
+            ITEM_TYPE_EVENEMENT -> EvenementViewHolder(inflater.inflate(R.layout.item_search_evenements, parent, false), onClick as (Evenement) -> Unit, ::getItemAtPosition)
+            ITEM_TYPE_RELANCE -> RelanceViewHolder(inflater.inflate(R.layout.item_search_relances, parent, false), onClick as (Relance) -> Unit, ::getItemAtPosition)
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -177,6 +162,7 @@ class SearchResultsAdapter(
     }
 
 
+
     class SectionHeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val title : TextView = view.findViewById(R.id.sectionTitle)
 
@@ -184,32 +170,41 @@ class SearchResultsAdapter(
             title.text = sectionTitle
         }
     }
-
-    class CandidatureViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    class CandidatureViewHolder(view: View, private val onClick: (Candidature) -> Unit, private val getItemAtPosition: (Int) -> Any) : RecyclerView.ViewHolder(view) {
         private val nomPoste: TextView = view.findViewById(R.id.tvSearchCandidatureTitre)
-        //private val entreprise: TextView = view.findViewById(R.id.entreprise)
-        //private val date: TextView = view.findViewById(R.id.date_candidature)
-        //private val etat: TextView = view.findViewById(R.id.etat)
-        //private val typePoste: TextView = view.findViewById(R.id.typePoste)
-        //private val plateforme: TextView = view.findViewById(R.id.plateforme)
-        //private val notes: TextView = view.findViewById(R.id.tvNotesCandidature)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItemAtPosition(position) as Candidature
+                    onClick(item)
+                }
+            }
+        }
 
         fun bind(candidature: Candidature) {
             nomPoste.text = candidature.titre_offre
-            //entreprise.text = candidature.entrepriseNom
-            //date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)
-            //etat.text = candidature.state.toString()
-            //typePoste.text = candidature.type_poste
-            //plateforme.text = candidature.plateforme
-            //notes.text = if (candidature.notes.isEmpty()) "Pas de notes" else candidature.notes
         }
     }
 
-    class ContactViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+
+    class ContactViewHolder(view: View, private val onClick: (Contact) -> Unit, private val getItemAtPosition: (Int) -> Any) : RecyclerView.ViewHolder(view) {
         private val fullName: TextView = view.findViewById(R.id.tvSearchContactFullName)
         //private val company: TextView = view.findViewById(R.id.entrepriseContact)
         //private val phone: TextView = view.findViewById(R.id.telephoneContact)
         //private val email: TextView = view.findViewById(R.id.emailContact)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItemAtPosition(position) as Contact
+                    onClick(item)
+                }
+            }
+        }
 
         fun bind(contact: Contact) {
             fullName.text = contact.getFullName()
@@ -219,18 +214,38 @@ class SearchResultsAdapter(
         }
     }
 
-    class EntrepriseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class EntrepriseViewHolder(view: View, private val onClick: (Entreprise) -> Unit, private val getItemAtPosition: (Int) -> Any) : RecyclerView.ViewHolder(view) {
         private val name: TextView = view.findViewById(R.id.tvSearchEntrepriseName)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItemAtPosition(position) as Entreprise
+                    onClick(item)
+                }
+            }
+        }
 
         fun bind(entreprise: Entreprise) {
             name.text = entreprise.nom
         }
     }
 
-    class EntretienViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class EntretienViewHolder(view: View, private val onClick: (Entretien) -> Unit, private val getItemAtPosition: (Int) -> Any) : RecyclerView.ViewHolder(view) {
         //private val date: TextView = view.findViewById(R.id.dateEntretien)
         private val entreprise: TextView = view.findViewById(R.id.tvSearchEntretiensEntrepriseName)
         //private val typeEntretien: TextView = view.findViewById(R.id.typeEntretien)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItemAtPosition(position) as Entretien
+                    onClick(item)
+                }
+            }
+        }
 
         fun bind(entretien: Entretien) {
             //date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(entretien.date_entretien)
@@ -238,13 +253,23 @@ class SearchResultsAdapter(
             //typeEntretien.text = entretien.type
         }
     }
-    class AppelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class AppelViewHolder(view: View, private val onClick: (Appel) -> Unit, private val getItemAtPosition: (Int) -> Any) : RecyclerView.ViewHolder(view) {
         //private val date: TextView = view.findViewById(R.id.tvDateAppel)
         //private val objet: TextView = view.findViewById(R.id.tvObjetAppel)
         private val company: TextView = view.findViewById(R.id.tvSearchAppelsEntrepriseName)
         //private val contact: TextView = view.findViewById(R.id.tvContactAppel)
         //private val notes: TextView = view.findViewById(R.id.tvNotesAppels)
 
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItemAtPosition(position) as Appel
+                    onClick(item)
+                }
+            }
+        }
 
         fun bind(appel: Appel) {
             //date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(appel.date_appel)
@@ -256,9 +281,19 @@ class SearchResultsAdapter(
         }
     }
 
-    class EvenementViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class EvenementViewHolder(view: View, private val onClick: (Evenement) -> Unit, private val getItemAtPosition: (Int) -> Any) : RecyclerView.ViewHolder(view) {
         private val title: TextView = view.findViewById(R.id.tvSearchEventTitle)
         //private val date: TextView = view.findViewById(R.id.eventDate)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItemAtPosition(position) as Evenement
+                    onClick(item)
+                }
+            }
+        }
 
         fun bind(evenement: Evenement) {
             title.text = evenement.title
@@ -266,14 +301,22 @@ class SearchResultsAdapter(
         }
     }
 
-    class RelanceViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class RelanceViewHolder(view: View, private val onClick: (Relance) -> Unit, private val getItemAtPosition: (Int) -> Any) : RecyclerView.ViewHolder(view) {
         //private val date: TextView = view.findViewById(R.id.dateRelance)
         private val entreprise: TextView = view.findViewById(R.id.tvSearchRelancesEntrepriseName)
         //private val candidatureRelance: TextView = view.findViewById(R.id.candidatureTitre)
         //private val plateformeRelance: TextView = view.findViewById(R.id.plateformeRelance)
         //private val notesRelance: TextView = view.findViewById(R.id.notesRelance)
 
-
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItemAtPosition(position) as Relance
+                    onClick(item)
+                }
+            }
+        }
 
         fun bind(relance: Relance) {
             //date.text = relance.date_relance.toString()

@@ -2,6 +2,7 @@ package com.delhomme.jobber.Candidature
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -11,6 +12,7 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.delhomme.jobber.Candidature.model.Candidature
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
@@ -21,6 +23,7 @@ import java.util.Locale
 class EditCandidatureActivity : AppCompatActivity() {
     private lateinit var dataRepository: DataRepository
     private var candidatureId: String? = null
+    private lateinit var candidature: Candidature
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,10 +34,16 @@ class EditCandidatureActivity : AppCompatActivity() {
         }
 
         dataRepository = DataRepository(applicationContext)
-        candidatureId = intent.getStringExtra("CANDIDATURE_ID")
 
-        if (candidatureId == null) {
-            Toast.makeText(this, "Erreur: ID de candidature manquant.", Toast.LENGTH_LONG).show()
+        candidature = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("CANDIDATURE_KEY", Candidature::class.java)!!
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra("CANDIDATURE_KEY")!!
+        }
+
+        if (!::candidature.isInitialized) { // Vérification si la candidature est initialisée
+            Toast.makeText(this, "Erreur: Candidature manquante.", Toast.LENGTH_LONG).show()
             finish()
             return
         }

@@ -1,11 +1,13 @@
 package com.delhomme.jobber.Contact
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,6 +31,18 @@ class DetailsContactActivity : AppCompatActivity() {
 
         if(getSupportActionBar() != null) {
             getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
+        }
+
+        var contact: Contact? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("CONTACT_KEY", Contact::class.java)
+        } else {
+            intent.getParcelableExtra("CONTACT_KEY")
+        }
+
+        if (contact == null) {
+            Toast.makeText(this, "Contact data is missing !", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
         val contactId = intent.getStringExtra("CONTACT_ID") ?: return
 

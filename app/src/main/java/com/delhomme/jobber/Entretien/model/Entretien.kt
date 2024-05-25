@@ -1,8 +1,11 @@
 package com.delhomme.jobber.Entretien.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.Date
 import java.util.UUID
 
+@Parcelize
 data class Entretien(
     val id: String = UUID.randomUUID().toString(),
     val entrepriseNom: String,
@@ -14,4 +17,4 @@ data class Entretien(
     val notes_pre_entretien: String? = null,
     var archivee: Boolean = false,
     val notes_post_entretien: String? = null,
-)
+) : Parcelable

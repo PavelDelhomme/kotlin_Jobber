@@ -1,6 +1,10 @@
 package com.delhomme.jobber
 
-enum class CandidatureState(val priority: Int) {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+enum class CandidatureState(val priority: Int) : Parcelable {
     CANDIDATEE_ET_EN_ATTENTE(1),
     EN_ATTENTE_APRES_ENTRETIEN(2),
     EN_ATTENTE_D_UN_ENTRETIEN(3),
