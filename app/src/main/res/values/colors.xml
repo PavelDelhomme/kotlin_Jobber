@@ -33,6 +33,7 @@
     <color name="flamingo">#F06292</color> <!-- Rose flamingo -->
     <color name="graphite">#616161</color> <!-- Gris graphite -->
     <color name="vanilla">#F5F5F5</color> <!-- Blanc vanille -->
+    <color name="light_gray">#415378</color> <!-- Bleu foncé -->
 
     <!-- Couleurs d'état existantes -->
     <color name="colorState1">#E3F2FD</color>

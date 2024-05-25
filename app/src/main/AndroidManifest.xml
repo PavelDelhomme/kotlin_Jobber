@@ -133,6 +133,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"
             android:label="@string/app_name"
             android:theme="@style/Theme.Jobber">
             <intent-filter>

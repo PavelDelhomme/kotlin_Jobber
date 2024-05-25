@@ -11,14 +11,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.delhomme.jobber.Appel.AddAppelActivity
 import com.delhomme.jobber.Appel.FragmentAppels
 import com.delhomme.jobber.Calendrier.FragmentCalendrier
@@ -35,11 +36,23 @@ import com.delhomme.jobber.Relance.FragmentRelances
 import com.delhomme.jobber.Search.SearchResultsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val REQUEST_NOTIFICATION_PERMISSION = 1001
+
+    private var searchJob: Job? = null
+    private val searchFlow = MutableStateFlow("")
+
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
@@ -84,6 +97,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fabMenuJobber.setOnClickListener { view ->
             showPopupMenu(view)
         }
+
+        setupSearch()
     }
 
     private fun showPopupMenu(view: View) {
@@ -194,12 +209,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                performSearch(query)
+                searchFlow.value = query ?: ""
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                performSearch(newText)
+                searchFlow.value = newText ?: ""
                 return true
             }
         })
@@ -207,13 +222,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun performSearch(query: String?) {
-        if (!query.isNullOrEmpty()) {
-            val results = dataRepository.search(query)
-            displayResults(results)
-        } else {
-            displayDefaultState()
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch(Dispatchers.IO) {
+            if (!query.isNullOrEmpty()) {
+                val results = dataRepository.search(query)
+                withContext(Dispatchers.Main) {
+                    displayResults(results)
+                }
+            } else {
+                displayDefaultState()
+            }
         }
-
     }
 
     private fun displayResults(results: List<Any>) {
@@ -223,6 +242,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun displayDefaultState() {
         // Utiliser cette méthode pour afficher l'état par défaut de k'aookucatuib
-        replaceFragment(FragmentDashboard())
+        //replaceFragment(FragmentDashboard())
+    }
+    private fun setupSearch() {
+        lifecycleScope.launch {
+            searchFlow
+                .debounce(200)
+                .filter { it.isNotEmpty() }
+                .distinctUntilChanged()
+                .collect { query ->
+                    performSearch(query)
+                }
+        }
     }
 }

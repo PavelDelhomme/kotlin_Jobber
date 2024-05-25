@@ -57,7 +57,27 @@ class SearchResultsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = SearchResultsAdapter(results ?: emptyList(), dataRepository, this::onItemClicked)
+        recyclerView.adapter = SearchResultsAdapter(createSections(results ?: emptyList()), dataRepository, this::onItemClicked)
+    }
+
+    private fun createSections(items: List<Any>) : List<SearchSection> {
+        val candidatures = items.filterIsInstance<Candidature>()
+        val contacts = items.filterIsInstance<Contact>()
+        val entreprises = items.filterIsInstance<Entreprise>()
+        val entretiens = items.filterIsInstance<Entretien>()
+        val appels = items.filterIsInstance<Appel>()
+        val evenements = items.filterIsInstance<Evenement>()
+        val relances = items.filterIsInstance<Relance>()
+
+        return listOf(
+            SearchSection("Candidatures", candidatures),
+            SearchSection("Contacts", contacts),
+            SearchSection("Entreprises", entreprises),
+            SearchSection("Entretiens", entretiens),
+            SearchSection("Appels", appels),
+            SearchSection("Evenements", evenements),
+            SearchSection("Relances", relances),
+        )
     }
 
     private fun onItemClicked(item: Any) {

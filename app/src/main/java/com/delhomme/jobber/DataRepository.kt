@@ -46,22 +46,6 @@ class DataRepository(val context: Context) {
     private var notifications: List<Notification>? = null
     private var evenements: List<Evenement>? = null
 
-    val stateColors = arrayOf(
-        "#E3F2FD", // CANDIDATEE_ET_EN_ATTENTE
-        "#FFCCBC", // EN_ATTENTE_APRES_ENTRETIEN
-        "#C8E6C9", // EN_ATTENTE_D_UN_ENTRETIEN
-        "#FFF9C4", // FAIRE_UN_RETOUR_POST_ENTRETIEN
-        "#D1C4E9", // A_RELANCEE_APRES_ENTRETIEN
-        "#FFAB91", // A_RELANCEE
-        "#B2EBF2", // RELANCEE_ET_EN_ATTENTE
-        "#F8BBD0", // AUCUNE_REPONSE
-        "#D7CCC8", // NON_RETENU
-        "#BCAAA4", // ERREUR
-        "#FFCDD2", // NON_RETENU_APRES_ENTRETIEN
-        "#CFD8DC"  // NON_RETENU_SANS_ENTRETIEN
-    )
-
-
     init {
         loadInitialData()
         generateDefaultEvents()
@@ -1782,11 +1766,17 @@ class DataRepository(val context: Context) {
     fun searchCandidatures(query: String?): List<Candidature> = loadCandidatures().filter {
         it.titre_offre.contains(query ?: "", ignoreCase = true)
                 || it.notes?.contains(query ?: "", ignoreCase = true) == true
+                || it.entrepriseNom?.contains(query ?: "", ignoreCase = true) == true
+                || it.lieuPoste?.contains(query ?: "", ignoreCase = true) == true
     }
     fun searchContacts(query: String?): List<Contact> = loadContacts().filter {
         it.getFullName().contains(query ?: "", ignoreCase = true)
                 || it.email?.contains(query ?: "", ignoreCase = true) == true
-                || it.entrepriseNom.contains(query ?: "", ignoreCase = true)
+                || it.nom?.contains(query ?: "", ignoreCase = true) == true
+                || it.prenom?.contains(query ?: "", ignoreCase = true) == true
+                || it.getFullName()?.contains(query ?: "", ignoreCase = true) == true
+                || it.entrepriseNom?.contains(query ?: "", ignoreCase = true) == true
+                || it.telephone?.contains(query ?: "", ignoreCase = true) == true
     }
     fun searchAppels(query: String?): List<Appel> = loadAppels().filter {
         it.objet.contains(query ?: "", ignoreCase = true)
