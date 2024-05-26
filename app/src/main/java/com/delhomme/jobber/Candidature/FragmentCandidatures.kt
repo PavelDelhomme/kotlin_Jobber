@@ -31,8 +31,7 @@ class FragmentCandidatures : Fragment() {
     private val updateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d("FragmentCandidatures", "Broadcast received: com.jobber.CANDIDATURE_LIST_UPDATED")
-            adapter.updateCandidatures(dataRepository.getCandidatures())
-            adapter.notifyDataSetChanged()
+            updateCandidatures()
         }
     }
 

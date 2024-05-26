@@ -81,7 +81,7 @@ class DataRepository(val context: Context) {
     }
 
     fun getCandidatures(): List<Candidature> {
-        return getAllCandidatures().filterNot { it.archivee }
+        return getAllCandidatures().filterNot { it.archivee }.sortedByDescending { it.date_candidature }
     }
     fun getAllCandidatures() = candidatures ?: emptyList()
     fun getEntreprises() = entreprises ?: emptyList()
