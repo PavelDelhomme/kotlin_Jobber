@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.SignUser.LoginActivity
-import com.delhomme.jobber.SignUser.User
+import com.delhomme.jobber.Model.User
 // import com.google.gson.Gson
 
 class WelcomeActivity : AppCompatActivity() {

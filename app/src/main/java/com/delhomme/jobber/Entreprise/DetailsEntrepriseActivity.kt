@@ -1,6 +1,6 @@
 package com.delhomme.jobber.Entreprise
 
-import RelanceAdapter
+import com.delhomme.jobber.Adapter.RelanceAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,29 +13,29 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Appel.AddAppelActivity
 import com.delhomme.jobber.Appel.DetailsAppelActivity
 import com.delhomme.jobber.Appel.EditAppelActivity
-import com.delhomme.jobber.Appel.adapter.AppelAdapter
-import com.delhomme.jobber.Appel.model.Appel
+import com.delhomme.jobber.Adapter.AppelAdapter
+import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Candidature.DetailsCandidatureActivity
 import com.delhomme.jobber.Candidature.EditCandidatureActivity
-import com.delhomme.jobber.Candidature.adapter.CandidatureAdapter
-import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.Adapter.CandidatureAdapter
+import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Contact.AddContactActivity
 import com.delhomme.jobber.Contact.DetailsContactActivity
 import com.delhomme.jobber.Contact.EditContactActivity
-import com.delhomme.jobber.Contact.adapter.ContactAdapter
-import com.delhomme.jobber.Contact.model.Contact
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.Entreprise.model.Entreprise
+import com.delhomme.jobber.Adapter.ContactAdapter
+import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Utils.DataRepository
+import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.Entretien.AddEntretienActivity
 import com.delhomme.jobber.Entretien.DetailsEntretienActivity
 import com.delhomme.jobber.Entretien.EditEntretienActivity
-import com.delhomme.jobber.Entretien.adapter.EntretienAdapter
-import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.Adapter.EntretienAdapter
+import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
 import com.delhomme.jobber.Relance.AddRelanceActivity
 import com.delhomme.jobber.Relance.DetailsRelanceActivity
 import com.delhomme.jobber.Relance.EditRelanceActivity
-import com.delhomme.jobber.Relance.model.Relance
+import com.delhomme.jobber.Model.Relance
 
 class DetailsEntrepriseActivity : AppCompatActivity() {
 

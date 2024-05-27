@@ -101,4 +101,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-auth:22.3.1"))
     implementation(platform("com.google.firebase:firebase-analytics:22.0.0"))
     implementation(platform("com.google.android.gms:play-services-auth:21.1.0"))
+
+    // Retrofit configuration
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }

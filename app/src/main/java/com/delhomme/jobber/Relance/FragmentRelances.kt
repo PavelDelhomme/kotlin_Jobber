@@ -1,6 +1,6 @@
 package com.delhomme.jobber.Relance
 
-import RelanceAdapter
+import com.delhomme.jobber.Adapter.RelanceAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -18,9 +18,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Candidature.SwipeCallback
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
-import com.delhomme.jobber.Relance.model.Relance
+import com.delhomme.jobber.Model.Relance
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentRelances : Fragment() {

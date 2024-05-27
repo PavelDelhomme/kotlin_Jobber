@@ -9,9 +9,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.Contact.model.Contact
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.Entreprise.model.Entreprise
+import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Utils.DataRepository
+import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.R
 
 class AddContactActivity : AppCompatActivity() {

@@ -6,8 +6,8 @@ import android.view.MenuItem
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.Utils.DataRepository
+import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale

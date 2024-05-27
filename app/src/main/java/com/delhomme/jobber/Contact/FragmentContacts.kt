@@ -16,9 +16,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Candidature.SwipeCallback
-import com.delhomme.jobber.Contact.adapter.ContactAdapter
-import com.delhomme.jobber.Contact.model.Contact
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Adapter.ContactAdapter
+import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 

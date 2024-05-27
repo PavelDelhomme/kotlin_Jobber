@@ -13,10 +13,10 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.delhomme.jobber.Contact.model.Contact
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
-import com.delhomme.jobber.Relance.model.Relance
+import com.delhomme.jobber.Model.Relance
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

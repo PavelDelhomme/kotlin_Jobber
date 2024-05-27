@@ -1,6 +1,6 @@
 package com.delhomme.jobber.Entreprise
 
-import com.delhomme.jobber.Entreprise.model.Entreprise
+import com.delhomme.jobber.Model.Entreprise
 
 object EntrepriseManager {
     private val entreprises = mutableListOf<Entreprise>()

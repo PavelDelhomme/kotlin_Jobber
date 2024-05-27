@@ -13,8 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.Notification.adapter.NotificationAdapter
+import com.delhomme.jobber.Utils.DataRepository
+import com.delhomme.jobber.Adapter.NotificationAdapter
 import com.delhomme.jobber.R
 
 class FragmentNotifications : Fragment() {

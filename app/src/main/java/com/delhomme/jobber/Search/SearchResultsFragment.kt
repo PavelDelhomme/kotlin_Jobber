@@ -9,21 +9,21 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Appel.DetailsAppelActivity
-import com.delhomme.jobber.Appel.model.Appel
+import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Calendrier.DetailsEvenementActivity
-import com.delhomme.jobber.Calendrier.Evenement
+import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Candidature.DetailsCandidatureActivity
-import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Contact.DetailsContactActivity
-import com.delhomme.jobber.Contact.model.Contact
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.Entreprise.DetailsEntrepriseActivity
-import com.delhomme.jobber.Entreprise.model.Entreprise
+import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.Entretien.DetailsEntretienActivity
-import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
 import com.delhomme.jobber.Relance.DetailsRelanceActivity
-import com.delhomme.jobber.Relance.model.Relance
+import com.delhomme.jobber.Model.Relance
 
 
 class SearchResultsFragment : Fragment() {

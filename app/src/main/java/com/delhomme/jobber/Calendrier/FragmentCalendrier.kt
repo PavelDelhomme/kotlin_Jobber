@@ -9,7 +9,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Adapter.EventsAdapter
+import com.delhomme.jobber.Model.Evenement
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Calendar

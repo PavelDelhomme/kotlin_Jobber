@@ -1,6 +1,6 @@
 package com.delhomme.jobber.Entreprise
 
-import EntrepriseAdapter
+import com.delhomme.jobber.Adapter.EntrepriseAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Candidature.SwipeCallback
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.Entreprise.model.Entreprise
+import com.delhomme.jobber.Utils.DataRepository
+import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 

@@ -17,6 +17,9 @@
         android:theme="@style/Theme.Jobber"
         tools:targetApi="31">
         <activity
+            android:name=".SignUser.SignInActivity"
+            android:exported="false" />
+        <activity
             android:name=".Calendrier.DetailsEvenementActivity"
             android:exported="false" />
         <activity
@@ -121,10 +124,6 @@
             android:name=".WelcomeActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".SignUser.SignInActivity"
-            android:exported="false"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".SignUser.LoginActivity"

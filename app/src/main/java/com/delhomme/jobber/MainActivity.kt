@@ -33,6 +33,7 @@ import com.delhomme.jobber.Notification.FragmentNotifications
 import com.delhomme.jobber.Notification.NotificationReceiver
 import com.delhomme.jobber.Relance.FragmentRelances
 import com.delhomme.jobber.Search.SearchResultsFragment
+import com.delhomme.jobber.Utils.DataRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import java.util.Calendar

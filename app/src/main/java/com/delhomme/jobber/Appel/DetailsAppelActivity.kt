@@ -5,7 +5,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale

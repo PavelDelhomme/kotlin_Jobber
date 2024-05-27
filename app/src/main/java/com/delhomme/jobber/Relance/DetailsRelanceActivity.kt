@@ -8,9 +8,9 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
-import com.delhomme.jobber.Relance.model.Relance
+import com.delhomme.jobber.Model.Relance
 import java.text.SimpleDateFormat
 import java.util.Locale
 

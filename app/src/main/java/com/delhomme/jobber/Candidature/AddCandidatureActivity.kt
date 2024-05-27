@@ -12,11 +12,11 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.delhomme.jobber.Calendrier.Evenement
 import com.delhomme.jobber.Calendrier.EventType
-import com.delhomme.jobber.Candidature.model.Candidature
-import com.delhomme.jobber.CandidatureState
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Model.Evenement
+import com.delhomme.jobber.Model.Candidature
+import com.delhomme.jobber.Utils.CandidatureState
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -39,6 +39,9 @@ class AddCandidatureActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.button_add_candidature).setOnClickListener {
             addCandidature()
+        }
+        findViewById<Button>(R.id.button_cancel_candidature).setOnClickListener {
+            finish()
         }
     }
 

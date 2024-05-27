@@ -9,6 +9,7 @@ import android.webkit.WebView
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.delhomme.jobber.Utils.DataRepository
 
 class FragmentDashboard : Fragment() {
     private lateinit var dataRepository: DataRepository

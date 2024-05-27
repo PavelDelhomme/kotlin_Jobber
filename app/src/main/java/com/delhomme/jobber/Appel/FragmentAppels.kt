@@ -12,10 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.Appel.adapter.AppelAdapter
-import com.delhomme.jobber.Appel.model.Appel
+import com.delhomme.jobber.Adapter.AppelAdapter
+import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Candidature.SwipeCallback
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 

@@ -18,9 +18,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.delhomme.jobber.Candidature.adapter.CandidatureAdapter
-import com.delhomme.jobber.Candidature.model.Candidature
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Adapter.CandidatureAdapter
+import com.delhomme.jobber.Model.Candidature
+import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
