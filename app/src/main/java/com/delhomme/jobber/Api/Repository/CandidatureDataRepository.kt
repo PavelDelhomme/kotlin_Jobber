@@ -41,7 +41,7 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
         val eventRepo = EvenementDataRepository(context)
         val event = eventRepo.findEventByRelatedId(candidature.id) ?: Evenement(
             id = UUID.randomUUID().toString(),
-            title = "Candidature pou ${candidature.titre_offre} chez ${candidature.date_candidature}",
+            title = "Candidature pour ${candidature.titre_offre} chez ${candidature.date_candidature}",
             description = "Candidature concernant ${candidature.notes}",
             startTime = candidature.date_candidature.time,
             endTime = candidature.date_candidature.time + 600000,
