@@ -9,19 +9,15 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.Api.Repository.AppelDataRepository
 import com.delhomme.jobber.Api.Repository.ContactDataRepository
 import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
-import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Model.Contact
 import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.R
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 class AddAppelActivity : AppCompatActivity() {
@@ -58,13 +54,28 @@ class AddAppelActivity : AppCompatActivity() {
         spContactsAppel = findViewById(R.id.spContactsAppel)
         spEntreprisesAppel = findViewById(R.id.spEntreprisesAppel)
 
-        val entreprises = entrepriseDataRepository.loadEntreprises()
-        entrepriseMap = entreprises.associateBy { it.nom }
-        spEntreprisesAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entreprises)
 
         spEntreprisesAppel.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, nom: Long) {
                 val selectedEntreprise = parent.getItemAtPosition(position) as Entreprise
+                updateContactSpinner(selectedEntreprise.nom)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                spContactsAppel.adapter = ArrayAdapter(this@AddAppelActivity, android.R.layout.simple_spinner_dropdown_item, listOf("--"))
+            }
+        }
+    }
+
+    private fun setupSpinners() {
+        val entreprises = entrepriseDataRepository.loadEntreprises()
+        entrepriseMap = entreprises.associateBy { it.nom }
+        val entrepriseNames = entreprises.map { it.nom }
+        spEntreprisesAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entrepriseNames)
+
+        spEntreprisesAppel.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val selectedEntreprise = entreprises[position]
                 updateContactSpinner(selectedEntreprise.nom)
             }
 
@@ -94,47 +105,30 @@ class AddAppelActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateContactSpinner(entrepriseNom: String) {
+        val contacts = contactDataRepository.loadContactsForEntreprise(entrepriseNom)
+        contactMap = contacts.associateBy { it.getFullName() }
+        val contactNames = contacts.map { it.getFullName() }
+        spContactsAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contactNames)
+    }
+
     private fun handleIntent() {
-        val entrepriseNom = intent.getStringExtra("ENTREPRISE_ID")
+        intent.getStringExtra("ENTREPRISE_ID")?.let { entrepriseNom ->
+            spEntreprisesAppel.setSelection(entrepriseMap.keys.indexOf(entrepriseNom))
+            updateContactSpinner(entrepriseNom)
+        }
+        // Ancien :
+        //val entrepriseNom = intent.getStringExtra("ENTREPRISE_ID")
         val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
 
-        entrepriseNom?.let {
+        /*entrepriseNom?.let {
             val index = entrepriseMap.keys.indexOf(it)
             if (index != -1) {
                 spEntreprisesAppel.setSelection(index)
                 spEntreprisesAppel.isEnabled = candidatureId == null
                 updateContactSpinner(it)
             }
-        }
-    }
-
-    private fun updateContactSpinner(entrepriseNom: String?) {
-        val contacts = contactDataRepository.loadContactsForEntreprise(entrepriseNom ?: "")
-        contactMap = contacts.associateBy { it.getFullName() }
-        spContactsAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contacts.map { it.getFullName() })
-    }
-
-    private fun addAppel(view: View) {
-        val selectedContactName = spContactsAppel.selectedItem.toString()
-        val contactId = if (selectedContactName != "--") contactMap[selectedContactName]?.id else null
-        val selectedEntreprise = spEntreprisesAppel.selectedItem as? Entreprise
-        val entrepriseNom = selectedEntreprise?.nom ?: "No Company"
-
-        if (entrepriseNom == "No Company") {
-            Toast.makeText(this, "Erreur: entreprise non sélectionnée ou non trouvée.", Toast.LENGTH_LONG).show()
-            return
-        }
-        try {
-            val dateAppel = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateAppel.text.toString()) ?: Date()
-            val objet = etObjetAppel.text.toString()
-            val notes = etNotesAppel.text.toString()
-            val appel = Appel(contact_id = contactId, entrepriseNom = entrepriseNom, date_appel = dateAppel, objet = objet, notes = notes)
-            appelDataRepository.saveItem(appel)
-
-            finish()
-        } catch (e: ParseException) {
-            Toast.makeText(this, "Format de date invalide", Toast.LENGTH_SHORT).show()
-        }
+        }*/
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

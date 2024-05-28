@@ -1,8 +1,8 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
-import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.Model.Evenement
+import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.Model.Relance
 import java.util.UUID
 
@@ -47,6 +47,16 @@ class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(cont
     private fun deleteEventForRelance(relance: Relance) {
         val eventRepo = EvenementDataRepository(context)
         eventRepo.deleteEventByRelatedId(relance.id)
+    }
+
+    fun loadRelancesForCandidature(candidatureId: String): List<Relance> {
+        return findByCondition { it.candidatureId == candidatureId }
+    }
+    fun loadRelancesForEntreprise(entrepriseNom: String): List<Relance> {
+        return findByCondition { it.entrepriseNom == entrepriseNom }
+    }
+    fun loadRelancesForContact(contactId: String): List<Relance> {
+        return findByCondition { it.contactId == contactId }
     }
 
 }

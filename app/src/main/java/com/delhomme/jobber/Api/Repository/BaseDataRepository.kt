@@ -39,4 +39,7 @@ abstract class BaseDataRepository<T>(val context: Context, private val sharedPre
     }
 
     abstract fun updateOrAddItem(mutableItems: MutableList<T>, item: T)
+    fun findByCondition(predicate: (T) -> Boolean): List<T> {
+        return items?.filter(predicate) ?: emptyList()
+    }
 }

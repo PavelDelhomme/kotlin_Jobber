@@ -241,7 +241,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         replaceFragment(FragmentDashboard())
     }
 
-    fun syncDataWithServer(data: String) {
+    fun syncDataWithServer() {
         val unsyncedData = LocalStorageManager.getData("unsynced_data_key")
         unsyncedData?.let { data ->
             val apiService = RetrofitClient.createService(UserProfileApi::class.java)
@@ -259,7 +259,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_LONG).show()
                 }
             })
-        }
+        } ?: Log.d("MainActivity", "No unsynced data to send.")
     }
     private fun refreshTokenAndRetrySync(data: String) {
         val refreshToken = LocalStorageManager.getRefreshToken()
@@ -271,7 +271,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     if (response.isSuccessful) {
                         response.body()?.accessToken?.let { newToken ->
                             LocalStorageManager.saveJWT(newToken)
-                            syncDataWithServer(data)
+                            syncDataWithServer()
                         }
                     } else {
                         redirectToLogin()

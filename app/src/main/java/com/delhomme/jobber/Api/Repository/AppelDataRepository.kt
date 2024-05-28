@@ -1,9 +1,9 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
-import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Model.Evenement
+import com.delhomme.jobber.Model.EventType
 import java.util.UUID
 
 class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context, "appels") {
@@ -28,6 +28,10 @@ class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context,
         }
     }
 
+    fun getAppelById(appelId: String): Appel? {
+        return items?.find { it.id == appelId }
+    }
+
     private fun updateEventForAppel(appel: Appel) {
         val eventRepo = EvenementDataRepository(context)
         val event = eventRepo.findEventByRelatedId(appel.id) ?: Evenement(
@@ -47,5 +51,25 @@ class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context,
     private fun deleteEventForAppel(appel: Appel) {
         val eventRepo = EvenementDataRepository(context)
         eventRepo.deleteEventByRelatedId(appel.id)
+    }
+
+    fun loadAppelsForCandidature(candidatureId: String): List<Appel> {
+        return findByCondition { it.candidature_id == candidatureId }
+    }
+
+    fun loadAppelsForContact(contactId: String): List<Appel> {
+        return findByCondition { it.contact_id == contactId }
+    }
+    fun loadAppelsForEntreprise(entrepriseNom: String): List<Appel> {
+        return findByCondition { it.entrepriseNom == entrepriseNom }
+    }
+
+    fun deleteAppelsByContactId(contactId: String) {
+        items?.removeAll { it.contact_id == contactId }
+        saveItemsToPrefs(items ?: mutableListOf())
+    }
+    fun deleteAppelsByEntrepriseId(entrepriseId: String) {
+        items?.removeAll { it.entrepriseNom == entrepriseId }
+        saveItemsToPrefs(items ?: mutableListOf())
     }
 }

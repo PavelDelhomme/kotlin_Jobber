@@ -4,18 +4,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Api.Repository.RelanceDataRepository
 import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import com.delhomme.jobber.Model.Relance
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.reflect.KFunction1
 
 class RelanceAdapter(
     var relances: List<Relance>,
-    private val dataRepository: DataRepository,
+    private val dataRepository: RelanceDataRepository,
     private val itemClickListener: (Relance) -> Unit,
-    private val deleteClickListener: (String) -> Unit,
-    private val editClickListener: (String) -> Unit
+    private val deleteClickListener: KFunction1<String, Unit>,
+    private val editClickListener: KFunction1<Relance, Unit>
 ) : RecyclerView.Adapter<RelanceAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val dateRelance: TextView = view.findViewById(R.id.dateRelance)
