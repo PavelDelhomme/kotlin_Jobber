@@ -1,12 +1,15 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
-import com.delhomme.jobber.Calendrier.EventType
 import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Model.Evenement
+import com.delhomme.jobber.Model.EventType
 import java.util.UUID
 
 class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidature>(context, "candidatures") {
+
+    private lateinit var entrepriseRepository: EntrepriseDataRepository
+    private lateinit var candidatureRepository: CandidatureDataRepository
 
     override fun updateOrAddItem(mutableItems: MutableList<Candidature>, item: Candidature) {
         val index = mutableItems.indexOfFirst { it.id == item.id }
@@ -29,6 +32,11 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
         }
     }
 
+    fun getCandidatureById(candidatureId: String): Candidature? {
+        return items?.find { it.id == candidatureId }
+    }
+
+
     private fun updateEventsForCandidature(candidature: Candidature) {
         val eventRepo = EvenementDataRepository(context)
         val event = eventRepo.findEventByRelatedId(candidature.id) ?: Evenement(
@@ -49,4 +57,14 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
         val eventRepo = EvenementDataRepository(context)
         eventRepo.deleteEventByRelatedId(candidature.id)
     }
+    fun addOrUpdateCandidature(candidature: Candidature) {
+        val index = items?.indexOfFirst { it.id == candidature.id }
+        if (index != null && index != -1) {
+            items!![index] = candidature
+        } else {
+            items?.add(candidature)
+        }
+        saveItemsToPrefs(items!!)
+    }
+
 }

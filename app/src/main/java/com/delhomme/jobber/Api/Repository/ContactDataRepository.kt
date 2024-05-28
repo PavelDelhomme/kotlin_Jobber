@@ -13,4 +13,7 @@ class ContactDataRepository(context: Context) : BaseDataRepository<Contact>(cont
             mutableItems.add(item)
         }
     }
+    fun loadContactsForEntreprise(entrepriseNom: String): List<Contact> {
+        return loadItems().filter { it.entrepriseNom == entrepriseNom }
+    }
 }

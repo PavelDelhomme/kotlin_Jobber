@@ -1,7 +1,7 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
-import com.delhomme.jobber.Calendrier.EventType
+import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Model.Relance
 import java.util.UUID

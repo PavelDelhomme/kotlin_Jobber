@@ -13,4 +13,14 @@ class EntrepriseDataRepository(context: Context) : BaseDataRepository<Entreprise
             mutableItems.add(item)
         }
     }
+
+    fun loadEntreprises(): List<Entreprise> {
+        return items?: listOf()
+    }
+    fun getOrCreateEntreprise(nom: String): Entreprise {
+        return items?.find { it.nom == nom } ?: Entreprise(nom).also {
+            updateOrAddItem(items ?: mutableListOf(), it)
+        }
+    }
+
 }
