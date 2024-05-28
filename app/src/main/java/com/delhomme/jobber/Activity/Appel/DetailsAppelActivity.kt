@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Appel
+package com.delhomme.jobber.Activity.Appel
 
 import android.os.Bundle
 import android.util.Log

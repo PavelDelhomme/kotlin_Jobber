@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Entretien
+package com.delhomme.jobber.Activity.Entretien
 
 import android.content.Intent
 import android.os.Bundle

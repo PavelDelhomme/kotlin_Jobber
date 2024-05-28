@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Candidature
+package com.delhomme.jobber.Activity.Candidature
 
 import android.app.DatePickerDialog
 import android.content.Intent

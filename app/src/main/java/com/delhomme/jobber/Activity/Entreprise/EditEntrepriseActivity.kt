@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Entreprise
+package com.delhomme.jobber.Activity.Entreprise
 
 import android.os.Bundle
 import android.view.MenuItem

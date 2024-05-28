@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Contact
+package com.delhomme.jobber.Activity.Contact
 
 import android.content.Intent
 import android.os.Bundle

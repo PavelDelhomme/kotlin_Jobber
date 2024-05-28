@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Contact
+package com.delhomme.jobber.Activity.Contact
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,9 +9,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.Appel.AddAppelActivity
-import com.delhomme.jobber.Appel.DetailsAppelActivity
-import com.delhomme.jobber.Appel.EditAppelActivity
+import com.delhomme.jobber.Activity.Appel.AddAppelActivity
+import com.delhomme.jobber.Activity.Appel.DetailsAppelActivity
+import com.delhomme.jobber.Activity.Appel.EditAppelActivity
 import com.delhomme.jobber.Adapter.AppelAdapter
 import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Model.Contact

@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Calendrier
+package com.delhomme.jobber.Activity.Calendrier
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

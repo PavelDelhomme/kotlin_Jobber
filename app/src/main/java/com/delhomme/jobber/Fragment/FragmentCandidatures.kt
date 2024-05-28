@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Candidature
+package com.delhomme.jobber.Fragment
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -18,7 +18,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.delhomme.jobber.Activity.Candidature.AddCandidatureActivity
+import com.delhomme.jobber.Activity.Candidature.DetailsCandidatureActivity
+import com.delhomme.jobber.Activity.Candidature.EditCandidatureActivity
 import com.delhomme.jobber.Adapter.CandidatureAdapter
+import com.delhomme.jobber.Utils.SwipeCallback
 import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R

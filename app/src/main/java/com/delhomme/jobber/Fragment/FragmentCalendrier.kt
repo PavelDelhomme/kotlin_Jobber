@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Calendrier
+package com.delhomme.jobber.Fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater

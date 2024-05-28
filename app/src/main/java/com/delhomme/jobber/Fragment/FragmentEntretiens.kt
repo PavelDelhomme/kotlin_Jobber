@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Entretien
+package com.delhomme.jobber.Fragment
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -16,7 +16,10 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.Candidature.SwipeCallback
+import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.DetailsEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.EditEntretienActivity
+import com.delhomme.jobber.Utils.SwipeCallback
 import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.Adapter.EntretienAdapter
 import com.delhomme.jobber.Model.Entretien

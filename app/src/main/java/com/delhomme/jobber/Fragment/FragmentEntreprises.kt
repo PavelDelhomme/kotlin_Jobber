@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Entreprise
+package com.delhomme.jobber.Fragment
 
 import com.delhomme.jobber.Adapter.EntrepriseAdapter
 import android.content.Intent
@@ -12,7 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.Candidature.SwipeCallback
+import com.delhomme.jobber.Activity.Entreprise.DetailsEntrepriseActivity
+import com.delhomme.jobber.Activity.Entreprise.EditEntrepriseActivity
+import com.delhomme.jobber.Utils.SwipeCallback
 import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.R

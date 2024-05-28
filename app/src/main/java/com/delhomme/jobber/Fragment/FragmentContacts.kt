@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Contact
+package com.delhomme.jobber.Fragment
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -15,7 +15,10 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.Candidature.SwipeCallback
+import com.delhomme.jobber.Activity.Contact.AddContactActivity
+import com.delhomme.jobber.Activity.Contact.DetailsContactActivity
+import com.delhomme.jobber.Activity.Contact.EditContactActivity
+import com.delhomme.jobber.Utils.SwipeCallback
 import com.delhomme.jobber.Adapter.ContactAdapter
 import com.delhomme.jobber.Model.Contact
 import com.delhomme.jobber.Utils.DataRepository

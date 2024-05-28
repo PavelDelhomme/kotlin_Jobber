@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Appel
+package com.delhomme.jobber.Activity.Appel
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog

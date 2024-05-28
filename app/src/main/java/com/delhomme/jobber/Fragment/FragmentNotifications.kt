@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Notification
+package com.delhomme.jobber.Fragment
 
 import android.content.BroadcastReceiver
 import android.content.Context

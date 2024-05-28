@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Appel
+package com.delhomme.jobber.Fragment
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,9 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Activity.Appel.AddAppelActivity
+import com.delhomme.jobber.Activity.Appel.DetailsAppelActivity
+import com.delhomme.jobber.Activity.Appel.EditAppelActivity
 import com.delhomme.jobber.Adapter.AppelAdapter
 import com.delhomme.jobber.Model.Appel
-import com.delhomme.jobber.Candidature.SwipeCallback
+import com.delhomme.jobber.Utils.SwipeCallback
 import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

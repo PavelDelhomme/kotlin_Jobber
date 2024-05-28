@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Entreprise
+package com.delhomme.jobber.Utils
 
 import com.delhomme.jobber.Model.Entreprise
 

@@ -1,4 +1,4 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.Fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -9,6 +9,7 @@ import android.webkit.WebView
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.delhomme.jobber.R
 import com.delhomme.jobber.Utils.DataRepository
 
 class FragmentDashboard : Fragment() {

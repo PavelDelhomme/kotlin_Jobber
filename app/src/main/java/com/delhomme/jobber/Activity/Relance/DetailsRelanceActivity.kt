@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Relance
+package com.delhomme.jobber.Activity.Relance
 
 import android.content.Intent
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Candidature
+package com.delhomme.jobber.Activity.Candidature
 
 import com.delhomme.jobber.Adapter.RelanceAdapter
 import android.content.Intent
@@ -18,33 +18,34 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.Appel.AddAppelActivity
-import com.delhomme.jobber.Appel.DetailsAppelActivity
-import com.delhomme.jobber.Appel.EditAppelActivity
+import com.delhomme.jobber.Activity.Appel.AddAppelActivity
+import com.delhomme.jobber.Activity.Appel.DetailsAppelActivity
+import com.delhomme.jobber.Activity.Appel.EditAppelActivity
 import com.delhomme.jobber.Adapter.AppelAdapter
 import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Utils.CandidatureState
-import com.delhomme.jobber.Contact.AddContactActivity
-import com.delhomme.jobber.Contact.DetailsContactActivity
-import com.delhomme.jobber.Contact.EditContactActivity
+import com.delhomme.jobber.Activity.Contact.AddContactActivity
+import com.delhomme.jobber.Activity.Contact.DetailsContactActivity
+import com.delhomme.jobber.Activity.Contact.EditContactActivity
 import com.delhomme.jobber.Adapter.ContactAdapter
 import com.delhomme.jobber.Model.Contact
 import com.delhomme.jobber.Utils.DataRepository
-import com.delhomme.jobber.Entretien.AddEntretienActivity
-import com.delhomme.jobber.Entretien.DetailsEntretienActivity
-import com.delhomme.jobber.Entretien.EditEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.DetailsEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.EditEntretienActivity
 import com.delhomme.jobber.Adapter.EntretienAdapter
 import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
-import com.delhomme.jobber.Relance.AddRelanceActivity
-import com.delhomme.jobber.Relance.DetailsRelanceActivity
-import com.delhomme.jobber.Relance.EditRelanceActivity
+import com.delhomme.jobber.Activity.Relance.AddRelanceActivity
+import com.delhomme.jobber.Activity.Relance.DetailsRelanceActivity
+import com.delhomme.jobber.Activity.Relance.EditRelanceActivity
+import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
 import com.delhomme.jobber.Model.Relance
 import java.util.Locale
 
 class DetailsCandidatureActivity : AppCompatActivity() {
-    private lateinit var dataRepository: DataRepository
+    private lateinit var candidatureDataRepository: CandidatureDataRepository
     private var candidatureId: String? = null
     private lateinit var candidature: Candidature
 
@@ -67,7 +68,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_details_candidature)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        dataRepository = DataRepository(this)
+
         candidatureId = intent.getStringExtra("CANDIDATURE_ID")
         if (candidatureId != null) {
             loadCandidatureDetails(candidatureId!!)
@@ -77,7 +78,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             return
         }
 
-        candidature = dataRepository.getCandidatureById(candidatureId!!) ?: run {
+        candidature = candidatureDataRepository.getCandidatureById(candidatureId!!) ?: run {
             Toast.makeText(this, "Candidature non trouvée.", Toast.LENGTH_SHORT).show()
             finish()
             return
