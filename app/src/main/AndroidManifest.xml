@@ -17,65 +17,65 @@
         android:theme="@style/Theme.Jobber"
         tools:targetApi="31">
         <activity
-            android:name=".SignUser.SignInActivity"
+            android:name=".Activity.SignUser.SignInActivity"
             android:exported="false" />
         <activity
-            android:name=".Calendrier.DetailsEvenementActivity"
+            android:name=".Activity.Calendrier.DetailsEvenementActivity"
             android:exported="false" />
         <activity
-            android:name=".Candidature.StateChangeActivity"
+            android:name=".Activity.Candidature.StateChangeActivity"
             android:exported="false"
-            android:parentActivityName=".Candidature.DetailsCandidatureActivity"
+            android:parentActivityName=".Activity.Candidature.DetailsCandidatureActivity"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
         <receiver android:name=".Notification.NotificationReceiver" />
 
         <activity
-            android:name=".Relance.EditRelanceActivity"
+            android:name=".Activity.Relance.EditRelanceActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".Entretien.EditEntretienActivity"
+            android:name=".Activity.Entretien.EditEntretienActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".Entreprise.EditEntrepriseActivity"
+            android:name=".Activity.Entreprise.EditEntrepriseActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".Contact.EditContactActivity"
+            android:name=".Activity.Contact.EditContactActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".Appel.EditAppelActivity"
+            android:name=".Activity.Appel.EditAppelActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".Candidature.EditCandidatureActivity"
+            android:name=".Activity.Candidature.EditCandidatureActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".Relance.DetailsRelanceActivity"
+            android:name=".Activity.Relance.DetailsRelanceActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".Relance.AddRelanceActivity"
+            android:name=".Activity.Relance.AddRelanceActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".Entretien.DetailsEntretienActivity"
+            android:name=".Activity.Entretien.DetailsEntretienActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".Entretien.AddEntretienActivity"
+            android:name=".Activity.Entretien.AddEntretienActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".Appel.DetailsAppelActivity"
+            android:name=".Activity.Appel.DetailsAppelActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat">
@@ -84,12 +84,12 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".Appel.AddAppelActivity"
+            android:name=".Activity.Appel.AddAppelActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".Entreprise.DetailsEntrepriseActivity"
+            android:name=".Activity.Entreprise.DetailsEntrepriseActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
@@ -99,7 +99,7 @@
             android:value=".MainActivity" />
 
         <activity
-            android:name=".Contact.DetailsContactActivity"
+            android:name=".Activity.Contact.DetailsContactActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat">
@@ -108,25 +108,25 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".Contact.AddContactActivity"
+            android:name=".Activity.Contact.AddContactActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".Candidature.DetailsCandidatureActivity"
+            android:name=".Activity.Candidature.DetailsCandidatureActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".Candidature.AddCandidatureActivity"
+            android:name=".Activity.Candidature.AddCandidatureActivity"
             android:exported="true"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".Activity.WelcomeActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
         <activity
-            android:name=".SignUser.LoginActivity"
+            android:name=".Activity.SignUser.LoginActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat" />
         <activity

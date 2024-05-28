@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Candidature
+package com.delhomme.jobber.Activity.Candidature
 
 import android.os.Bundle
 import android.widget.ArrayAdapter

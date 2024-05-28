@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Contact
+package com.delhomme.jobber.Activity.Contact
 
 import android.annotation.SuppressLint
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Search
+package com.delhomme.jobber.Adapter
 
 import android.view.LayoutInflater
 import android.view.View

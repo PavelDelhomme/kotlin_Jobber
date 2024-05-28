@@ -1,7 +1,5 @@
 package com.delhomme.jobber.Model
 
-import com.delhomme.jobber.Calendrier.EventType
-
 data class Evenement(
     val id: String,
     var title: String,

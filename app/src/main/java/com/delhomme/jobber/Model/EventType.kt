@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Calendrier
+package com.delhomme.jobber.Model
 
 enum class EventType {
     Candidature,

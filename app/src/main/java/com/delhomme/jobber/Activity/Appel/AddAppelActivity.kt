@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Appel
+package com.delhomme.jobber.Activity.Appel
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -7,14 +7,15 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.delhomme.jobber.Api.Repository.AppelDataRepository
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Model.Contact
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.R
 import java.text.ParseException
@@ -32,21 +33,22 @@ class AddAppelActivity : AppCompatActivity() {
     private lateinit var contactMap: Map<String, Contact>
     private lateinit var entrepriseMap: Map<String, Entreprise>
 
-    private lateinit var dataRepository: DataRepository
+    private lateinit var appelDataRepository: AppelDataRepository
+    private lateinit var contactDataRepository: ContactDataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_appel)
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        dataRepository = DataRepository(applicationContext)
+
+        appelDataRepository = AppelDataRepository(applicationContext)
+        contactDataRepository = ContactDataRepository(applicationContext)
+        entrepriseDataRepository = EntrepriseDataRepository(applicationContext)
+
         setupUI()
         setupDatePicker()
         handleIntent()
-
-        findViewById<Button>(R.id.btnSaveAppel).setOnClickListener {
-            addAppel(it)
-        }
     }
 
     private fun setupUI() {
@@ -56,6 +58,10 @@ class AddAppelActivity : AppCompatActivity() {
         spContactsAppel = findViewById(R.id.spContactsAppel)
         spEntreprisesAppel = findViewById(R.id.spEntreprisesAppel)
 
+        val entreprises = entrepriseDataRepository.loadEntreprises()
+        entrepriseMap = entreprises.associateBy { it.nom }
+        spEntreprisesAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entreprises)
+
         spEntreprisesAppel.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, nom: Long) {
                 val selectedEntreprise = parent.getItemAtPosition(position) as Entreprise
@@ -63,7 +69,7 @@ class AddAppelActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
-                spContactsAppel.adapter = ArrayAdapter<String>(this@AddAppelActivity, android.R.layout.simple_spinner_dropdown_item, listOf("--"))
+                spContactsAppel.adapter = ArrayAdapter(this@AddAppelActivity, android.R.layout.simple_spinner_dropdown_item, listOf("--"))
             }
         }
     }
@@ -71,14 +77,20 @@ class AddAppelActivity : AppCompatActivity() {
     private fun setupDatePicker() {
         etDateAppel.setOnClickListener {
             val now = Calendar.getInstance()
-            DatePickerDialog(this, { _, year, month, day ->
-                TimePickerDialog(this, { _, hour, minute ->
-                    val selectedDate = Calendar.getInstance()
-                    selectedDate.set(year, month, day, hour, minute)
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
-                    etDateAppel.setText(dateFormat.format(selectedDate.time))
-                }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
-            }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
+            DatePickerDialog(
+                this,
+                { _, year, month, day ->
+                    TimePickerDialog(this, { _, hour, minute ->
+                        val selectedDate = Calendar.getInstance()
+                        selectedDate.set(year, month, day, hour, minute)
+                        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
+                        etDateAppel.setText(dateFormat.format(selectedDate.time))
+                    }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true).show()
+                },
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
     }
 
@@ -86,39 +98,27 @@ class AddAppelActivity : AppCompatActivity() {
         val entrepriseNom = intent.getStringExtra("ENTREPRISE_ID")
         val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
 
-        val entreprises = dataRepository.getEntreprises()
-        entrepriseMap = entreprises.associateBy { it.nom }
-        val entrepriseAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entreprises)
-        spEntreprisesAppel.adapter = entrepriseAdapter
-
-        if (entrepriseNom != null) {
-            val index = entreprises.indexOfFirst { it.nom == entrepriseNom }
+        entrepriseNom?.let {
+            val index = entrepriseMap.keys.indexOf(it)
             if (index != -1) {
                 spEntreprisesAppel.setSelection(index)
                 spEntreprisesAppel.isEnabled = candidatureId == null
+                updateContactSpinner(it)
             }
-            updateContactSpinner(entrepriseNom)
-        } else {
-            updateContactSpinner(null)
         }
     }
 
     private fun updateContactSpinner(entrepriseNom: String?) {
-        val contacts = dataRepository.loadContactsForEntreprise(entrepriseNom ?: "")
-        val contactNames = contacts.map { it.getFullName() }.toMutableList().apply {
-            add(0, "--")
-        }
-        spContactsAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contactNames)
+        val contacts = contactDataRepository.loadContactsForEntreprise(entrepriseNom ?: "")
         contactMap = contacts.associateBy { it.getFullName() }
+        spContactsAppel.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contacts.map { it.getFullName() })
     }
-
 
     private fun addAppel(view: View) {
         val selectedContactName = spContactsAppel.selectedItem.toString()
         val contactId = if (selectedContactName != "--") contactMap[selectedContactName]?.id else null
         val selectedEntreprise = spEntreprisesAppel.selectedItem as? Entreprise
         val entrepriseNom = selectedEntreprise?.nom ?: "No Company"
-        val candidatureId = intent.getStringExtra("CANDIDATURE_ID")
 
         if (entrepriseNom == "No Company") {
             Toast.makeText(this, "Erreur: entreprise non sélectionnée ou non trouvée.", Toast.LENGTH_LONG).show()
@@ -128,20 +128,8 @@ class AddAppelActivity : AppCompatActivity() {
             val dateAppel = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateAppel.text.toString()) ?: Date()
             val objet = etObjetAppel.text.toString()
             val notes = etNotesAppel.text.toString()
-            val appel = Appel(contact_id = contactId, entrepriseNom = entrepriseNom, date_appel = dateAppel, objet = objet, notes = notes, candidature_id = candidatureId)
-            dataRepository.saveAppel(appel)
-
-            candidatureId?.let {
-                val candidature = dataRepository.getCandidatureById(it)
-                candidature?.appels?.add(appel.id)
-                dataRepository.saveCandidature(candidature!!)
-            }
-
-            contactId?.let {
-                val contact = dataRepository.getContactById(it)
-                contact?.appelsIds?.add(appel.id)
-                dataRepository.saveContact(contact!!)
-            }
+            val appel = Appel(contact_id = contactId, entrepriseNom = entrepriseNom, date_appel = dateAppel, objet = objet, notes = notes)
+            appelDataRepository.saveItem(appel)
 
             finish()
         } catch (e: ParseException) {

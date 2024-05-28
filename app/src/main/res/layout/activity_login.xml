@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignUser.LoginActivity">
+    tools:context=".Activity.SignUser.LoginActivity">
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
@@ -47,20 +47,19 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/login_activity_email_txtview"
+                android:text="@string/login_signin_activity_email_txtview"
                 android:layout_marginTop="10dp" />
 
             <EditText
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:hint="@string/login_activity_email_hint" />
+                android:inputType="textEmailAddress" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/login_activity_password"
+                android:text="@string/login_signin_activity_password"
                 android:layout_marginTop="10dp" />
 
             <EditText
@@ -80,14 +79,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/login_activity_button_text"
                 android:layout_marginTop="10dp" />
-            <Button
-                android:id="@+id/btnGoogleSignIn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Se connecter avec Google"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"/>
-
             <Button
                 android:id="@+id/signUpButton"
                 android:layout_width="match_parent"

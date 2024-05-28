@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".Contact.AddContactActivity">
+    tools:context=".Activity.Contact.AddContactActivity">
 
     <EditText
         android:id="@+id/etContactPrenom"

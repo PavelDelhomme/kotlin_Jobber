@@ -11,7 +11,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.delhomme.jobber.Calendrier.EventType
+import com.delhomme.jobber.Api.Repository.AppelDataRepository
+import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Api.Repository.EntretienDataRepository
+import com.delhomme.jobber.Api.Repository.EvenementDataRepository
+import com.delhomme.jobber.Api.Repository.RelanceDataRepository
+import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.MainActivity
 import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Model.Candidature
@@ -33,7 +40,16 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-class DataRepository(val context: Context) {
+class DataRepository(
+    val context: Context,
+    val appelDataRepository: AppelDataRepository,
+    val candidatureDataRepository: CandidatureDataRepository,
+    val entrepriseDataRepository: EntrepriseDataRepository,
+    val evenementDataRepository: EvenementDataRepository,
+    val relanceDataRepository: RelanceDataRepository,
+    val entretienDataRepository: EntretienDataRepository,
+    val contactDataRepository: ContactDataRepository
+) {
     private val sharedPreferences =
         context.getSharedPreferences("CandidaturesPrefs", Context.MODE_PRIVATE)
     private val gson = Gson()
@@ -47,6 +63,14 @@ class DataRepository(val context: Context) {
     private var relances: List<Relance>? = null
     private var notifications: List<Notification>? = null
     private var evenements: List<Evenement>? = null
+
+    private val candidatureRepository = CandidatureDataRepository(context)
+    private val entrepriseRepository = EntrepriseDataRepository(context)
+    private val appelRepository = AppelDataRepository(context)
+    private val entretienRepository = EntretienDataRepository(context)
+    private val evenementRepository = EvenementDataRepository(context)
+    private val contactRepository = ContactDataRepository(context)
+    private val relanceRepository = RelanceDataRepository(context)
 
     val stateColors = arrayOf(
         "#E3F2FD", // CANDIDATEE_ET_EN_ATTENTE
@@ -82,6 +106,45 @@ class DataRepository(val context: Context) {
         Log.d("DataRepository", "DataRepository events loader : $evenements")
     }
 
+
+    fun saveCandidature(candidature: Candidature) {
+        candidatureDataRepository.saveItem(candidature)
+        createEventForCandidature(candidature)
+        getCandidatureById(candidature.id)?.let { updateCandidatureState(it) }
+    }
+    fun saveEntreprise(entreprise: Entreprise) {
+        entrepriseDataRepository.saveItem(entreprise)
+    }
+
+    fun saveAppel(appel: Appel) {
+        appelDataRepository.saveItem(appel)
+        appel.candidature_id?.let {
+            val candidature = getCandidatureById(it)
+            candidature?.let { cand ->
+                updateCandidatureState(cand)
+            }
+        }
+    }
+
+    fun saveContact(contact: Contact) {
+        contactDataRepository.saveItem(contact)
+    }
+
+    fun saveEntretien(entretien: Entretien) {
+        entretienDataRepository.saveItem(entretien)
+        getCandidatureById(entretien.candidature_id)?.let { updateCandidatureState(it) }
+        handleEventForEntretien(entretien, getCandidatureById(entretien.candidature_id))
+    }
+    fun saveEvenement(evenement: Evenement) {
+        evenementDataRepository.saveItem(evenement)
+    }
+    fun saveRelance(relance: Relance) {
+        relanceDataRepository.saveItem(relance)
+        getCandidatureById(relance.candidatureId)?.let { updateCandidatureState(it) }
+        handleEventForRelance(relance, getCandidatureById(relance.candidatureId))
+    }
+
+
     fun getCandidatures(): List<Candidature> {
         return getAllCandidatures().filterNot { it.archivee }.sortedByDescending { it.date_candidature }
     }
@@ -93,49 +156,23 @@ class DataRepository(val context: Context) {
     fun getRelances() = relances ?: emptyList()
 
 
-    fun saveEntreprise(entreprise: Entreprise) {
-        val mutableEntreprises = entreprises?.toMutableList() ?: mutableListOf()
-        val index = mutableEntreprises.indexOfFirst { it.nom == entreprise.nom }
-        if (index != -1) {
-            mutableEntreprises[index] = entreprise
-        } else {
-            mutableEntreprises.add(entreprise)
-        }
-        entreprises = mutableEntreprises
-        val jsonString = gson.toJson(entreprises)
-        sharedPreferences.edit().putString("entreprises", jsonString).apply()
+    fun addNewCandidatureWithEntreprise(candidature: Candidature, entrepriseNom: String) {
+        val entreprise = entrepriseRepository.updateOrAddItem(entreprises!!.toMutableList(), Entreprise(nom = entrepriseNom))
+        saveEntreprises(entreprises!!)
     }
 
-    fun saveRelance(relance: Relance) {
-        val relances = loadRelances().toMutableList()
-        val index = relances.indexOfFirst { it.id == relance.id }
-        if (index != -1) {
-            relances[index] = relance
+    private fun loadEntreprises(): List<Entreprise> {
+        val jsonString = sharedPreferences.getString("entreprises", "")
+        return if (!jsonString.isNullOrEmpty()) {
+            gson.fromJson(jsonString, Array<Entreprise>::class.java).toList()
         } else {
-            relances.add(relance)
-            val entreprise = getEntrepriseByNom(relance.entrepriseNom)
-            entreprise?.let {
-                it.relanceIds = (it.relanceIds ?: mutableListOf()).apply { add(relance.id) }
-                saveEntreprise(it)
-            }
-            val candidature = getCandidatureById(relance.candidatureId)
-            candidature?.let {
-                it.relances = (it.relances ?: mutableListOf()).apply { add(relance.id) }
-                saveCandidature(it)
-            }
+            emptyList()
+        }
+    }
 
-            if (relance.plateformeUtilisee == "Téléphone") {
-                val appel = if (relance.contactId!!.isNotEmpty()) {
-                    Appel(date_appel = Date(), objet = "Suivi relance", notes = "Appel suite à relance", entrepriseNom = relance.entrepriseNom, contact_id = relance.contactId, candidature_id = relance.candidatureId)
-                } else {
-                    Appel(date_appel = Date(), objet = "Suivi relance", notes = "Appel suite à relance", entrepriseNom = relance.entrepriseNom, contact_id = "", candidature_id = relance.candidatureId)
-                }
-                saveAppel(appel)
-            }
-            handleEventForRelance(relance, candidature)
-            }
-        val jsonString = gson.toJson(relances)
-        sharedPreferences.edit().putString("relances", jsonString).apply()
+    private fun saveEntreprises(entreprises: List<Entreprise>) {
+        val jsonString = gson.toJson(entreprises)
+        sharedPreferences.edit().putString("entreprises", jsonString).apply()
     }
 
     fun handleEventForRelance(relance: Relance, candidature: Candidature?) {
@@ -166,93 +203,35 @@ class DataRepository(val context: Context) {
         }
     }
 
-    fun saveEntretien(entretien: Entretien) {
-        val entretiens = loadEntretiens().toMutableList()
-        val index = entretiens.indexOfFirst { it.id == entretien.id }
-        if (index != -1) {
-            entretiens[index] = entretien
-        } else {
-            entretiens.add(entretien)
-        }
+    fun handleEventForEntretien(entretien: Entretien, candidature: Candidature?) {
+        candidature?.let { cand ->
+            val events = loadEvents()
+            val existingEvent = events.find { it.relatedId == entretien.id }
 
-        val candidature = getCandidatureById(entretien.candidature_id)
-        candidature?.let {
-            if (!it.entretiens.contains(entretien.id)) {
-                it.entretiens.add(entretien.id)
-                saveCandidature(it)
-                updateCandidatureState(it)
-            }
-        }
-
-        val contact = getContactById(entretien.contact_id)
-        contact?.let {
-            if (it.candidatureIds?.contains(entretien.candidature_id) == false) {
-                it.candidatureIds?.add(entretien.candidature_id)
-                saveContact(it)
-            }
-        }
-
-        val newEvenement = candidature?.entrepriseNom?.let {
-            candidature?.id?.let { it1 ->
-                Evenement(
-                    id = UUID.randomUUID().toString(),
-                    title = "Candidature: ${candidature?.titre_offre}",
-                    description = "Candidature for ${candidature?.entrepriseNom} at ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)}",
-                    startTime = candidature.date_candidature.time,
-                    endTime = candidature.date_candidature.time + 10 * 60 * 1000, // 10 minutes duration
-                    type = EventType.Candidature,
-                    relatedId = it1,
-                    entrepriseId = it,
-                    color = "#FFFF00"
-                )
-            }
-        }
-        if (newEvenement != null) {
-            saveEvent(newEvenement)
-        }
-
-
-        val jsonString = gson.toJson(entretiens)
-        sharedPreferences.edit().putString("entretiens", jsonString).apply()
-    }
-
-
-    fun saveContact(contact: Contact) {
-        val contacts = loadContacts().toMutableList()
-        val index = contacts.indexOfFirst { it.id == contact.id }
-        if (index != -1) {
-            contacts[index] = contact
-        } else {
-            contacts.add(contact)
-        }
-        val jsonString = gson.toJson(contacts)
-        sharedPreferences.edit().putString("contacts", jsonString).apply()
-    }
-
-    fun saveAppel(appel: Appel) {
-        val appels = loadAppels().toMutableList()
-        val index = appels.indexOfFirst { it.id == appel.id }
-        if (index != -1) {
-            appels[index] = appel
-        } else {
-            appels.add(appel)
-        }
-
-        val candidature = appel.candidature_id?.let { getCandidatureById(it) }
-        candidature?.let {
-            updateCandidatureState(it)
-        }
-        if (candidature != null) {
-            val event = evenements?.find { it.relatedId == appel.id }
-            if (event != null) {
-                updateEvent(event, appel, candidature)
+            if (existingEvent != null) {
+                existingEvent.title = "Entretien pour ${cand.titre_offre}"
+                existingEvent.description = "Entretien pour ${entretien.entrepriseNom} à ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(entretien.date_entretien)}"
+                existingEvent.startTime = entretien.date_entretien.time
+                existingEvent.endTime = entretien.date_entretien.time + 10 * 60 * 1000
+                saveEvent(existingEvent)
             } else {
-                createEventForAppel(appel, candidature)
+                val newEvent = Evenement(
+                    id = UUID.randomUUID().toString(),
+                    title = "Entretien pour ${entretien.entrepriseNom} à ${SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(entretien.date_entretien)}",
+                    description = "Entretien planifié avec ${entretien.entrepriseNom} pour ${cand.titre_offre}",
+                    startTime = entretien.date_entretien.time,
+                    endTime = entretien.date_entretien.time + 30 * 60 * 1000,
+                    type = EventType.Entretien,
+                    entrepriseId = entretien.entrepriseNom,
+                    color = "#FFD700",
+                    relatedId = entretien.id
+                )
+                saveEvenement(newEvent)
             }
         }
-        val jsonString = gson.toJson(appels)
-        sharedPreferences.edit().putString("appels", jsonString).apply()
     }
+
+
     // todo : Faire de l'héritage ou polymorphisme
     fun deleteCandidature(candidatureId: String) {
         val candidatures = loadCandidatures().toMutableList()
@@ -450,18 +429,6 @@ class DataRepository(val context: Context) {
         } else {
             emptyList()
         }
-    }
-
-    private fun loadEntreprises(): List<Entreprise> {
-        val jsonString = sharedPreferences.getString("entreprises", null)
-        val entreprises = if (jsonString != null) {
-            val type = object : TypeToken<List<Entreprise>>() {}.type
-            gson.fromJson<List<Entreprise>>(jsonString, type)
-        } else {
-            emptyList()
-        }
-        Log.d("DataRepository", "Entreprises chargées : $entreprises")
-        return entreprises
     }
 
     private fun loadAppels(): List<Appel> {

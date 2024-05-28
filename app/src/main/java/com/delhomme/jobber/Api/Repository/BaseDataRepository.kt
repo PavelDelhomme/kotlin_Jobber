@@ -23,7 +23,7 @@ abstract class BaseDataRepository<T>(val context: Context, private val sharedPre
         saveItemsToPrefs(items!!)
     }
 
-    private fun loadItems(): List<T> {
+    fun loadItems(): List<T> {
         val jsonString = context.getSharedPreferences("JobberPrefs", Context.MODE_PRIVATE).getString(sharedPrefsKey, null)
         return if (jsonString != null) {
             val type = object : TypeToken<List<T>>() {}.type

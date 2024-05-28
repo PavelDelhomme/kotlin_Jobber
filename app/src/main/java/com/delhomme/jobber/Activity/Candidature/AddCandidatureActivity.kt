@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Candidature
+package com.delhomme.jobber.Activity.Candidature
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -9,22 +9,19 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.delhomme.jobber.Calendrier.EventType
-import com.delhomme.jobber.Model.Evenement
+import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Utils.CandidatureState
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import java.util.UUID
 
 class AddCandidatureActivity : AppCompatActivity() {
-    private lateinit var dataRepository: DataRepository
+    private lateinit var dataRepository: CandidatureDataRepository
     private lateinit var etDateCandidature: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +29,7 @@ class AddCandidatureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_candidature)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        dataRepository = DataRepository(applicationContext)
+        dataRepository = CandidatureDataRepository(applicationContext)
         etDateCandidature = findViewById(R.id.editText_date_candidature)
         setupSpinners()
         setupDatePicker()
@@ -78,45 +75,21 @@ class AddCandidatureActivity : AppCompatActivity() {
         val notesCandidature = findViewById<EditText>(R.id.editText_notes).text.toString()
         val lieuPoste = findViewById<EditText>(R.id.editText_lieuPoste).text.toString()
 
-        val entreprise = dataRepository.getOrCreateEntreprise(nomEntreprise)
-
-        if (dataRepository.getCandidatures().any { it.titre_offre == titreOffre && it.entrepriseNom == entreprise.nom }) {
-            Toast.makeText(this, "Cette candidature existe déjà !", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val entreprise = EntrepriseDataRepository(applicationContext)
 
         val newCandidature = Candidature(
-            id = UUID.randomUUID().toString(),
             titre_offre = titreOffre,
-            entrepriseNom = entreprise.nom,
-            date_candidature = dateCandidature,
-            plateforme = plateformeUtilisee,
+            entrepriseNom = nomEntreprise,
             type_poste = typePoste,
+            plateforme = plateformeUtilisee,
             lieuPoste = lieuPoste,
             state = CandidatureState.CANDIDATEE_ET_EN_ATTENTE,
             notes = notesCandidature,
+            date_candidature = dateCandidature
         )
 
-        dataRepository.saveCandidature(newCandidature)
-
-        Log.d("AddCandidatureActivity", "newCandidature : $newCandidature\n newCandidature.date ${newCandidature.date_candidature}")
-        Toast.makeText(this, "Candidature ajoutée avec succès", Toast.LENGTH_SHORT).show()
-
-        val evenement = Evenement(
-            id = UUID.randomUUID().toString(),
-            title = "Candidature : $titreOffre",
-            description = "Candidature pour $nomEntreprise à ${etDateCandidature.text}",
-            startTime = dateCandidature.time,
-            endTime = dateCandidature.time + 10 * 60 * 1000,
-            type = EventType.Candidature,
-            relatedId = newCandidature.id,
-            entrepriseId = entreprise.nom
-        )
-        dataRepository.saveEvent(evenement)
-
+        dataRepository.addOrUpdateCandidature(newCandidature)
         val intentEvent = Intent("com.jobber.EVENEMENT_LIST_UPDATED")
-
-
         val intentCandidature = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentCandidature)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentEvent)
