@@ -7,35 +7,48 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import androidx.appcompat.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import com.delhomme.jobber.Appel.AddAppelActivity
-import com.delhomme.jobber.Appel.FragmentAppels
-import com.delhomme.jobber.Calendrier.FragmentCalendrier
-import com.delhomme.jobber.Candidature.AddCandidatureActivity
-import com.delhomme.jobber.Candidature.FragmentCandidatures
-import com.delhomme.jobber.Contact.AddContactActivity
-import com.delhomme.jobber.Contact.FragmentContacts
-import com.delhomme.jobber.Entreprise.FragmentEntreprises
-import com.delhomme.jobber.Entretien.AddEntretienActivity
-import com.delhomme.jobber.Entretien.FragmentEntretiens
-import com.delhomme.jobber.Notification.FragmentNotifications
+import com.delhomme.jobber.Activity.Appel.AddAppelActivity
+import com.delhomme.jobber.Activity.Candidature.AddCandidatureActivity
+import com.delhomme.jobber.Activity.Contact.AddContactActivity
+import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
+import com.delhomme.jobber.Activity.SignUser.LoginActivity
+import com.delhomme.jobber.Api.DjangoApi.ApiResponse
+import com.delhomme.jobber.Api.DjangoApi.RetrofitClient
+import com.delhomme.jobber.Api.DjangoApi.TokenResponse
+import com.delhomme.jobber.Api.DjangoApi.TokenService
+import com.delhomme.jobber.Api.LocalApi.LocalStorageManager
+import com.delhomme.jobber.Api.UserProfileApi
+import com.delhomme.jobber.Fragment.FragmentAppels
+import com.delhomme.jobber.Fragment.FragmentCalendrier
+import com.delhomme.jobber.Fragment.FragmentCandidatures
+import com.delhomme.jobber.Fragment.FragmentContacts
+import com.delhomme.jobber.Fragment.FragmentDashboard
+import com.delhomme.jobber.Fragment.FragmentEntreprises
+import com.delhomme.jobber.Fragment.FragmentEntretiens
+import com.delhomme.jobber.Fragment.FragmentNotifications
+import com.delhomme.jobber.Fragment.FragmentRelances
+import com.delhomme.jobber.Fragment.SearchResultsFragment
 import com.delhomme.jobber.Notification.NotificationReceiver
-import com.delhomme.jobber.Relance.FragmentRelances
-import com.delhomme.jobber.Search.SearchResultsFragment
 import com.delhomme.jobber.Utils.DataRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -50,7 +63,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        dataRepository = DataRepository(this)
+        LocalStorageManager.initialize(this)
+        syncDataWithServer()
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATION_PERMISSION)
@@ -226,4 +240,55 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Utiliser cette méthode pour afficher l'état par défaut de k'aookucatuib
         replaceFragment(FragmentDashboard())
     }
+
+    fun syncDataWithServer(data: String) {
+        val unsyncedData = LocalStorageManager.getData("unsynced_data_key")
+        unsyncedData?.let { data ->
+            val apiService = RetrofitClient.createService(UserProfileApi::class.java)
+            apiService.sendDataToServer(data).enqueue(object : Callback<ApiResponse> {
+                override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+                    if (response.isSuccessful) {
+                        LocalStorageManager.clearSpecificData("unsynced_data_key")
+                    } else if (response.code() == 401) {
+                        refreshTokenAndRetrySync(data)
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+                    Log.e("MainActivity", "synDataWithServer : error: ${t.message}")
+                    Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_LONG).show()
+                }
+            })
+        }
+    }
+    private fun refreshTokenAndRetrySync(data: String) {
+        val refreshToken = LocalStorageManager.getRefreshToken()
+        refreshToken?.let {
+            val params = mapOf("refresh" to it)
+            val tokenService = RetrofitClient.createService(TokenService::class.java)
+            tokenService.refreshToken(params).enqueue(object : Callback<TokenResponse> {
+                override fun onResponse(call: Call<TokenResponse>, response: Response<TokenResponse>) {
+                    if (response.isSuccessful) {
+                        response.body()?.accessToken?.let { newToken ->
+                            LocalStorageManager.saveJWT(newToken)
+                            syncDataWithServer(data)
+                        }
+                    } else {
+                        redirectToLogin()
+                    }
+                }
+
+                override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
+                    redirectToLogin()
+                }
+            })
+        } ?: redirectToLogin()  // Si aucun refreshToken n'est trouvé, rediriger vers LoginActivity
+    }
+
+    private fun redirectToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
 }

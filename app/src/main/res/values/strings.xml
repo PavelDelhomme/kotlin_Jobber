@@ -4,14 +4,14 @@
     <string name="login_activity_bienvenue">Bienvenue</string>
     <string name="login_activity_sinscrire">Créer un compte</string>
     <string name="login_activity_sign_in_with_google">Sign in with Google</string>
-    <string name="login_activity_email_txtview">Email</string>
-    <string name="login_activity_password">Password</string>
+    <string name="login_signin_activity_email_txtview">Email</string>
+    <string name="login_signin_activity_password">Password</string>
     <string name="login_activity_button_text">Se connecter</string>
     <string name="login_activity_signin_button_text">S\'inscrire</string>
     <string name="login_activity_signin_button_finaliser">Créer le compte</string>
     <string name="login_activity_password_forgot">Mot de passe oublié ?</string>
     <string name="login_activity_password_hint">Your password</string>
-    <string name="login_activity_email_hint">Exemple : email@provider.com</string>
+    <string name="signin_activity_email_hint">Exemple : email@provider.com</string>
     <string name="backbutton_text">Retour</string>
     <string name="back">Back</string>
     <string name="calendar_button">📅</string>

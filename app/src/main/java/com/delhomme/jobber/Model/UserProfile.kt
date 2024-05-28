@@ -5,5 +5,4 @@ data class UserProfile(
     val password: String,
     val telephone: String? = null,
     val birthDate: String? = null
-
 )

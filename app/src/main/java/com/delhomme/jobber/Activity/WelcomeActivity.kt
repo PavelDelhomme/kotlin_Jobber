@@ -1,15 +1,28 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.Activity
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.SignUser.LoginActivity
+import com.delhomme.jobber.Activity.SignUser.LoginActivity
+import com.delhomme.jobber.Api.LocalApi.LocalStorageManager
+import com.delhomme.jobber.Fragment.FragmentDashboard
+import com.delhomme.jobber.MainActivity
 import com.delhomme.jobber.Model.User
 // import com.google.gson.Gson
 
 class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        LocalStorageManager.initialize(this)
+
+
+        val token = LocalStorageManager.getJWT()
+        if (token != null && token.isNotEmpty()) {
+            startActivity(Intent(this, MainActivity::class.java))
+        } else {
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
 
         val user = getUserData()
 
