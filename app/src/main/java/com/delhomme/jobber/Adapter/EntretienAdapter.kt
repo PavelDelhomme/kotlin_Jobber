@@ -11,12 +11,11 @@ import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale
-import kotlin.reflect.KFunction1
 
 class EntretienAdapter(
     var entretiens: List<Entretien>,
     private val entretienDataRepository: EntretienDataRepository,
-    private val entrepriseDataRepository: KFunction1<Entretien, Unit>,
+    private val entrepriseDataRepository: EntrepriseDataRepository,  // Assurez-vous que ceci est correctement typé
     private val itemClickListener: (Entretien) -> Unit,
     private val deleteClickListener: (String) -> Unit,
     private val editClickListener: (String) -> Unit
@@ -55,7 +54,6 @@ class EntretienAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(entretiens[position], entrepriseDataRepository, itemClickListener, deleteClickListener, editClickListener)
     }
-
     override fun getItemCount() = entretiens.size
 
     fun updateEntretiens(newList: List<Entretien>) {

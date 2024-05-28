@@ -1,10 +1,10 @@
 package com.delhomme.jobber.Activity.Candidature
 
+import android.app.AlertDialog
 import com.delhomme.jobber.Adapter.RelanceAdapter
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
@@ -27,10 +27,8 @@ import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Utils.CandidatureState
 import com.delhomme.jobber.Activity.Contact.AddContactActivity
 import com.delhomme.jobber.Activity.Contact.DetailsContactActivity
-import com.delhomme.jobber.Activity.Contact.EditContactActivity
 import com.delhomme.jobber.Adapter.ContactAdapter
 import com.delhomme.jobber.Model.Contact
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
 import com.delhomme.jobber.Activity.Entretien.DetailsEntretienActivity
 import com.delhomme.jobber.Activity.Entretien.EditEntretienActivity
@@ -43,6 +41,7 @@ import com.delhomme.jobber.Activity.Relance.EditRelanceActivity
 import com.delhomme.jobber.Api.Repository.AppelDataRepository
 import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
 import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Api.Repository.EntretienDataRepository
 import com.delhomme.jobber.Api.Repository.RelanceDataRepository
 import com.delhomme.jobber.Model.Relance
@@ -54,9 +53,13 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     private lateinit var appelDataRepository: AppelDataRepository
     private lateinit var entretienDataRepository: EntretienDataRepository
     private lateinit var relanceDataRepository: RelanceDataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
 
     private var candidatureId: String? = null
     private lateinit var candidature: Candidature
+
+    private lateinit var spinnerState: Spinner
+    private lateinit var buttonConfirmChangeState: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,14 +67,6 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         initRepositories()
-
-        candidatureId = intent.getStringExtra("CANDIDATURE_ID")
-        candidature = candidatureDataRepository.getCandidatureById(candidatureId!!) ?: run {
-            Toast.makeText(this, "Candidature non trouvée.", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
         setupUI()
         displayCandidatureDetails()
     }
@@ -82,52 +77,75 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         appelDataRepository = AppelDataRepository(applicationContext)
         entretienDataRepository = EntretienDataRepository(applicationContext)
         relanceDataRepository = RelanceDataRepository(applicationContext)
+
+        candidatureId = intent.getStringExtra("CANDIDATURE_ID")
+        candidature = candidatureDataRepository.getCandidatureById(candidatureId!!) ?: run {
+            Toast.makeText(this, "Candidature non trouvée.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
     }
 
     private fun setupUI() {
+        displayCandidatureDetails()
+        setupStateSpinner()
+        setupButtons()
+        setupRecyclerView()
+    }
+
+    private fun setupButtons() {
         findViewById<Button>(R.id.btnAddContact).setOnClickListener {
             startActivity(Intent(this, AddContactActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
             })
         }
-
         findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
             startActivity(Intent(this, AddAppelActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
                 putExtra("CANDIDATURE_ID", candidature.id)
             })
         }
-
         findViewById<Button>(R.id.btnAddRelance).setOnClickListener {
             startActivity(Intent(this, AddRelanceActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
                 putExtra("CANDIDATURE_ID", candidature.id)
             })
         }
-
         findViewById<Button>(R.id.btnAddEntretien).setOnClickListener {
             startActivity(Intent(this, AddEntretienActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
                 putExtra("CANDIDATURE8ID", candidature.id)
             })
         }
-
         findViewById<ImageButton>(R.id.btnEditCandidature).setOnClickListener {
             startActivity(Intent(this, EditCandidatureActivity::class.java).apply {
                 putExtra("CANDIDATURE_ID", candidatureId)
             })
         }
-
         findViewById<ImageButton>(R.id.button_mark_as_rejected).setOnClickListener {
             markAsRejected()
         }
-
         findViewById<ImageButton>(R.id.button_mark_as_accepted).setOnClickListener {
             markAsAccepted()
         }
-
-        setupRecyclerView()
     }
+
+    private fun setupStateSpinner() {
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            CandidatureState.values().map { it.name }) // Assuming CandidatureState is an enum
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerState.adapter = adapter
+        spinnerState.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                // Optionally handle spinner item selected events here
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
 
     private fun displayCandidatureDetails() {
         findViewById<TextView>(R.id.titreoffre).text = candidature.titre_offre
@@ -137,26 +155,51 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvTypePoste).text = candidature.type_poste
         findViewById<TextView>(R.id.tvPlateforme).text = candidature.plateforme
         findViewById<TextView>(R.id.tvLieuPoste).text = candidature.lieuPoste
-        updateStateDisplay()
+        findViewById<TextView>(R.id.tvEtatCandidature).text = getStateWithEmoji(candidature.state)
     }
 
-    private fun updateStateDisplay() {
-        val stateWithEmoji = when (candidature.state) {
-            CandidatureState.CANDIDATEE_ET_EN_ATTENTE -> "🕒 Candidature en attente"
-            CandidatureState.EN_ATTENTE_APRES_ENTRETIEN -> "🕒 En attente après entretien"
-            CandidatureState.EN_ATTENTE_D_UN_ENTRETIEN -> "🕒 En attente d'un entretien"
-            CandidatureState.FAIRE_UN_RETOUR_POST_ENTRETIEN -> "🔄 Faire un retour post entretien"
-            CandidatureState.A_RELANCEE_APRES_ENTRETIEN -> "🔄 Relancée après entretien"
-            CandidatureState.A_RELANCEE -> "🔄 À relancer"
-            CandidatureState.RELANCEE_ET_EN_ATTENTE -> "🕒 Relancée et en attente"
-            CandidatureState.AUCUNE_REPONSE -> "🚫 Aucune réponse"
-            CandidatureState.NON_RETENU -> "❌ Non retenue"
-            CandidatureState.ERREUR -> "⚠️ Erreur"
-            CandidatureState.NON_RETENU_APRES_ENTRETIEN -> "❌️ Non retenue après entretien"
-            CandidatureState.NON_RETENU_SANS_ENTRETIEN -> "❌ Non retenue"
-            CandidatureState.ACCEPTEE -> "✅ Acceptée"
+    private fun getStateWithEmoji(state: CandidatureState): String {
+        return when (state) {
+            CandidatureState.CANDIDATEE_ET_EN_ATTENTE -> {
+                "🕒 Candidature en attente"
+            }
+            CandidatureState.EN_ATTENTE_APRES_ENTRETIEN -> {
+                "🕒 En attente après entretien"
+            }
+            CandidatureState.EN_ATTENTE_D_UN_ENTRETIEN -> {
+                "🕒 En attente d'un entretien"
+            }
+            CandidatureState.FAIRE_UN_RETOUR_POST_ENTRETIEN -> {
+                "🔄 Faire un retour post entretien"
+            }
+            CandidatureState.A_RELANCEE_APRES_ENTRETIEN -> {
+                "🔄 Relancée après entretien"
+            }
+            CandidatureState.A_RELANCEE -> {
+                "🔄 À relancer"
+            }
+            CandidatureState.RELANCEE_ET_EN_ATTENTE -> {
+                "🕒 Relancée et en attente"
+            }
+            CandidatureState.AUCUNE_REPONSE -> {
+                "🚫 Aucune réponse"
+            }
+            CandidatureState.NON_RETENU -> {
+                "❌ Non retenue"
+            }
+            CandidatureState.ERREUR -> {
+                "⚠️ Erreur"
+            }
+            CandidatureState.NON_RETENU_APRES_ENTRETIEN -> {
+                "❌️ Non retenue après entretien"
+            }
+            CandidatureState.NON_RETENU_SANS_ENTRETIEN -> {
+                "❌ Non retenue"
+            }
+            CandidatureState.ACCEPTEE -> {
+                "✅ Acceptée"
+            }
         }
-        findViewById<TextView>(R.id.tvEtatCandidature).text = stateWithEmoji
     }
 
     private fun setupRecyclerView() {
@@ -168,7 +211,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
     private fun setupContactRecyclerView() {
         val contacts = contactDataRepository.loadContactsForEntreprise(candidature.entrepriseNom)
-        val contactAdapter = ContactAdapter(contacts, this::onContactClicked)
+        val contactAdapter = ContactAdapter(contacts, contactDataRepository, entrepriseDataRepository, this::onContactClicked, this::onDeleteContactClicked, this::onEditContactClicked)
         findViewById<RecyclerView>(R.id.recyclerViewContacts).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = contactAdapter
@@ -182,7 +225,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
     private fun setupAppelRecyclerView() {
         val appels = appelDataRepository.loadAppelsForCandidature(candidature.id)
-        val appelAdapter = AppelAdapter(appels, this::onAppelClicked)
+        val appelAdapter = AppelAdapter(appels, appelDataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
         findViewById<RecyclerView>(R.id.recyclerViewAppels).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = appelAdapter
@@ -193,10 +236,71 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             putExtra("APPEL_ID", appel.id)
         })
     }
+    private fun onDeleteAppelClicked(appelId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmer la suppression")
+            .setMessage("Êtes-vous sûr de vouloir supprimer cette appel ?")
+            .setPositiveButton("Supprimer") { _, _ ->
+                appelDataRepository.deleteAppel(appelId)
+                updateAppelList()
+                Toast.makeText(this, "Appel supprimé.", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Annuler", null)
+            .show()
+    }
+
+    private fun onEditAppelClicked(appelId: String) {
+        startActivity(Intent(this, EditAppelActivity::class.java).apply {
+            putExtra("CANDIDATURE_ID", candidatureId)
+            putExtra("APPEL_ID", appelId)
+        })
+    }
+    private fun onDeleteContactClicked(contactId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmer la suppression")
+            .setMessage("Êtes-vous sûr de vouloir supprimer ce contact ?")
+            .setPositiveButton("Supprimer") { _, _ ->
+                contactDataRepository.deleteContact(contactId)
+                updateContactList()
+                Toast.makeText(this, "Contact supprimé.", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Annuler", null)
+            .show()
+    }
+    private fun onDeleteEntretienClicked(entretienId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmer la suppression")
+            .setMessage("Êtes-vous sûr de vouloir supprimer cet entretien ?")
+            .setPositiveButton("Supprimer") { _, _ ->
+                entretienDataRepository.deleteEntretien(entretienId)
+                updateEntretienList()
+                Toast.makeText(this, "Entretien supprimé.", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Annuler", null)
+            .show()
+    }
+
+    private fun updateAppelList() {
+        val appels = appelDataRepository.loadAppelsForCandidature(candidature.id)
+        (findViewById<RecyclerView>(R.id.recyclerViewAppels).adapter as AppelAdapter).updateAppels(appels)
+    }
+    private fun updateEntretienList() {
+        val entretiens = entretienDataRepository.findByCondition { it.candidature_id == candidature.id }
+        (findViewById<RecyclerView>(R.id.recyclerViewEntretiens).adapter as EntretienAdapter).updateEntretiens(entretiens)
+    }
+    private fun updateRelanceList() {
+        val relances = relanceDataRepository.findByCondition { it.candidatureId == candidature.id }
+        (findViewById<RecyclerView>(R.id.recyclerViewRelances).adapter as RelanceAdapter).updateRelances(relances)
+    }
+
+    private fun updateContactList() {
+        val contacts = contactDataRepository.loadContactsForCandidature(candidature.id)
+        (findViewById<RecyclerView>(R.id.recyclerViewContacts).adapter as ContactAdapter).updateContacts(contacts)
+    }
 
     private fun setupEntretienRecyclerView() {
-        val entretiens = entretienDataRepository.loadEntretienForCandidature(candidature.id)
-        val entretienAdapter = EntretienAdapter(entretiens, this::onEntretienClicked)
+        val entretiens = entretienDataRepository.findByCondition { it.candidature_id == candidature.id }
+        val entretienAdapter = EntretienAdapter(entretiens, entretienDataRepository, entrepriseDataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEntretienEditClicked)
         findViewById<RecyclerView>(R.id.recyclerViewEntretiens).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = entretienAdapter
@@ -210,8 +314,8 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     }
 
     private fun setupRelanceRecyclerView() {
-        val relances = relanceDataRepository.loadRelanceForCandidature(candidature.id)
-        val relanceAdapter = RelanceAdapter(relances, this::onRelanceClicked)
+        val relances = relanceDataRepository.loadRelancesForCandidature(candidature.id)
+        val relanceAdapter = RelanceAdapter(relances, relanceDataRepository, candidatureDataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked, this::onEditRelanceClicked)
         findViewById<RecyclerView>(R.id.recyclerViewRelances).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = relanceAdapter
@@ -223,20 +327,47 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             putExtra("RELANCE_ID", relance.id)
         })
     }
+    private fun onDeleteRelanceClicked(relanceId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmer la suppression")
+            .setMessage("Êtes-vous sûr de vouloir supprimer cette relance ?")
+            .setPositiveButton("Supprimer") { _, _ ->
+                relanceDataRepository.deleteRelance(relanceId)
+                updateRelanceList()
+                Toast.makeText(this, "Relance supprimée.", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Annuler", null)
+            .show()
+    }
+
+    private fun onEditRelanceClicked(relance: Relance) {
+        startActivity(Intent(this, EditRelanceActivity::class.java).apply {
+            putExtra("CANDIDATURE_ID", candidature.id)
+            putExtra("RELANCE_ID", relance.id)
+        })
+    }
+
+    private fun onEditEntretienClicked(entretien: Entretien) {
+        startActivity(Intent(this, EditEntretienActivity::class.java).apply {
+            putExtra("CANDIDATURE_ID", candidature.id)
+            putExtra("ENTRETIEN_ID", entretien.id)
+        })
+    }
 
     private fun markAsRejected() {
         candidature.state = if (candidature.entretiens.isEmpty()) CandidatureState.NON_RETENU_SANS_ENTRETIEN else CandidatureState.NON_RETENU_APRES_ENTRETIEN
-        candidatureDataRepository.updateCandidature(candidature)
+        candidatureDataRepository.saveItem(candidature)
         LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("CANDIDATURE_UPDATED"))
         finish()
     }
 
     private fun markAsAccepted() {
         candidature.state = CandidatureState.ACCEPTEE
-        candidatureDataRepository.updateCandidature(candidature)
+        candidatureDataRepository.saveItem(candidature)
         LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("CANDIDATURE_UPDATED"))
         finish()
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {

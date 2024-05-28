@@ -6,14 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Model.Contact
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 
 
 class ContactAdapter(
     var contacts: List<Contact>,
-    private val dataRepository: DataRepository,
+    private val contactDataRepository: ContactDataRepository,
+    private val entrepriseDataRepository: EntrepriseDataRepository,
     private val itemClickListener: (Contact) -> Unit,
     private val deleteClickListener: (String) -> Unit,
     private val editClickListener: (String) -> Unit
@@ -25,8 +27,8 @@ class ContactAdapter(
         val telephone: TextView = view.findViewById(R.id.telephoneContact)
         val email: TextView = view.findViewById(R.id.emailContact)
 
-        fun bind(contact: Contact, dataRepository: DataRepository, clickListener: (Contact) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
-            val entrepriseName = dataRepository.getEntrepriseByNom(contact.entrepriseNom)?.nom ?: "Entreprise inconnue"
+        fun bind(contact: Contact, entrepriseDataRepository: EntrepriseDataRepository, clickListener: (Contact) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
+            val entrepriseName = entrepriseDataRepository.findByCondition { it.nom == contact.entrepriseNom }.firstOrNull()?.nom ?: "Entreprise inconnue"
             fullNameContact.text = contact.getFullName()
             entreprise.text = entrepriseName
             telephone.text = contact.telephone
@@ -43,7 +45,7 @@ class ContactAdapter(
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(contacts[position], dataRepository, itemClickListener, deleteClickListener, editClickListener)
+        holder.bind(contacts[position], entrepriseDataRepository, itemClickListener, deleteClickListener, editClickListener)
     }
 
     override fun getItemCount() = contacts.size
