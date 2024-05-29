@@ -28,6 +28,17 @@ class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context,
         }
     }
 
+    fun deleteAppelByContactId(contactId: String) {
+        items?.let { appels ->
+            val toRemove = appels.filter { it.contact_id == contactId }
+            appels.removeAll(toRemove)
+            toRemove.forEach {
+                deleteEventForAppel(it)
+            }
+            saveItemsToPrefs(appels)
+        }
+    }
+
     fun getAppelById(appelId: String): Appel? {
         return items?.find { it.id == appelId }
     }
@@ -64,10 +75,6 @@ class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context,
         return findByCondition { it.entrepriseNom == entrepriseNom }
     }
 
-    fun deleteAppelsByContactId(contactId: String) {
-        items?.removeAll { it.contact_id == contactId }
-        saveItemsToPrefs(items ?: mutableListOf())
-    }
     fun deleteAppelsByEntrepriseId(entrepriseId: String) {
         items?.removeAll { it.entrepriseNom == entrepriseId }
         saveItemsToPrefs(items ?: mutableListOf())
