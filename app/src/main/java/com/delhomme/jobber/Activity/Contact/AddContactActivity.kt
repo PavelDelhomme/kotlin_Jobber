@@ -9,63 +9,59 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Model.Contact
-import com.delhomme.jobber.Utils.DataRepository
-import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.R
 
 class AddContactActivity : AppCompatActivity() {
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
+    private lateinit var contactDataRepository: ContactDataRepository
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_contact)
-        if(getSupportActionBar() != null) {
-            getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
-        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val dataRepository = DataRepository(this)
-        val entreprises = dataRepository.getEntreprises()
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, entreprises.map { it.nom })
+        entrepriseDataRepository = EntrepriseDataRepository(applicationContext)
+        contactDataRepository = ContactDataRepository(applicationContext)
+
+        setupEntrepriseAutoComplete()
+    }
+
+    private fun setupEntrepriseAutoComplete() {
+        val entreprises = entrepriseDataRepository.loadEntreprises().map { it.nom }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, entreprises)
         val autoCompleteTextView = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
         autoCompleteTextView.setAdapter(adapter)
 
-        var entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
-        var entreprise: Entreprise? = null
+        setupContactFields(autoCompleteTextView.text.toString())
+    }
 
-        if (entrepriseId != null) {
-            entreprise = dataRepository.getEntrepriseByNom(entrepriseId)
-        }
 
+    private fun setupContactFields(entrepriseNom: String) {
         val etContactPrenom = findViewById<EditText>(R.id.etContactPrenom)
         val etContactNom = findViewById<EditText>(R.id.etContactNom)
         val etContactEmail = findViewById<EditText>(R.id.etContactEmail)
         val etContactTelephone = findViewById<EditText>(R.id.etContactPhone)
 
-        val etCompanyName = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
-        etCompanyName.setText(entreprise?.nom)
-
         findViewById<Button>(R.id.button_add_contact).setOnClickListener {
-
             val nom = etContactNom.text.toString()
             val prenom = etContactPrenom.text.toString()
             val email = etContactEmail.text.toString()
             val telephone = etContactTelephone.text.toString()
-            val entrepriseNom = autoCompleteTextView.text.toString()
+            val entreprise = entrepriseDataRepository.getOrCreateEntreprise(entrepriseNom)
 
-            val entreprise = entreprise ?: dataRepository.getOrCreateEntreprise(entrepriseNom)
-            val contact = Contact(
+            val newContact = Contact(
                 nom = nom,
                 prenom = prenom,
                 email = email,
                 telephone = telephone,
                 entrepriseNom = entreprise.nom,
-                appelsIds = mutableListOf()
+                appelsIds = mutableListOf()  // Starting with an empty list of calls
             )
 
-            dataRepository.addContactToEntreprise(contact.id, entreprise.nom)
-            dataRepository.saveEntreprise(entreprise)
-            dataRepository.saveContact(contact)
-
+            contactDataRepository.updateOrAddItem(contactDataRepository.getItems().toMutableList(), newContact)
             Toast.makeText(this, "Contact added to ${entreprise.nom}", Toast.LENGTH_SHORT).show()
             finish()
         }
