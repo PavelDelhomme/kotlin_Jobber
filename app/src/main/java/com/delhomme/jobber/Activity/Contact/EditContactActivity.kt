@@ -9,49 +9,46 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Model.Contact
 import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 
 class EditContactActivity : AppCompatActivity() {
-    private lateinit var dataRepository: DataRepository
+    private lateinit var etContactPrenom : EditText
+    private lateinit var etContactNom : EditText
+    private lateinit var etContactEmail : EditText
+    private lateinit var etContactPhone : EditText
+    private lateinit var actvEntreprise: AutoCompleteTextView
+    private lateinit var contactDataRepository: ContactDataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
     private var contactId: String? = null
     private var entrepriseId: String? = null
 
-    private lateinit var etContactPrenom: EditText
-    private lateinit var etContactNom: EditText
-    private lateinit var etContactEmail: EditText
-    private lateinit var etContactPhone: EditText
-    private lateinit var actvEntreprise: AutoCompleteTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_contact)
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        dataRepository = DataRepository(this)
+        contactDataRepository = ContactDataRepository(this)
+        entrepriseDataRepository = EntrepriseDataRepository(this)
         contactId = intent.getStringExtra("CONTACT_ID")
         entrepriseId = intent.getStringExtra("ENTREPRISE_ID")
-
-        etContactPrenom = findViewById(R.id.etContactPrenom)
-        etContactNom = findViewById(R.id.etContactNom)
-        etContactEmail = findViewById(R.id.etContactEmail)
-        etContactPhone = findViewById(R.id.etContactPhone)
-        actvEntreprise = findViewById(R.id.actvNomEntreprise)
-        val btnSave = findViewById<Button>(R.id.btnSaveContactChanges)
-
+        
+        if (contactId == null) {
+            Toast.makeText(this, "Erreur: ID de contact manquant.", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+        
         setupEntrepriseAutoComplete()
         setupFields()
 
-        btnSave.setOnClickListener {
-            if (saveContactChanges()) {
-                Toast.makeText(this, "Contact updated successfully!", Toast.LENGTH_SHORT).show()
-                LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent("CONTACTS_UPDATED"))
-                finish()
-            } else {
-                Toast.makeText(this, "Failed to update contact!", Toast.LENGTH_SHORT).show()
-            }
+        
+        findViewById<Button>(R.id.btnSaveContactChanges).setOnClickListener { 
+            saveChanges()
         }
         findViewById<Button>(R.id.btnCancelContactChanges).setOnClickListener {
             cancelChanges()
@@ -59,36 +56,47 @@ class EditContactActivity : AppCompatActivity() {
     }
 
     private fun setupEntrepriseAutoComplete() {
-        val entreprises = dataRepository.getEntreprises().map { it.nom }
+        val entreprises = entrepriseDataRepository.getItems().map { it.nom }
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, entreprises)
-        actvEntreprise.setAdapter(adapter)
+        findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).apply {
+            setAdapter(adapter)
+        }
     }
+
 
     private fun setupFields() {
         contactId?.let {
-            val contact = dataRepository.getContactById(it)
-            if (contact != null) {
-                etContactPrenom.setText(contact.prenom)
-                etContactNom.setText(contact.nom)
-                etContactEmail.setText(contact.email)
-                etContactPhone.setText(contact.telephone)
-                actvEntreprise.setText(contact.entrepriseNom)
-            } else {
-                Toast.makeText(this, "Contact not found", Toast.LENGTH_SHORT).show()
+            val contact = contactDataRepository.findByCondition { it.id == contactId }.firstOrNull()
+            contact?.let {  cont ->
+                findViewById<EditText>(R.id.etContactNom)
+                findViewById<EditText>(R.id.etContactPrenom)
+                findViewById<EditText>(R.id.etContactEmail)
+                findViewById<EditText>(R.id.actvNomEntreprise).setText(cont.entrepriseNom)
             }
         }
     }
 
-    private fun saveContactChanges(): Boolean {
-        val prenom = etContactPrenom.text.toString().trim()
-        val nom = etContactNom.text.toString().trim()
-        val email = etContactEmail.text.toString().trim()
-        val phone = etContactPhone.text.toString().trim()
-        val entrepriseNom = actvEntreprise.text.toString().trim()
+    private fun saveChanges(): Boolean {
+        val prenom = etContactPrenom.text.toString()
+        val nom = etContactNom.text.toString()
+        val email = etContactEmail.text.toString()
+        val phone = etContactPhone.text.toString()
+        val entrepriseNom = actvEntreprise.text.toString()
+        val entreprise = entrepriseDataRepository.getOrCreateEntreprise(entrepriseNom)
+
+        val updatedContact = Contact(
+            id = contactId!!,
+            nom = nom,
+            prenom = prenom,
+            email = email,
+            telephone = phone,
+            entrepriseNom = entreprise.nom,
+
+        )
 
         if (contactId != null) {
-            val existingContact = dataRepository.getContactById(contactId!!)
-            val appelsIds = existingContact?.appelsIds ?: mutableListOf()
+            val existingContact = contactDataRepository.findByCondition { it.id == contactId!! }
+            val appelsIds = existingContact.appelsIds ?: mutableListOf()
             val candidatureIds = existingContact?.candidatureIds ?: mutableListOf()
 
             dataRepository.editContact(
