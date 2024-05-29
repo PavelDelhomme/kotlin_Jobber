@@ -89,7 +89,7 @@ class EditCandidatureActivity : AppCompatActivity() {
 
     private fun setupFields() {
         candidatureId?.let {
-            val candidature = candidatureDataRepository.getCandidatureById(it)
+            val candidature = candidatureDataRepository.findByCondition { it.id == candidatureId }.firstOrNull()
             candidature?.let { cand ->
                 findViewById<EditText>(R.id.etTitreOffre).setText(cand.titre_offre)
                 findViewById<EditText>(R.id.etNotes).setText(cand.notes)

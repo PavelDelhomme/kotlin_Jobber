@@ -80,10 +80,12 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         relanceDataRepository = RelanceDataRepository(applicationContext)
 
         candidatureId = intent.getStringExtra("CANDIDATURE_ID")
-        candidature = candidatureDataRepository.getCandidatureById(candidatureId!!) ?: run {
-            Toast.makeText(this, "Candidature non trouvée.", Toast.LENGTH_SHORT).show()
+
+        if (candidatureDataRepository.getItems().find { it.id == candidatureId } == null) {
+            Toast.makeText(this, "Candidature non trouvée !", Toast.LENGTH_LONG).show()
             finish()
-            return
+        } else {
+            candidature = candidatureDataRepository.getItems().find { it.id == candidatureId } ?: return
         }
     }
 
@@ -98,6 +100,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnAddContact).setOnClickListener {
             startActivity(Intent(this, AddContactActivity::class.java).apply {
                 putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
+                putExtra("CANDIDATURE_ID", candidatureId)
             })
         }
         findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
@@ -157,6 +160,8 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvPlateforme).text = candidature.plateforme
         findViewById<TextView>(R.id.tvLieuPoste).text = candidature.lieuPoste
         findViewById<TextView>(R.id.tvEtatCandidature).text = getStateWithEmoji(candidature.state)
+
+        title = "$${candidature.titre_offre} - ${candidature.entrepriseNom}"
     }
 
     private fun getStateWithEmoji(state: CandidatureState): String {
@@ -211,7 +216,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     }
 
     private fun setupContactRecyclerView() {
-        val contacts = contactDataRepository.loadContactsForEntreprise(candidature.entrepriseNom)
+        val contacts = contactDataRepository.findByCondition { it.entrepriseNom == candidature.entrepriseNom }
         val contactAdapter = ContactAdapter(contacts, contactDataRepository, entrepriseDataRepository, this::onContactClicked, this::onDeleteContactClicked, this::onEditContactClicked)
         findViewById<RecyclerView>(R.id.recyclerViewContacts).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)

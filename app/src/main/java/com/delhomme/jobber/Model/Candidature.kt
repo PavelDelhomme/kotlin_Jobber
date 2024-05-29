@@ -19,5 +19,6 @@ data class Candidature(
     val entretiens: MutableList<String> = mutableListOf(),
     val appels: MutableList<String> = mutableListOf(),
     var relances: MutableList<String> = mutableListOf(),
-    var etatManuel: Boolean = false // Ajoutez ce champ
+    var etatManuel: Boolean = false,
+    var contacts: MutableList<String> = mutableListOf()
 )

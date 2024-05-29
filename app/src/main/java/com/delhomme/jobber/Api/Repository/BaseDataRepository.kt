@@ -42,4 +42,22 @@ abstract class BaseDataRepository<T>(val context: Context, private val sharedPre
     fun findByCondition(predicate: (T) -> Boolean): List<T> {
         return items?.filter(predicate) ?: emptyList()
     }
+
+    fun <R> loadRelatedItemsById(fieldAccessor: (T) -> R?, id: R): List<T> {
+        return items?.filter { fieldAccessor(it) == id } ?: emptyList()
+    }
+
+    fun <R> loadItemsWhereCollectionContains(fieldAccessor: (T) -> Collection<R>, value: R): List<T> {
+        return items?.filter { value in fieldAccessor(it) } ?: emptyList()
+    }
+    // TODO normalement cette méthode fonctionne si une Collection est passé ou simplement un objet unique
+    fun <R> loadRelatedItemsById2(fieldAccessor: (T) -> Any?, id: R): List<T> {
+        return items?.filter { item ->
+            val fieldValue = fieldAccessor(item)
+            when (fieldValue) {
+                is Collection<*> -> id in fieldValue
+                else -> id == fieldValue
+            }
+        } ?: emptyList()
+    }
 }

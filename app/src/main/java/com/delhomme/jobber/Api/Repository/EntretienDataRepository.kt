@@ -51,4 +51,16 @@ class EntretienDataRepository(context: Context) : BaseDataRepository<Entretien>(
     fun getTypeEntretienOptions(): List<String> {
         return listOf("---", "Présentiel", "Visio-conférence")
     }
+
+    // TODO Test de l'implémentation de la récupération de tout les contacts lié à l'entretien
+    fun loadEntretiensForContact(contactId: String): List<Entretien> {
+        return loadRelatedItemsById2({ it.id }, contactId)
+    }
+
+    fun loadEntretiensForEntreprise(entrepriseNom: String): List<Entretien> {
+        return loadRelatedItemsById2({ entrepriseNom }, entrepriseNom)
+    }
+    fun loadEntretiensForCandidature(candidatureId: String): List<Entretien> {
+        return loadRelatedItemsById2({ it.candidature_id }, candidatureId)
+    }
 }

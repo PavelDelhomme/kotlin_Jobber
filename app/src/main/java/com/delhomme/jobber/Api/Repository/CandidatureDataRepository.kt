@@ -32,10 +32,6 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
         }
     }
 
-    fun getCandidatureById(candidatureId: String): Candidature? {
-        return items?.find { it.id == candidatureId }
-    }
-
 
     private fun updateEventsForCandidature(candidature: Candidature) {
         val eventRepo = EvenementDataRepository(context)
@@ -97,4 +93,7 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
         )
     }
 
+    fun loadCandidaturesForContact(contactId: String): List<Candidature> {
+        return loadItemsWhereCollectionContains({ it.contacts }, contactId)
+    }
 }
