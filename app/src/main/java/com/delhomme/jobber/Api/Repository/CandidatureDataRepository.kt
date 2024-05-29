@@ -67,4 +67,34 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
         saveItemsToPrefs(items!!)
     }
 
+    fun getTypePosteOptions(): List<String> {
+        return listOf("---", "CDD", "CDI", "Freelance", "Intérim", "Alternance")
+    }
+
+    fun getPlateformeOptions(): List<String> {
+        return listOf(
+            "---",
+            "HelloWork",
+            "LinkedIn",
+            "Indeed",
+            "Welcome To The Jungle",
+            "SpaceMonk",
+            "Jobteaser",
+            "Monster",
+            "Keljob",
+            "RegioJob",
+            "bretagne-alternance",
+            "Ouest-France Emploi",
+            "Meteojob",
+            "Jooble",
+            "APEC",
+            "Talent.io",
+            "Téléphone",
+            "Email",
+            "Sur place",
+            "WhatsApp",
+            "Autre"
+        )
+    }
+
 }

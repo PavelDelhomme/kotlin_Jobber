@@ -1,9 +1,9 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
-import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.Model.Evenement
+import com.delhomme.jobber.Model.EventType
 import java.util.UUID
 
 class EntretienDataRepository(context: Context) : BaseDataRepository<Entretien>(context, "entretiens") {
@@ -45,5 +45,10 @@ class EntretienDataRepository(context: Context) : BaseDataRepository<Entretien>(
     private fun deleteEventForEntretien(entretien: Entretien) {
         val eventRepo = EvenementDataRepository(context)
         eventRepo.deleteEventByRelatedId(entretien.id)
+    }
+
+    // TODO : Implement getTypeEntretienOptions
+    fun getTypeEntretienOptions(): List<String> {
+        return listOf("---", "Présentiel", "Visio-conférence")
     }
 }

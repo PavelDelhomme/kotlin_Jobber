@@ -22,6 +22,13 @@ import com.delhomme.jobber.Activity.Candidature.AddCandidatureActivity
 import com.delhomme.jobber.Activity.Candidature.DetailsCandidatureActivity
 import com.delhomme.jobber.Activity.Candidature.EditCandidatureActivity
 import com.delhomme.jobber.Adapter.CandidatureAdapter
+import com.delhomme.jobber.Api.Repository.AppelDataRepository
+import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Api.Repository.EntretienDataRepository
+import com.delhomme.jobber.Api.Repository.EvenementDataRepository
+import com.delhomme.jobber.Api.Repository.RelanceDataRepository
 import com.delhomme.jobber.Utils.SwipeCallback
 import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Utils.DataRepository
@@ -30,7 +37,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentCandidatures : Fragment() {
     private lateinit var adapter: CandidatureAdapter
-    private val dataRepository by lazy { DataRepository(requireContext()) }
+    private val dataRepository by lazy { DataRepository(requireContext(), AppelDataRepository(context), CandidatureDataRepository(context), EntrepriseDataRepository(context), EvenementDataRepository(context), RelanceDataRepository(context), EntretienDataRepository(context), ContactDataRepository(context)) }
 
     private val updateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {

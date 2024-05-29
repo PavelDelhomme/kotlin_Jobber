@@ -15,7 +15,7 @@ import java.util.Locale
 class EntretienAdapter(
     var entretiens: List<Entretien>,
     private val entretienDataRepository: EntretienDataRepository,
-    private val entrepriseDataRepository: EntrepriseDataRepository,  // Assurez-vous que ceci est correctement typé
+    private val entrepriseDataRepository: EntrepriseDataRepository,
     private val itemClickListener: (Entretien) -> Unit,
     private val deleteClickListener: (String) -> Unit,
     private val editClickListener: (String) -> Unit

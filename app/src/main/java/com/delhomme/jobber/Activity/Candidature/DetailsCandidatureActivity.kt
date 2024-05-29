@@ -1,7 +1,6 @@
 package com.delhomme.jobber.Activity.Candidature
 
 import android.app.AlertDialog
-import com.delhomme.jobber.Adapter.RelanceAdapter
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
@@ -21,30 +20,32 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Activity.Appel.AddAppelActivity
 import com.delhomme.jobber.Activity.Appel.DetailsAppelActivity
 import com.delhomme.jobber.Activity.Appel.EditAppelActivity
-import com.delhomme.jobber.Adapter.AppelAdapter
-import com.delhomme.jobber.Model.Appel
-import com.delhomme.jobber.Model.Candidature
-import com.delhomme.jobber.Utils.CandidatureState
 import com.delhomme.jobber.Activity.Contact.AddContactActivity
 import com.delhomme.jobber.Activity.Contact.DetailsContactActivity
-import com.delhomme.jobber.Adapter.ContactAdapter
-import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Activity.Contact.EditContactActivity
 import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
 import com.delhomme.jobber.Activity.Entretien.DetailsEntretienActivity
 import com.delhomme.jobber.Activity.Entretien.EditEntretienActivity
-import com.delhomme.jobber.Adapter.EntretienAdapter
-import com.delhomme.jobber.Model.Entretien
-import com.delhomme.jobber.R
 import com.delhomme.jobber.Activity.Relance.AddRelanceActivity
 import com.delhomme.jobber.Activity.Relance.DetailsRelanceActivity
 import com.delhomme.jobber.Activity.Relance.EditRelanceActivity
+import com.delhomme.jobber.Adapter.AppelAdapter
+import com.delhomme.jobber.Adapter.ContactAdapter
+import com.delhomme.jobber.Adapter.EntretienAdapter
+import com.delhomme.jobber.Adapter.RelanceAdapter
 import com.delhomme.jobber.Api.Repository.AppelDataRepository
 import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
 import com.delhomme.jobber.Api.Repository.ContactDataRepository
 import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Api.Repository.EntretienDataRepository
 import com.delhomme.jobber.Api.Repository.RelanceDataRepository
+import com.delhomme.jobber.Model.Appel
+import com.delhomme.jobber.Model.Candidature
+import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.Model.Relance
+import com.delhomme.jobber.R
+import com.delhomme.jobber.Utils.CandidatureState
 import java.util.Locale
 
 class DetailsCandidatureActivity : AppCompatActivity() {
@@ -223,19 +224,27 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         })
     }
 
+    private fun onEditContactClicked(contactId: String) {
+        startActivity(Intent(this, EditContactActivity::class.java).apply {
+            putExtra("CONTACT_ID", contactId)
+            putExtra("CANDIDATURE_ID", candidatureId)
+        })
+    }
     private fun setupAppelRecyclerView() {
         val appels = appelDataRepository.loadAppelsForCandidature(candidature.id)
-        val appelAdapter = AppelAdapter(appels, appelDataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
+        val appelAdapter = AppelAdapter(appels, appelDataRepository, contactDataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
         findViewById<RecyclerView>(R.id.recyclerViewAppels).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = appelAdapter
         }
     }
-    private fun onAppelClicked(appel: Appel) {
+
+    fun onAppelClicked(appel: Appel) {
         startActivity(Intent(this, DetailsAppelActivity::class.java).apply {
             putExtra("APPEL_ID", appel.id)
         })
     }
+
     private fun onDeleteAppelClicked(appelId: String) {
         AlertDialog.Builder(this)
             .setTitle("Confirmer la suppression")
@@ -267,19 +276,6 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             .setNegativeButton("Annuler", null)
             .show()
     }
-    private fun onDeleteEntretienClicked(entretienId: String) {
-        AlertDialog.Builder(this)
-            .setTitle("Confirmer la suppression")
-            .setMessage("Êtes-vous sûr de vouloir supprimer cet entretien ?")
-            .setPositiveButton("Supprimer") { _, _ ->
-                entretienDataRepository.deleteEntretien(entretienId)
-                updateEntretienList()
-                Toast.makeText(this, "Entretien supprimé.", Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton("Annuler", null)
-            .show()
-    }
-
     private fun updateAppelList() {
         val appels = appelDataRepository.loadAppelsForCandidature(candidature.id)
         (findViewById<RecyclerView>(R.id.recyclerViewAppels).adapter as AppelAdapter).updateAppels(appels)
@@ -300,17 +296,38 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
     private fun setupEntretienRecyclerView() {
         val entretiens = entretienDataRepository.findByCondition { it.candidature_id == candidature.id }
-        val entretienAdapter = EntretienAdapter(entretiens, entretienDataRepository, entrepriseDataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEntretienEditClicked)
+        val entretienAdapter = EntretienAdapter(entretiens, entretienDataRepository, entrepriseDataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
         findViewById<RecyclerView>(R.id.recyclerViewEntretiens).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
             adapter = entretienAdapter
         }
     }
+
     private fun onEntretienClicked(entretien: Entretien) {
         startActivity(Intent(this, DetailsEntretienActivity::class.java).apply {
             putExtra("CANDIDATURE_ID", candidature.id)
             putExtra("ENTRETIEN_ID", entretien.id)
         })
+    }
+
+    private fun onEditEntretienClicked(entretienId: String) {
+        startActivity(Intent(this, EditEntretienActivity::class.java).apply {
+            putExtra("CANDIDATURE_ID", candidature.id)
+            putExtra("ENTRETIEN_ID", entretienId)
+        })
+    }
+
+    fun onDeleteEntretienClicked(entretienId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmer la suppression")
+            .setMessage("Êtes-vous sûr de vouloir supprimer cet entretien ?")
+            .setPositiveButton("Supprimer") { _, _ ->
+                entretienDataRepository.deleteEntretien(entretienId)
+                updateEntretienList()
+                Toast.makeText(this, "Entretien supprimé.", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Annuler", null)
+            .show()
     }
 
     private fun setupRelanceRecyclerView() {
@@ -340,19 +357,13 @@ class DetailsCandidatureActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun onEditRelanceClicked(relance: Relance) {
+    private fun onEditRelanceClicked(relanceId: String) {
         startActivity(Intent(this, EditRelanceActivity::class.java).apply {
             putExtra("CANDIDATURE_ID", candidature.id)
-            putExtra("RELANCE_ID", relance.id)
+            putExtra("RELANCE_ID", relanceId)
         })
     }
 
-    private fun onEditEntretienClicked(entretien: Entretien) {
-        startActivity(Intent(this, EditEntretienActivity::class.java).apply {
-            putExtra("CANDIDATURE_ID", candidature.id)
-            putExtra("ENTRETIEN_ID", entretien.id)
-        })
-    }
 
     private fun markAsRejected() {
         candidature.state = if (candidature.entretiens.isEmpty()) CandidatureState.NON_RETENU_SANS_ENTRETIEN else CandidatureState.NON_RETENU_APRES_ENTRETIEN

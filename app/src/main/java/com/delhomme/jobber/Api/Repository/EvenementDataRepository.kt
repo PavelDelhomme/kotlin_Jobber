@@ -27,4 +27,9 @@ class EvenementDataRepository(context: Context) : BaseDataRepository<Evenement>(
             }
         }
     }
+
+    // TODO : Implement getTypeEvementOptions
+    fun getTypeEvenementOptions(): List<String> {
+        return listOf("---", "Candidature", "Relance", "Entretien", "Appel")
+    }
 }

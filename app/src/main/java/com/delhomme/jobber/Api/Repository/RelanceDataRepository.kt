@@ -59,4 +59,10 @@ class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(cont
         return findByCondition { it.contactId == contactId }
     }
 
+    // TODO : Implement getTypeRelanceOptions
+    fun getTypesRelanceOptions(): List<String> {
+        return listOf("---", "Présentiel", "Visioconférence")
+    }
+
+
 }

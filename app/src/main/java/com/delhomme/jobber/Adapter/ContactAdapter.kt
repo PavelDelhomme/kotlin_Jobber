@@ -35,6 +35,10 @@ class ContactAdapter(
             email.text = contact.email
 
             itemView.setOnClickListener { clickListener(contact) }
+            itemView.setOnLongClickListener {
+                editListener(contact.id)
+                true
+            }
         }
     }
 

@@ -11,13 +11,12 @@ import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale
-import kotlin.reflect.KFunction1
 
 class AppelAdapter(
     var appels: List<Appel>,
     private val appelDataRepository: AppelDataRepository,
-    private val contactDataRepository: KFunction1<Appel, Unit>,
-    private val itemClickListener: KFunction1<String, Unit>,
+    private val contactDataRepository: ContactDataRepository,
+    private val itemClickListener: (Appel) -> Unit,
     private val deleteClickListener: (String) -> Unit,
     private val editClickListener: (String) -> Unit
 ) : RecyclerView.Adapter<AppelAdapter.ViewHolder>() {
@@ -29,7 +28,7 @@ class AppelAdapter(
         private val textViewNotes: TextView = view.findViewById(R.id.tvNotesAppels)
         private val textViewEntreprise: TextView = view.findViewById(R.id.tvEntrepriseAppel)
 
-        fun bind(appel: Appel, contactDataRepository: ContactDataRepository, clickListener: (Appel) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
+        fun bind(appel: Appel, appelDataRepository: AppelDataRepository, contactDataRepository: ContactDataRepository, clickListener: (Appel) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
             val contactName = appel.contact_id?.let { contactId ->
                 contactDataRepository.getItems().find { it.id == contactId }?.getFullName() ?: "No Contact"
             } ?: "No Contact"
@@ -54,7 +53,7 @@ class AppelAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(appels[position], contactDataRepository, itemClickListener, deleteClickListener, editClickListener)
+        holder.bind(appels[position],appelDataRepository, contactDataRepository, itemClickListener, deleteClickListener, editClickListener)
     }
 
     override fun getItemCount() = appels.size

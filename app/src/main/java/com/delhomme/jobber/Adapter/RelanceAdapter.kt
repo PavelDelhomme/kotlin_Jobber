@@ -10,7 +10,6 @@ import com.delhomme.jobber.Model.Relance
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale
-import kotlin.reflect.KFunction1
 
 class RelanceAdapter(
     var relances: List<Relance>,
@@ -18,7 +17,7 @@ class RelanceAdapter(
     private val candidatureDataRepository: CandidatureDataRepository,
     private val itemClickListener: (Relance) -> Unit,
     private val deleteClickListener: (String) -> Unit,
-    private val editClickListener: KFunction1<Relance, Unit>
+    private val editClickListener: (String) -> Unit
 ) : RecyclerView.Adapter<RelanceAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val dateRelance: TextView = view.findViewById(R.id.dateRelance)
