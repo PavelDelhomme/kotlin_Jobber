@@ -1,6 +1,5 @@
 package com.delhomme.jobber.Activity.Contact
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -8,18 +7,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.delhomme.jobber.Api.Repository.ContactDataRepository
 import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Model.Contact
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 
 class EditContactActivity : AppCompatActivity() {
-    private lateinit var etContactPrenom : EditText
-    private lateinit var etContactNom : EditText
-    private lateinit var etContactEmail : EditText
-    private lateinit var etContactPhone : EditText
+    private lateinit var etContactPrenom: EditText
+    private lateinit var etContactNom: EditText
+    private lateinit var etContactEmail: EditText
+    private lateinit var etContactPhone: EditText
     private lateinit var actvEntreprise: AutoCompleteTextView
     private lateinit var contactDataRepository: ContactDataRepository
     private lateinit var entrepriseDataRepository: EntrepriseDataRepository
@@ -46,12 +43,14 @@ class EditContactActivity : AppCompatActivity() {
         setupEntrepriseAutoComplete()
         setupFields()
 
-        
-        findViewById<Button>(R.id.btnSaveContactChanges).setOnClickListener { 
-            saveChanges()
+        findViewById<Button>(R.id.btnSaveContactChanges).setOnClickListener {
+            if (saveChanges()) {
+                Toast.makeText(this, "Modifications enregistrées.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
         findViewById<Button>(R.id.btnCancelContactChanges).setOnClickListener {
-            cancelChanges()
+            finish()
         }
     }
 
@@ -63,16 +62,14 @@ class EditContactActivity : AppCompatActivity() {
         }
     }
 
-
     private fun setupFields() {
-        contactId?.let {
-            val contact = contactDataRepository.findByCondition { it.id == contactId }.firstOrNull()
-            contact?.let {  cont ->
-                findViewById<EditText>(R.id.etContactNom)
-                findViewById<EditText>(R.id.etContactPrenom)
-                findViewById<EditText>(R.id.etContactEmail)
-                findViewById<EditText>(R.id.actvNomEntreprise).setText(cont.entrepriseNom)
-            }
+        val contact = contactDataRepository.findByCondition { it.id == contactId }.firstOrNull()
+        contact?.let { cont ->
+            etContactPrenom = findViewById<EditText>(R.id.etContactPrenom).apply { setText(cont.prenom) }
+            etContactNom = findViewById<EditText>(R.id.etContactNom).apply { setText(cont.nom) }
+            etContactEmail = findViewById<EditText>(R.id.etContactEmail).apply { setText(cont.email) }
+            etContactPhone = findViewById<EditText>(R.id.etContactPhone).apply { setText(cont.telephone) }
+            actvEntreprise.setText(cont.entrepriseNom)
         }
     }
 
@@ -82,39 +79,19 @@ class EditContactActivity : AppCompatActivity() {
         val email = etContactEmail.text.toString()
         val phone = etContactPhone.text.toString()
         val entrepriseNom = actvEntreprise.text.toString()
+
         val entreprise = entrepriseDataRepository.getOrCreateEntreprise(entrepriseNom)
 
         val updatedContact = Contact(
             id = contactId!!,
-            nom = nom,
             prenom = prenom,
+            nom = nom,
             email = email,
             telephone = phone,
-            entrepriseNom = entreprise.nom,
-
+            entrepriseNom = entreprise.nom
         )
 
-        if (contactId != null) {
-            val existingContact = contactDataRepository.findByCondition { it.id == contactId!! }
-            val appelsIds = existingContact.appelsIds ?: mutableListOf()
-            val candidatureIds = existingContact?.candidatureIds ?: mutableListOf()
-
-            dataRepository.editContact(
-                contactId!!,
-                nom,
-                prenom,
-                email,
-                phone,
-                entrepriseNom,
-                appelsIds,
-                candidatureIds
-            )
-            return true
-        }
-        return false
-    }
-
-    private fun cancelChanges() {
-        finish()
+        contactDataRepository.addOrUpdateContact(updatedContact)
+        return true
     }
 }

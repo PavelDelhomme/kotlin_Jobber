@@ -19,30 +19,43 @@ import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
 import com.delhomme.jobber.Activity.Entretien.DetailsEntretienActivity
 import com.delhomme.jobber.Activity.Entretien.EditEntretienActivity
-import com.delhomme.jobber.Utils.SwipeCallback
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.Adapter.EntretienAdapter
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Api.Repository.EntretienDataRepository
 import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
+import com.delhomme.jobber.Utils.SwipeCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentEntretiens : Fragment() {
-    private lateinit var adapter: EntretienAdapter
-    private val dataRepository by lazy { DataRepository(requireContext()) }
+    private lateinit var entretienAdapter: EntretienAdapter
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
+    private lateinit var entretienDataRepository: EntretienDataRepository
     private lateinit var broadcastReceiver: BroadcastReceiver
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_entretiens, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.title = "Entretiens"
+
+        initRepositories()
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewEntretiens)
         val emptyView = view.findViewById<TextView>(R.id.empty_view_entretiens)
 
-        adapter = EntretienAdapter(dataRepository.getEntretiens(), dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
-        recyclerView.adapter = adapter
+        entretienAdapter = EntretienAdapter(
+            entretienDataRepository.getItems(),
+            entretienDataRepository,
+            entrepriseDataRepository,
+            this::onEntretienClicked,
+            this::onDeleteEntretienClicked,
+            this::onEditEntretienClicked
+        )
+        recyclerView.adapter = entretienAdapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         updateUI(recyclerView, emptyView)
@@ -53,30 +66,31 @@ class FragmentEntretiens : Fragment() {
 
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                adapter.updateEntretiens(dataRepository.getEntretiens())
+                entretienAdapter.updateEntretiens(entretienDataRepository.getItems())
             }
         }
-
-        val swipeCallback = SwipeCallback(requireContext(),
-            { position ->
-                val entretien = adapter.entretiens[position]
-                showDeleteConfirmationDialog(entretien.id, position)
-            },
-            { position ->
-                val entretien = adapter.entretiens[position]
-                onEditEntretienClicked(entretien.id)
-            }
-        )
-
-        val itemTouchHelper = ItemTouchHelper(swipeCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-
         LocalBroadcastManager.getInstance(requireContext())
             .registerReceiver(broadcastReceiver, IntentFilter("ENTRETIENS_UPDATED"))
+
+        setupSwipeCallback(recyclerView)
+    }
+
+    private fun initRepositories() {
+        entrepriseDataRepository = EntrepriseDataRepository(requireContext())
+        entretienDataRepository = EntretienDataRepository(requireContext())
+    }
+
+    private fun setupSwipeCallback(recyclerView: RecyclerView) {
+        val swipeCallback = SwipeCallback(requireContext(),
+            { position -> showDeleteConfirmationDialog(entretienAdapter.entretiens[position].id, position) },
+            { position -> onEditEntretienClicked(entretienAdapter.entretiens[position].id) }
+        )
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     private fun updateUI(recyclerView: RecyclerView, emptyView: TextView) {
-        if (adapter.itemCount > 0) {
+        if (entretienAdapter.itemCount > 0) {
             recyclerView.visibility = View.VISIBLE
             emptyView.visibility = View.GONE
         } else {
@@ -84,12 +98,13 @@ class FragmentEntretiens : Fragment() {
             emptyView.visibility = View.VISIBLE
         }
     }
+
     private fun showDeleteConfirmationDialog(entretienId: String, position: Int) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Confirmation de suppression")
             .setMessage("Voulez-vous vraiment supprimer cet entretien ?")
             .setNegativeButton("Annuler") { dialog, _ ->
-                adapter.notifyItemChanged(position)
+                entretienAdapter.notifyItemChanged(position)
                 dialog.dismiss()
             }
             .setPositiveButton("Supprimer") { dialog, _ ->
@@ -97,37 +112,23 @@ class FragmentEntretiens : Fragment() {
                 dialog.dismiss()
             }
             .show()
-
     }
 
     private fun onEntretienClicked(entretien: Entretien) {
-        val intent = Intent(activity, DetailsEntretienActivity::class.java).apply {
-            putExtra("ENTRETIEN_ID", entretien.id)
-        }
-        startActivity(intent)
+        startActivity(Intent(activity, DetailsEntretienActivity::class.java).putExtra("ENTRETIEN_ID", entretien.id))
     }
 
     private fun onDeleteEntretienClicked(entretienId: String) {
-        dataRepository.deleteEntretien(entretienId)
-        LocalBroadcastManager.getInstance(requireContext())
-            .sendBroadcast(Intent("ENTRETIENS_UPDATED"))
+        entretienDataRepository.deleteEntretien(entretienId)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(Intent("ENTRETIENS_UPDATED"))
     }
 
     private fun onEditEntretienClicked(entretienId: String) {
-        val intent = Intent(activity, EditEntretienActivity::class.java).apply {
-            putExtra("ENTRETIEN_ID", entretienId)
-        }
-        startActivity(intent)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        adapter.updateEntretiens(dataRepository.getEntretiens())
+        startActivity(Intent(activity, EditEntretienActivity::class.java).putExtra("ENTRETIEN_ID", entretienId))
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        LocalBroadcastManager.getInstance(requireContext())
-            .unregisterReceiver(broadcastReceiver)
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(broadcastReceiver)
     }
 }

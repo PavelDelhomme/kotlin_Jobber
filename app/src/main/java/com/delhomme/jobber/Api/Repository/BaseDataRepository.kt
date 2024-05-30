@@ -47,6 +47,15 @@ abstract class BaseDataRepository<T>(val context: Context, private val sharedPre
         return items?.filter { fieldAccessor(it) == id } ?: emptyList()
     }
 
+    fun deleteItem(predicate: (T) -> Boolean) {
+        items?.let { itemList ->
+            val itemToRemove = itemList.firstOrNull(predicate)
+            itemToRemove?.let {
+                itemList.remove(it)
+                saveItemsToPrefs(itemList)
+            }
+        }
+    }
     fun <R> loadItemsWhereCollectionContains(fieldAccessor: (T) -> Collection<R>, value: R): List<T> {
         return items?.filter { value in fieldAccessor(it) } ?: emptyList()
     }

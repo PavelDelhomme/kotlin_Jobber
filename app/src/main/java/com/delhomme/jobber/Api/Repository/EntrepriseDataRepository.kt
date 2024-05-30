@@ -14,6 +14,10 @@ class EntrepriseDataRepository(context: Context) : BaseDataRepository<Entreprise
         }
     }
 
+    fun addOrUpdateEntreprise(entreprise: Entreprise) {
+
+    }
+
     fun loadEntreprises(): List<Entreprise> {
         return items?: listOf()
     }
@@ -22,5 +26,7 @@ class EntrepriseDataRepository(context: Context) : BaseDataRepository<Entreprise
             updateOrAddItem(items ?: mutableListOf(), it)
         }
     }
-
+    fun reloadEntreprises() {
+        items = loadItems().toMutableList()
+    }
 }

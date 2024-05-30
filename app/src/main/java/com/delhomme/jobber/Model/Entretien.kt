@@ -7,6 +7,7 @@ data class Entretien(
     val id: String = UUID.randomUUID().toString(),
     val entrepriseNom: String,
     val contact_id: String? = null,
+    val contact: Contact?,
     val candidature_id: String,
     val date_entretien: Date,
     val type: String, // (RH, technique, autre)

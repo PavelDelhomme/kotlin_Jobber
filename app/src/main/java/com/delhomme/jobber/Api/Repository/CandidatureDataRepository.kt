@@ -96,4 +96,14 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
     fun loadCandidaturesForContact(contactId: String): List<Candidature> {
         return loadItemsWhereCollectionContains({ it.contacts }, contactId)
     }
+    fun loadCandidaturesForEntreprise(entrepriseNom: String): List<Candidature> {
+        return loadRelatedItemsById2({ it.entrepriseNom }, entrepriseNom)
+    }
+
+    fun addEntretienToCandidature(candidatureId: String, entretienId: String) {
+        items?.find { it.id == candidatureId }?.let {
+            it.entretiens.add(entretienId)
+            saveItemsToPrefs(items!!)
+        }
+    }
 }

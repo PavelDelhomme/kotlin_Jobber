@@ -6,13 +6,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.Utils.DataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.R
 
 class EditEntrepriseActivity : AppCompatActivity() {
     private lateinit var etNomEntreprise: EditText
     private lateinit var btnSaveEntrepriseChanges: Button
-    private lateinit var dataRepository: DataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
     private var entrepriseNom: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,20 +23,25 @@ class EditEntrepriseActivity : AppCompatActivity() {
 
         etNomEntreprise = findViewById(R.id.etNomEntreprise)
         btnSaveEntrepriseChanges = findViewById(R.id.btnSaveEntrepriseChanges)
-        dataRepository = DataRepository(this)
+        entrepriseDataRepository = EntrepriseDataRepository(this)
 
         entrepriseNom = intent.getStringExtra("ENTREPRISE_ID")
 
         entrepriseNom?.let {
-            val entreprise = dataRepository.getEntrepriseByNom(it)
-            etNomEntreprise.setText(entreprise?.nom)
+            val entreprise = entrepriseDataRepository.findByCondition { it.nom == entrepriseNom }.firstOrNull()
+            if (entreprise != null) {
+                etNomEntreprise.setText(entreprise.nom)
+            } else {
+                Toast.makeText(this, "Entreprise non trouvée.", Toast.LENGTH_LONG).show()
+                finish()
+            }
         }
 
         btnSaveEntrepriseChanges.setOnClickListener {
             saveEntrepriseChanges()
         }
         findViewById<Button>(R.id.btnCancelEntrepriseChanges).setOnClickListener {
-            cancelChange()
+            finish()
         }
     }
 
@@ -44,28 +49,25 @@ class EditEntrepriseActivity : AppCompatActivity() {
         val newNomEntreprise = etNomEntreprise.text.toString()
 
         entrepriseNom?.let { oldNom ->
-            val entreprise = dataRepository.getEntrepriseByNom(oldNom)
-            entreprise?.let {
-                dataRepository.editEntreprise(
-                    entrepriseNom = oldNom,
-                    newName = newNomEntreprise,
-                    newContactIds = it.contactIds,
-                    newRelancesIds = it.relanceIds,
-                    newEntretiensIds = it.entretiens,
-                    newCandidaturesIds = it.candidatureIds
-                )
-                dataRepository.updateEntrepriseName(oldNom, newNomEntreprise)
+            val existingEntreprise = entrepriseDataRepository.findByCondition { it.nom == oldNom }.firstOrNull()
+            existingEntreprise?.let {
+                it.nom = newNomEntreprise
+                // Mise à jour de l'entreprise en utilisant la méthode générique saveItem qui appliquera updateOrAddItem
+                entrepriseDataRepository.saveItem(it)
                 Toast.makeText(this, "Entreprise mise à jour avec succès.", Toast.LENGTH_SHORT).show()
-                dataRepository.reloadEntreprises()
-                dataRepository.reloadEntretiens()
-                dataRepository.reloadRelances()
-                dataRepository.reloadContacts()
-                dataRepository.reloadAppels()
-                dataRepository.reloadCandidatures()
+                finish()
+            } ?: run {
+                // Gérer le cas où l'entreprise n'est pas trouvée
+                Toast.makeText(this, "Entreprise non trouvée.", Toast.LENGTH_LONG).show()
                 finish()
             }
+        } ?: run {
+            // Gérer le cas où entrepriseNom est null
+            Toast.makeText(this, "ID d'entreprise manquant.", Toast.LENGTH_LONG).show()
+            finish()
         }
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
@@ -75,7 +77,4 @@ class EditEntrepriseActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun cancelChange() {
-        finish()
-    }
 }

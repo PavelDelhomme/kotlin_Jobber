@@ -12,15 +12,22 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.delhomme.jobber.Utils.DataRepository
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Api.Repository.EntretienDataRepository
+import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 class EditEntretienActivity : AppCompatActivity() {
+
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
+    private lateinit var contactDataRepository: ContactDataRepository
+    private lateinit var entretienDataRepository: EntretienDataRepository
 
     private lateinit var etDateEntretien: EditText
     private lateinit var etNotesPreEntretien: EditText
@@ -28,9 +35,9 @@ class EditEntretienActivity : AppCompatActivity() {
     private lateinit var spinnerTypeEntretien: Spinner
     private lateinit var spinnerModeEntretien: Spinner
     private lateinit var autoCompleteTextViewEntreprise: AutoCompleteTextView
-    private lateinit var spinnerContact: Spinner
+    private lateinit var autocompleteTextViewContact: AutoCompleteTextView
     private var entretienId: String? = null
-    private lateinit var dataRepository: DataRepository
+    private var candidatureId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,15 +45,22 @@ class EditEntretienActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        dataRepository = DataRepository(this)
-        entretienId = intent.getStringExtra("ENTRETIEN_ID")
-
+        initRepositories()
         setupUI()
         setupListeners()
-        setupFields()
-        findViewById<Button>(R.id.btnCancelEntretienChanges).setOnClickListener {
-            cancelChange()
+
+        entretienId = intent.getStringExtra("ENTRETIEN_ID")
+        candidatureId = intent.getStringExtra("CANDIDATURE_ID")
+
+        entretienId?.let {
+            setupFields(entretienId!!)
         }
+    }
+
+    private fun initRepositories() {
+        entrepriseDataRepository = EntrepriseDataRepository(this)
+        contactDataRepository = ContactDataRepository(this)
+        entretienDataRepository = EntretienDataRepository(this)
     }
 
     private fun setupUI() {
@@ -56,11 +70,13 @@ class EditEntretienActivity : AppCompatActivity() {
         spinnerTypeEntretien = findViewById(R.id.spinner_type_entretien)
         spinnerModeEntretien = findViewById(R.id.spinner_mode_entretien)
         autoCompleteTextViewEntreprise = findViewById(R.id.autoCompleteTextViewEntretien)
-        spinnerContact = findViewById(R.id.spinnerContact)
         autoCompleteTextViewEntreprise.setOnItemClickListener { adapterView, _, position, _ ->
             val selectedEntreprise = adapterView.getItemAtPosition(position) as String
             updateContactsForSelectedEntreprise(selectedEntreprise)
         }
+        autocompleteTextViewContact = findViewById(R.id.autoCompleteTextViewContact)
+        setupContactAutoComplete()
+
 
         ArrayAdapter.createFromResource(
             this,
@@ -79,29 +95,46 @@ class EditEntretienActivity : AppCompatActivity() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerModeEntretien.adapter = adapter
         }
+        findViewById<Button>(R.id.btnCancelEntretienChanges).setOnClickListener {
+            finish()
+            Toast.makeText(this, "Annulation de la création de l'entretien...", Toast.LENGTH_SHORT).show()
+        }
 
+        setupEntrepriseAutoComplete()
         setupDateTimePicker()
+    }
 
-        val entreprises = dataRepository.getEntreprises()
-        val entrepriseAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, entreprises.map { it.nom })
+    private fun setupFields(entretienId: String) {
+        val entretien = entretienDataRepository.findByCondition { it.id == entretienId }.firstOrNull()
+        entretien?.let {
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH)
+            etDateEntretien.setText(dateFormat.format(it.date_entretien))
+            etNotesPreEntretien.setText(it.notes_pre_entretien)
+            etNotesPostEntretien.setText(it.notes_post_entretien)
+            autoCompleteTextViewEntreprise.setText(it.entrepriseNom)
+
+            updateContactsForSelectedEntreprise(it.entrepriseNom)
+            autocompleteTextViewContact.setText("${it.contact?.prenom} ${it.contact?.nom}")
+
+            spinnerTypeEntretien.setSelection(resources.getStringArray(R.array.types_entretien).indexOf(it.type))
+            spinnerModeEntretien.setSelection(resources.getStringArray(R.array.modes_entretien).indexOf(it.mode))
+        }
+    }
+    private fun setupEntrepriseAutoComplete() {
+        val entreprises = entrepriseDataRepository.loadEntreprises().map { it.nom }
+        val entrepriseAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, entreprises)
         autoCompleteTextViewEntreprise.setAdapter(entrepriseAdapter)
     }
 
-    private fun updateContactsForSelectedEntreprise(entrepriseNom: String) {
-        val contacts = dataRepository.getContactsForEntreprise(entrepriseNom)
-        val contactNames = mutableListOf("Aucun contact") // Ajoute l'option par défaut
-        if (contacts != null) {
-            contactNames.addAll(contacts.map { "${it.prenom} ${it.nom}" })
+    private fun setupContactAutoComplete() {
+        autoCompleteTextViewEntreprise.setOnItemClickListener { _, _, position, _ ->
+            val selectedEntreprise = autoCompleteTextViewEntreprise.adapter.getItem(position) as String
+            val contacts = contactDataRepository.loadContactsForEntreprise(selectedEntreprise)
+            val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, contacts.map { it.getFullName() })
+            autocompleteTextViewContact.setAdapter(adapter)
         }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, contactNames)
-        spinnerContact.adapter = adapter
     }
 
-    private fun setupListeners() {
-        findViewById<Button>(R.id.button_save_entretien_changes).setOnClickListener {
-            saveEntretienChanges()
-        }
-    }
 
     private fun setupDateTimePicker() {
         etDateEntretien.setOnClickListener {
@@ -117,27 +150,21 @@ class EditEntretienActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupFields() {
-        entretienId?.let {
-            dataRepository.getEntretienById(it)?.let { entretien ->
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
-                etDateEntretien.setText(dateFormat.format(entretien.date_entretien))
-                etNotesPreEntretien.setText(entretien.notes_pre_entretien)
-                etNotesPostEntretien.setText(entretien.notes_post_entretien)
-                autoCompleteTextViewEntreprise.setText(entretien.entrepriseNom)
-                updateContactsForSelectedEntreprise(entretien.entrepriseNom)
-
-                val contactIndex =
-                    dataRepository.getContactsForEntreprise(entretien.entrepriseNom)?.indexOfFirst { it.id == entretien.contact_id }
-                        ?.plus(1)
-                spinnerContact.setSelection(contactIndex!!)
-                spinnerTypeEntretien.setSelection(resources.getStringArray(R.array.types_entretien).indexOf(entretien.type))
-                spinnerModeEntretien.setSelection(resources.getStringArray(R.array.modes_entretien).indexOf(entretien.mode))
-            }
+    private fun setupListeners() {
+        findViewById<Button>(R.id.button_save_entretien_changes).setOnClickListener {
+            saveEntretienChanges()
         }
     }
+    private fun updateContactsForSelectedEntreprise(entrepriseNom: String) {
+        val contacts = contactDataRepository.loadContactsForEntreprise(entrepriseNom)
+        val contactNames = contacts.map { "${it.prenom} ${it.nom} - ${it.entrepriseNom}" }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, contactNames)
+        autocompleteTextViewContact.setAdapter(adapter)
+    }
+
 
     private fun saveEntretienChanges() {
+
         val format = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
         val dateEntretien = format.parse(etDateEntretien.text.toString()) ?: Date()
         val typeEntretien = spinnerTypeEntretien.selectedItem.toString()
@@ -145,41 +172,28 @@ class EditEntretienActivity : AppCompatActivity() {
         val notesPreEntretien = etNotesPreEntretien.text.toString()
         val notesPostEntretien = etNotesPostEntretien.text.toString()
         val nomEntreprise = autoCompleteTextViewEntreprise.text.toString()
-        val nomContact = spinnerContact.selectedItem.toString()
+        val contactInfo = autocompleteTextViewContact.text.toString().split(" ")
 
-        val entreprise = dataRepository.getOrCreateEntreprise(nomEntreprise)
-        val contact = dataRepository.getOrCreateContact(nomContact.split(" ")[0], nomContact.split(" ")[1], entreprise.nom)
+        val entreprise = entrepriseDataRepository.getOrCreateEntreprise(nomEntreprise)
+        val contact = contactDataRepository.getOrCreateContact(contactInfo[0], contactInfo[1], nomEntreprise)
 
+        val updatedEntretien = Entretien(
+            id = entretienId ?:UUID.randomUUID().toString(),
+            date_entretien = dateEntretien,
+            type = typeEntretien,
+            mode = modeEntretien,
+            notes_pre_entretien = notesPreEntretien,
+            notes_post_entretien = notesPostEntretien,
+            entrepriseNom = entreprise.nom,
+            contact_id = contact.id,
+            contact = contact,
+            candidature_id = candidatureId ?: ""
+        )
 
-        if (entretienId != null) {
-            val updatedEntretien = dataRepository.getEntretienById(entretienId!!)!!
-            dataRepository.editEntretien(
-                updatedEntretien.id,
-                entreprise.nom,
-                contact.id,
-                updatedEntretien.candidature_id,
-                dateEntretien,
-                typeEntretien,
-                modeEntretien,
-                notesPreEntretien,
-                notesPostEntretien
-            )
-
-            val event = dataRepository.findEventByEntretienId(updatedEntretien.id)
-            event?.let {
-                it.startTime = updatedEntretien.date_entretien.time
-                it.endTime = updatedEntretien.date_entretien.time + Duration.ofMinutes(10).toMillis()
-                dataRepository.saveEvent(it)
-            }
-            Toast.makeText(this, "Entretien mis à jour avec succès.", Toast.LENGTH_SHORT).show()
-            LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("ENTRETIENS_UPDATED"))
-            finish()
-        } else {
-            Toast.makeText(this, "Erreur : ID de l'entretien manquant", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun cancelChange() {
+        entretienDataRepository.updateOrAddItem(entretienDataRepository.getItems().toMutableList(), updatedEntretien)
+        Toast.makeText(this, "Entretien mis à jour avec succès.", Toast.LENGTH_SHORT).show()
+        LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("ENTRETIENS_UPDATED"))
         finish()
     }
+
 }
