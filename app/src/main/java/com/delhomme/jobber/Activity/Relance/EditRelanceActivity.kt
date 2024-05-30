@@ -11,77 +11,76 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.delhomme.jobber.Utils.DataRepository
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Api.Repository.RelanceDataRepository
+import com.delhomme.jobber.Model.Relance
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 class EditRelanceActivity : AppCompatActivity() {
-    private lateinit var dataRepository: DataRepository
-    private var relanceId: String? = null
-    private lateinit var autoCompleteEntreprise: AutoCompleteTextView
+    private lateinit var relanceDataRepository: RelanceDataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
+    private lateinit var contactDataRepository: ContactDataRepository
     private lateinit var etDateRelance: EditText
     private lateinit var spPlateformeRelance: Spinner
     private lateinit var spContact: Spinner
     private lateinit var etNotesRelance: EditText
-    private lateinit var candidatureId: String
-    private lateinit var entrepriseId: String
+    private lateinit var autoCompleteEntreprise: AutoCompleteTextView
+    private var relanceId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_relance)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        dataRepository = DataRepository(applicationContext)
-        relanceId = intent.getStringExtra("RELANCE_ID")
-        entrepriseId = intent.getStringExtra("ENTREPRISE_ID") ?: ""
-        candidatureId = intent.getStringExtra("CANDIDATURE_ID") ?: ""
+        // Initialisez les instances de vos repositories
+        relanceDataRepository = RelanceDataRepository(this)
+        entrepriseDataRepository = EntrepriseDataRepository(this)
+        contactDataRepository = ContactDataRepository(this)
 
-        setupEntrepriseAutoComplete()
         setupUI()
         setupListeners()
         loadData()
-
-        findViewById<Button>(R.id.btnCancelRelanceChanges).setOnClickListener {
-            cancelChanges()
-        }
     }
 
-    private fun setupEntrepriseAutoComplete() {
-        val entreprises = dataRepository.getEntreprises().map { it.nom }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, entreprises)
-        autoCompleteEntreprise = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextViewRelanceEntreprise).apply {
-            setAdapter(adapter)
-            setText(dataRepository.getEntrepriseByNom(entrepriseId)?.nom)
-            threshold = 1
-        }
-    }
 
     private fun setupUI() {
         etDateRelance = findViewById(R.id.etDateRelance)
         spPlateformeRelance = findViewById(R.id.spinner_plateforme_relance)
         spContact = findViewById(R.id.spinner_contact_relance)
         etNotesRelance = findViewById(R.id.editText_notes_relance)
+        autoCompleteEntreprise = findViewById(R.id.autoCompleteTextViewRelanceEntreprise)
 
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.plateforme_options,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spPlateformeRelance.adapter = adapter
-        }
-
+        setupSpinners()
         setupDatePicker()
         setupContactsSpinner()
     }
 
     private fun setupListeners() {
-        val btnSaveRelance = findViewById<Button>(R.id.button_save_relance_changes)
-        btnSaveRelance.setOnClickListener {
+        findViewById<Button>(R.id.btnSaveRelanceChanges).setOnClickListener {
             saveChanges()
         }
+        findViewById<Button>(R.id.btnCancelRelanceChanges).setOnClickListener {
+            cancelChanges()
+        }
+    }
+
+    private fun setupSpinners() {
+        val plateformeOptions = resources.getStringArray(R.array.plateforme_options)
+        val plateformeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, plateformeOptions)
+        plateformeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spPlateformeRelance.adapter = plateformeAdapter
+    }
+
+    private fun setupContactsSpinner() {
+        val contacts = contactDataRepository.getItems()
+        val contactNames = contacts.map { it.getFullName() }
+        val contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, contactNames)
+        contactAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spContact.adapter = contactAdapter
     }
 
     private fun setupDatePicker() {
@@ -97,51 +96,41 @@ class EditRelanceActivity : AppCompatActivity() {
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
         }
     }
-
-    private fun setupContactsSpinner() {
-        val contacts = dataRepository.getContacts()
-        val contactAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, contacts.map { it.getFullName() })
-        contactAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spContact.adapter = contactAdapter
-    }
-
     private fun loadData() {
-        relanceId?.let {
-            val relance = dataRepository.getRelanceById(it)
-            relance?.let {
+        relanceId?.let { id ->
+            val relance = relanceDataRepository.findByCondition { relance -> relance.id == id }.firstOrNull()
+            relance?.let { r ->
                 val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
-                etDateRelance.setText(dateFormat.format(relance.date_relance))
-                etNotesRelance.setText(relance.notes)
-                spPlateformeRelance.setSelection((spPlateformeRelance.adapter as ArrayAdapter<String>).getPosition(relance.plateformeUtilisee))
-                val contactIndex = (spContact.adapter as ArrayAdapter<String>).getPosition(dataRepository.getContactById(relance.contactId)?.getFullName())
+                etDateRelance.setText(dateFormat.format(r.date_relance))
+                etNotesRelance.setText(r.notes)
+                spPlateformeRelance.setSelection((spPlateformeRelance.adapter as ArrayAdapter<String>).getPosition(r.plateformeUtilisee))
+                val contactIndex = (spContact.adapter as ArrayAdapter<String>).getPosition(contactDataRepository.findByCondition { contact -> contact.id == r.contactId }.firstOrNull()?.getFullName() ?: "")
                 spContact.setSelection(maxOf(0, contactIndex))
             }
         }
     }
 
+
     private fun saveChanges() {
-        val selectedContactName = spContact.selectedItem.toString()
-        val contact = dataRepository.getContacts().find { it.getFullName() == selectedContactName }
-        val contactId = contact?.id
         val dateRelance = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateRelance.text.toString())!!
         val plateforme = spPlateformeRelance.selectedItem.toString()
         val notes = etNotesRelance.text.toString()
+        val contact = contactDataRepository.findByCondition { it.getFullName() == spContact.selectedItem.toString() }.firstOrNull()
 
-        if (relanceId != null) {
-            dataRepository.editRelance(
-                relanceId!!,
-                dateRelance,
-                plateforme,
-                entrepriseId,
-                contactId,
-                candidatureId,
-                notes
+        relanceId?.let {
+            val updatedRelance = Relance(
+                id = it,
+                date_relance = dateRelance,
+                plateformeUtilisee = plateforme,
+                entrepriseNom = autoCompleteEntreprise.text.toString(),
+                contactId = contact?.id,
+                candidatureId = intent.getStringExtra("CANDIDATURE_ID").toString(), // Adjust as necessary
+                notes = notes
             )
+            relanceDataRepository.updateOrAddItem(relanceDataRepository.getItems().toMutableList(), updatedRelance)
             Toast.makeText(this, "Relance mise à jour.", Toast.LENGTH_LONG).show()
             finish()
-        } else {
-            Toast.makeText(this, "Erreur : ID de relance manquant", Toast.LENGTH_SHORT).show()
-        }
+        } ?: Toast.makeText(this, "Erreur : ID de relance manquant", Toast.LENGTH_SHORT).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
