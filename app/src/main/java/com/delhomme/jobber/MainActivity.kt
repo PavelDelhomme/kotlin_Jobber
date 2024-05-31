@@ -31,6 +31,7 @@ import com.delhomme.jobber.Api.DjangoApi.RetrofitClient
 import com.delhomme.jobber.Api.DjangoApi.TokenResponse
 import com.delhomme.jobber.Api.DjangoApi.TokenService
 import com.delhomme.jobber.Api.LocalApi.LocalStorageManager
+import com.delhomme.jobber.Api.Repository.SearchDataRepository
 import com.delhomme.jobber.Api.UserProfileApi
 import com.delhomme.jobber.Fragment.FragmentAppels
 import com.delhomme.jobber.Fragment.FragmentCalendrier
@@ -43,7 +44,6 @@ import com.delhomme.jobber.Fragment.FragmentNotifications
 import com.delhomme.jobber.Fragment.FragmentRelances
 import com.delhomme.jobber.Fragment.SearchResultsFragment
 import com.delhomme.jobber.Notification.NotificationReceiver
-import com.delhomme.jobber.Utils.DataRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import retrofit2.Call
@@ -58,11 +58,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var dataRepository: DataRepository
+    private lateinit var searchDataRepository: SearchDataRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        searchDataRepository = SearchDataRepository(this)
+
+        setupUI()
+        checkPermissionAndSetupNotifications()
+
         LocalStorageManager.initialize(this)
         syncDataWithServer()
 
@@ -72,19 +78,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // triggerTestNotification()
             configureNotificationAlarm()
         }
-
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navView = findViewById(R.id.nav_view)
-        navView.setNavigationItemSelectedListener(this)
-
-        toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
-        )
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
@@ -98,6 +91,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val fabMenuJobber = findViewById<FloatingActionButton>(R.id.fabMenuJobber)
         fabMenuJobber.setOnClickListener { view ->
             showPopupMenu(view)
+        }
+    }
+
+    private fun setupUI() {
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navView = findViewById(R.id.nav_view)
+        navView.setNavigationItemSelectedListener(this)
+        toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        if (savedInstanceState == null) {
+            replaceFragment(FragmentDashboard())
+        }
+        findViewById<FloatingActionButton>(R.id.fabMenuJobber).setOnClickListener { view ->
+            showPopupMenu(view)
+        }
+
+    }
+
+    private fun checkPermissionAndSetupNotifications() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATION_PERMISSION)
+        } else {
+            configureNotificationAlarm()
         }
     }
 
@@ -130,105 +149,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun configureNotificationAlarm() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent = Intent(this, NotificationReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val alarmIntent = Intent(this, NotificationReceiver::class.java).let { intent -> PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         }
-
-        val calendar: Calendar = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
+        val calendar: Calendar = Calendar.getInstance().apply {timeInMillis = System.currentTimeMillis()
             set(Calendar.HOUR_OF_DAY, 18)  // Set the alarm time to 6 PM
             set(Calendar.MINUTE, 0)
         }
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            alarmIntent
-        )
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, AlarmManager.INTERVAL_DAY, alarmIntent)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                configureNotificationAlarm()
-            }
-        }
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_dashboard -> {
-                replaceFragment(FragmentDashboard())
-            }
-            R.id.nav_candidatures -> {
-                replaceFragment(FragmentCandidatures())
-            }
-            R.id.nav_contact_list -> {
-                replaceFragment(FragmentContacts())
-            }
-            R.id.nav_appel_list -> {
-                replaceFragment(FragmentAppels())
-            }
-            R.id.nav_relances -> {
-                replaceFragment(FragmentRelances())
-            }
-            R.id.nav_entretiens -> {
-                replaceFragment(FragmentEntretiens())
-            }
-            R.id.nav_entreprises -> {
-                replaceFragment(FragmentEntreprises())
-            }
-            R.id.nav_calendrier -> {
-                replaceFragment(FragmentCalendrier())
-            }
-            R.id.nav_notifications -> {
-                replaceFragment(FragmentNotifications())
-            }
-        }
-        drawerLayout.closeDrawer(navView)
-        return true
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        drawerLayout.openDrawer(navView)
-        return true
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        val searchItem = menu!!.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
+        (menu.findItem(R.id.action_search).actionView as SearchView).apply {
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    performSearch(query)
+                    return true
+                }
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                performSearch(query)
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                performSearch(newText)
-                return true
-            }
-        })
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    performSearch(newText)
+                    return true
+                }
+            })
+        }
         return true
     }
 
     private fun performSearch(query: String?) {
-        if (!query.isNullOrEmpty()) {
-            val results = dataRepository.search(query)
-            displayResults(results)
-        } else {
-            displayDefaultState()
+        query?.let {
+            if (it.isNotEmpty()) {
+                val results = searchDataRepository.search(it)
+                displayResults(results)
+            } else {
+                displayDefaultState()
+            }
         }
-
     }
 
     private fun displayResults(results: List<Any>) {
@@ -239,6 +195,41 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun displayDefaultState() {
         // Utiliser cette méthode pour afficher l'état par défaut de k'aookucatuib
         replaceFragment(FragmentDashboard())
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_dashboard -> replaceFragment(FragmentDashboard())
+            R.id.nav_candidatures -> replaceFragment(FragmentCandidatures())
+            R.id.nav_contact_list -> replaceFragment(FragmentContacts())
+            R.id.nav_appel_list -> replaceFragment(FragmentAppels())
+            R.id.nav_relances -> replaceFragment(FragmentRelances())
+            R.id.nav_entretiens -> replaceFragment(FragmentEntretiens())
+            R.id.nav_entreprises -> replaceFragment(FragmentEntreprises())
+            R.id.nav_calendrier -> replaceFragment(FragmentCalendrier())
+            R.id.nav_notifications -> replaceFragment(FragmentNotifications())
+        }
+        drawerLayout.closeDrawer(navView)
+        return true
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                configureNotificationAlarm()
+            }
+        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        drawerLayout.openDrawer(navView)
+        return true
     }
 
     fun syncDataWithServer() {
