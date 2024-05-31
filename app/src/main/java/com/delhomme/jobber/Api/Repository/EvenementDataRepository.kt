@@ -2,6 +2,9 @@ package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
 import com.delhomme.jobber.Model.Evenement
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class EvenementDataRepository(context: Context) : BaseDataRepository<Evenement>(context, "evenements") {
 
@@ -25,6 +28,13 @@ class EvenementDataRepository(context: Context) : BaseDataRepository<Evenement>(
                 evenements.remove(it)
                 saveItemsToPrefs(evenements)
             }
+        }
+    }
+
+    fun getEventsOn(date: Date): List<Evenement> {
+        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return findByCondition { evenement ->
+            format.format(evenement.startTime) == format.format(date)
         }
     }
 

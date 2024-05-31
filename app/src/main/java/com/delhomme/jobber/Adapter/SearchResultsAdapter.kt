@@ -5,20 +5,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Api.Repository.SearchDataRepository
 import com.delhomme.jobber.Model.Appel
-import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Model.Contact
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.Model.Entretien
-import com.delhomme.jobber.R
+import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Model.Relance
+import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class SearchResultsAdapter(private val items: List<Any>, private val dataRepository: DataRepository, private val onClick: (Any) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SearchResultsAdapter(private val items: List<Any>,
+                           private val searchDataRepository: SearchDataRepository,
+                           private val onClick: (Any) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
@@ -40,9 +42,9 @@ class SearchResultsAdapter(private val items: List<Any>, private val dataReposit
             1 -> ContactViewHolder(inflater.inflate(R.layout.item_contact, parent, false))
             2 -> EntrepriseViewHolder(inflater.inflate(R.layout.item_entreprise, parent, false))
             3 -> EntretienViewHolder(inflater.inflate(R.layout.item_entretien, parent, false))
-            4 -> AppelViewHolder(inflater.inflate(R.layout.item_appel, parent, false), dataRepository )
+            4 -> AppelViewHolder(inflater.inflate(R.layout.item_appel, parent, false), searchDataRepository)
             5 -> EvenementViewHolder(inflater.inflate(R.layout.item_event, parent, false))
-            6 -> RelanceViewHolder(inflater.inflate(R.layout.item_relance, parent, false), dataRepository)
+            6 -> RelanceViewHolder(inflater.inflate(R.layout.item_relance, parent, false), searchDataRepository)
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -113,24 +115,6 @@ class SearchResultsAdapter(private val items: List<Any>, private val dataReposit
             typeEntretien.text = entretien.type
         }
     }
-    class AppelViewHolder(view: View, private val dataRepository: DataRepository) : RecyclerView.ViewHolder(view) {
-        private val date: TextView = view.findViewById(R.id.tvDateAppel)
-        private val objet: TextView = view.findViewById(R.id.tvObjetAppel)
-        private val company: TextView = view.findViewById(R.id.tvEntrepriseAppel)
-        private val contact: TextView = view.findViewById(R.id.tvContactAppel)
-        private val notes: TextView = view.findViewById(R.id.tvNotesAppels)
-
-
-        fun bind(appel: Appel) {
-            date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(appel.date_appel)
-            objet.text = appel.objet
-            company.text = appel.entrepriseNom
-            val contactName = appel.contact_id?.let { dataRepository.getContactById(it)?.getFullName() } ?: "Unknown Contact"
-            contact.text = contactName
-            notes.text = appel.notes
-        }
-    }
-
     class EvenementViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val title: TextView = view.findViewById(R.id.eventTitle)
         private val date: TextView = view.findViewById(R.id.eventDate)
@@ -140,26 +124,39 @@ class SearchResultsAdapter(private val items: List<Any>, private val dataReposit
             date.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(Date(evenement.startTime))
         }
     }
+    class AppelViewHolder(view: View, private val searchDataRepository: SearchDataRepository) : RecyclerView.ViewHolder(view) {
+        private val date: TextView = view.findViewById(R.id.tvDateAppel)
+        private val objet: TextView = view.findViewById(R.id.tvObjetAppel)
+        private val company: TextView = view.findViewById(R.id.tvEntrepriseAppel)
+        private val contact: TextView = view.findViewById(R.id.tvContactAppel)
+        private val notes: TextView = view.findViewById(R.id.tvNotesAppels)
 
-    class RelanceViewHolder(view: View, private val dataRepository: DataRepository) : RecyclerView.ViewHolder(view) {
+        fun bind(appel: Appel) {
+            date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(appel.date_appel)
+            objet.text = appel.objet
+            company.text = appel.entrepriseNom
+            val contactName = appel.contact_id?.let { searchDataRepository.getContactById(it)?.getFullName() } ?: "Unknown Contact"
+            contact.text = contactName
+            notes.text = appel.notes
+        }
+    }
+
+    class RelanceViewHolder(view: View, private val searchDataRepository: SearchDataRepository) : RecyclerView.ViewHolder(view) {
         private val date: TextView = view.findViewById(R.id.dateRelance)
         private val entreprise: TextView = view.findViewById(R.id.entrepriseRelance)
         private val candidatureRelance: TextView = view.findViewById(R.id.candidatureTitre)
         private val plateformeRelance: TextView = view.findViewById(R.id.plateformeRelance)
         private val notesRelance: TextView = view.findViewById(R.id.notesRelance)
 
-
-
         fun bind(relance: Relance) {
-            date.text = relance.date_relance.toString()
+            date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)
             entreprise.text = relance.entrepriseNom
-            candidatureRelance.text = relance.candidatureId.let { dataRepository.getCandidatureById(it)?.titre_offre }
-                ?: "Unknown Candidature"
+            candidatureRelance.text = relance.candidatureId.let { searchDataRepository.getCandidatureById(it)?.titre_offre } ?: "Unknown Candidature"
             plateformeRelance.text = relance.plateformeUtilisee
             notesRelance.text = relance.notes
         }
-
     }
+
 
     override fun getItemCount(): Int = items.size
 

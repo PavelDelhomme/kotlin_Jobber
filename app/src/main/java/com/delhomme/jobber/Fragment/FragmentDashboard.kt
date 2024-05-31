@@ -9,11 +9,18 @@ import android.webkit.WebView
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.delhomme.jobber.Api.Repository.AppelDataRepository
+import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
+import com.delhomme.jobber.Api.Repository.EntretienDataRepository
+import com.delhomme.jobber.Api.Repository.RelanceDataRepository
 import com.delhomme.jobber.R
-import com.delhomme.jobber.Utils.DataRepository
 
 class FragmentDashboard : Fragment() {
-    private lateinit var dataRepository: DataRepository
+    private lateinit var candidatureDataRepository: CandidatureDataRepository
+    private lateinit var appelDataRepository: AppelDataRepository
+    private lateinit var entretienDataRepository: EntretienDataRepository
+    private lateinit var relanceDataRepository: RelanceDataRepository
+
     private lateinit var webViewCandidaturePer7Days: WebView
     private lateinit var webViewCandidaturePerPlateforme: WebView
     private lateinit var webViewCandidaturePerTypePoste: WebView
@@ -25,6 +32,7 @@ class FragmentDashboard : Fragment() {
     private lateinit var webViewRelancePerPlateforme: WebView
     private lateinit var webViewEntretiensPer7Days: WebView
     private lateinit var webViewEntretiensPerStyle: WebView
+
     private lateinit var btnPrevious: Button
     private lateinit var btnToday: Button
     private lateinit var btnNext: Button
@@ -39,7 +47,11 @@ class FragmentDashboard : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.title = "Dashboard"
 
-        dataRepository = DataRepository(requireContext())
+        candidatureDataRepository = CandidatureDataRepository(requireContext())
+        appelDataRepository = AppelDataRepository(requireContext())
+        entretienDataRepository = EntretienDataRepository(requireContext())
+        relanceDataRepository = RelanceDataRepository(requireContext())
+
         setupViews(view)
         setupGraphNavigation()
         loadGraphData()
@@ -80,17 +92,19 @@ class FragmentDashboard : Fragment() {
     }
 
     private fun loadGraphData() {
-        setupWebView(webViewCandidaturePer7Days, dataRepository.getCandidaturesLast7Days(dayOffset))
-        setupWebView(webViewCandidaturePerPlateforme, dataRepository.getCandidaturesPerPlateforme())
-        setupWebView(webViewCandidaturePerTypePoste, dataRepository.getCandidaturesPerTypePoste())
-        setupWebView(webViewCandidaturePerEntreprise, dataRepository.getCandidaturesPerCompany())
-        setupWebView(webViewCandidaturePerLocation, dataRepository.getCandidaturesPerLocation())
-        setupWebView(webViewCandidaturePerState, dataRepository.getCandidaturesPerState())
-        setupWebView(webViewAppelPer7Days, dataRepository.getAppelsLast7DaysDatas(dayOffset))
-        setupWebView(webViewEntretiensPerType, dataRepository.getEntretiensPerTypeDatas())
-        setupWebView(webViewRelancePerPlateforme, dataRepository.getRelancesPerPlateforme())
-        setupWebView(webViewEntretiensPer7Days, dataRepository.getEntretiensLast7Days(dayOffset))
-        setupWebView(webViewEntretiensPerStyle, dataRepository.getEntretiensPerStyleDatas())
+        setupWebView(webViewCandidaturePer7Days, candidatureDataRepository.getCandidaturesLast7Days(dayOffset))
+        setupWebView(webViewCandidaturePerPlateforme, candidatureDataRepository.getCandidaturesPerPlateforme(dayOffset))
+        setupWebView(webViewCandidaturePerTypePoste, candidatureDataRepository.getCandidaturesPerTypePoste(dayOffset))
+        setupWebView(webViewCandidaturePerPlateforme, candidatureDataRepository.getCandidaturesPerPlateforme(dayOffset))
+        setupWebView(webViewCandidaturePerTypePoste, candidatureDataRepository.getCandidaturesPerTypePoste(dayOffset))
+        setupWebView(webViewCandidaturePerEntreprise, candidatureDataRepository.getCandidaturesPerCompany())
+        setupWebView(webViewCandidaturePerLocation, candidatureDataRepository.getCandidaturesPerLocation())
+        setupWebView(webViewCandidaturePerState, candidatureDataRepository.getCandidaturesPerState())
+        setupWebView(webViewAppelPer7Days, appelDataRepository.getAppelsLast7DaysDatas(dayOffset))
+        setupWebView(webViewEntretiensPerType, entretienDataRepository.getEntretiensPerTypeDatas())
+        setupWebView(webViewRelancePerPlateforme, relanceDataRepository.getRelancesPerPlateforme())
+        setupWebView(webViewEntretiensPer7Days, entretienDataRepository.getEntretiensLast7Days(dayOffset))
+        setupWebView(webViewEntretiensPerStyle, entretienDataRepository.getEntretiensPerStyleDatas())
     }
 
     @SuppressLint("SetJavaScriptEnabled")

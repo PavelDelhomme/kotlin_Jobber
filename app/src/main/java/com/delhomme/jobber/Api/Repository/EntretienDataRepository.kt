@@ -63,4 +63,20 @@ class EntretienDataRepository(context: Context) : BaseDataRepository<Entretien>(
     fun loadEntretiensForCandidature(candidatureId: String): List<Entretien> {
         return loadRelatedItemsById2({ it.candidature_id }, candidatureId)
     }
+
+    fun getEntretiensPerTypeDatas(): String {
+        val data = getItemsGroupedBy { it.type }
+            .mapValues { it.value.size }
+        return generateHtmlForGraph("Entretiens par Type", "doughnut", data)
+    }
+    fun getEntretiensLast7Days(dayOffset: Int): String {
+        val data = getLast7DaysData(dayOffset) { entretien -> entretien.date_entretien }
+        return generateHtmlForGraph("Entretiens des Derniers 7 Jours", "line", data)
+    }
+
+    fun getEntretiensPerStyleDatas(): String {
+        val data = getItemsGroupedBy { it.mode }
+            .mapValues { it.value.size }
+        return generateHtmlForGraph("Entretiens par Style", "polarArea", data)
+    }
 }

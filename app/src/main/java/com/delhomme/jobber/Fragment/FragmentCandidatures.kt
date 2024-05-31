@@ -1,11 +1,7 @@
 package com.delhomme.jobber.Fragment
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,96 +9,71 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.delhomme.jobber.Activity.Candidature.AddCandidatureActivity
 import com.delhomme.jobber.Activity.Candidature.DetailsCandidatureActivity
 import com.delhomme.jobber.Activity.Candidature.EditCandidatureActivity
 import com.delhomme.jobber.Adapter.CandidatureAdapter
-import com.delhomme.jobber.Api.Repository.AppelDataRepository
 import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
-import com.delhomme.jobber.Api.Repository.ContactDataRepository
 import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
-import com.delhomme.jobber.Api.Repository.EntretienDataRepository
-import com.delhomme.jobber.Api.Repository.EvenementDataRepository
-import com.delhomme.jobber.Api.Repository.RelanceDataRepository
-import com.delhomme.jobber.Utils.SwipeCallback
 import com.delhomme.jobber.Model.Candidature
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
+import com.delhomme.jobber.Utils.SwipeCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentCandidatures : Fragment() {
-    private lateinit var adapter: CandidatureAdapter
-    private val dataRepository by lazy { DataRepository(requireContext(), AppelDataRepository(context), CandidatureDataRepository(context), EntrepriseDataRepository(context), EvenementDataRepository(context), RelanceDataRepository(context), EntretienDataRepository(context), ContactDataRepository(context)) }
+    private lateinit var candidatureAdapter: CandidatureAdapter
+    private lateinit var candidatureDataRepository: CandidatureDataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
 
-    private val updateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d("FragmentCandidatures", "Broadcast received: com.jobber.CANDIDATURE_LIST_UPDATED")
-            updateCandidatures()
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_candidatures, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
+        (activity as AppCompatActivity).supportActionBar?.title = "Candidatures"
+
+        candidatureDataRepository = CandidatureDataRepository(requireContext())
+        initUI(view)
+    }
+
+    private fun initUI(view: View) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val emptyView = view.findViewById<TextView>(R.id.empty_view_candidatures)
 
-        (activity as AppCompatActivity).supportActionBar?.title = "Candidatures"
-
-        adapter = CandidatureAdapter(
-            dataRepository.getCandidatures(),
-            dataRepository,
+        candidatureAdapter = CandidatureAdapter(
+            candidatureDataRepository.getItems(),
+            candidatureDataRepository,
+            entrepriseDataRepository,
             this::onCandidatureClicked,
             this::onDeleteCandidatureClicked,
             this::onEditCandidatureClicked
         )
-        recyclerView.adapter = adapter
+        recyclerView.adapter = candidatureAdapter
         recyclerView.layoutManager = LinearLayoutManager(context)
         updateUI(recyclerView, emptyView)
-
-        swipeRefreshLayout.setOnRefreshListener {
-            swipeRefreshLayout.isRefreshing = true
-            updateCandidatures()
-            swipeRefreshLayout.isRefreshing = false
-        }
 
         view.findViewById<Button>(R.id.btnAddCandidature).setOnClickListener {
             startActivity(Intent(activity, AddCandidatureActivity::class.java))
         }
 
+        setupSwipeCallback(recyclerView)
+    }
 
-        val swipeCallback = SwipeCallback(requireContext(),
-            { position ->
-                val candidature = adapter.candidatures[position]
-                showDeleteConfirmationDialog(candidature.id, position)
-            },
-            { position ->
-                val candidature = adapter.candidatures[position]
-                onEditCandidatureClicked(candidature.id)
-            }
+
+    private fun setupSwipeCallback(recyclerView: RecyclerView) {
+        val swipeCallback = SwipeCallback(requireActivity(),
+            { position -> showDeleteConfirmationDialog(candidatureAdapter.candidatures[position].id, position) },
+            { position -> onEditCandidatureClicked(candidatureAdapter.candidatures[position].id) }
         )
-
-        val itemTouchHelper = ItemTouchHelper(swipeCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-
-
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(updateReceiver, IntentFilter("com.jobber.CANDIDATURE_LIST_UPDATED"))
+        ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView)
     }
 
     private fun updateUI(recyclerView: RecyclerView, emptyView: TextView) {
-        if (adapter.itemCount > 0) {
+        if (candidatureAdapter.itemCount > 0) {
             recyclerView.visibility = View.VISIBLE
             emptyView.visibility = View.GONE
         } else {
@@ -115,53 +86,26 @@ class FragmentCandidatures : Fragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Confirmation de suppression")
             .setMessage("Voulez-vous vraiment supprimer cette candidature ?")
-            .setNegativeButton("Annuler") { dialog, _ ->
-                adapter.notifyItemChanged(position)
-                dialog.dismiss()
-            }
-            .setPositiveButton("Supprimer") { dialog, _ ->
-                onDeleteCandidatureClicked(candidatureId)
-                dialog.dismiss()
-            }
+            .setNegativeButton("Annuler", null)
+            .setPositiveButton("Supprimer") { _, _ -> onDeleteCandidatureClicked(candidatureId) }
             .show()
     }
 
     private fun onCandidatureClicked(candidature: Candidature) {
-        val intent = Intent(activity, DetailsCandidatureActivity::class.java).apply {
+        startActivity(Intent(activity, DetailsCandidatureActivity::class.java).apply {
             putExtra("CANDIDATURE_ID", candidature.id)
-        }
-        startActivity(intent)
+        })
     }
 
     private fun onDeleteCandidatureClicked(candidatureId: String) {
-        dataRepository.deleteCandidature(candidatureId)
+        candidatureDataRepository.deleteCandidature(candidatureId)
+        candidatureAdapter.updateCandidatures(candidatureDataRepository.getItems())
+        updateUI(view?.findViewById(R.id.recyclerView) as RecyclerView, view?.findViewById(R.id.empty_view_candidatures) as TextView)
     }
 
     private fun onEditCandidatureClicked(candidatureId: String) {
-        val intent = Intent(activity, EditCandidatureActivity::class.java).apply {
+        startActivity(Intent(activity, EditCandidatureActivity::class.java).apply {
             putExtra("CANDIDATURE_ID", candidatureId)
-        }
-        startActivity(intent)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(updateReceiver, IntentFilter("com.jobber.CANDIDATURE_LIST_UPDATED"))
-        adapter.updateCandidatures(dataRepository.getCandidatures())
-    }
-
-    override fun onPause() {
-        super.onPause()
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(updateReceiver)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(updateReceiver)
-    }
-
-    private fun updateCandidatures() {
-        adapter.updateCandidatures(dataRepository.getCandidatures())
-        adapter.notifyDataSetChanged()
+        })
     }
 }

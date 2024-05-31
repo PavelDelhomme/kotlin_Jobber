@@ -64,5 +64,11 @@ class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(cont
         return listOf("---", "Présentiel", "Visioconférence")
     }
 
+    fun getRelancesPerPlateforme(): String {
+        val data = getItemsGroupedBy { it.plateformeUtilisee }
+            .mapValues { it.value.size }
+        return generateHtmlForGraph("Relances par Plateformes", "pie", data)
+    }
+
 
 }

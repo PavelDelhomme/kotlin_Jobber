@@ -18,7 +18,6 @@ import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Api.Repository.EntretienDataRepository
 import com.delhomme.jobber.Api.Repository.EvenementDataRepository
 import com.delhomme.jobber.Api.Repository.RelanceDataRepository
-import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.MainActivity
 import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Model.Candidature
@@ -26,6 +25,7 @@ import com.delhomme.jobber.Model.Contact
 import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.Model.Evenement
+import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.Model.Notification
 import com.delhomme.jobber.Model.Relance
 import com.delhomme.jobber.Notification.NotificationReceiver
@@ -843,7 +843,6 @@ class DataRepository(
             }
         }
     }
-
     fun generateGlobalData(dayOffset: Int = 0): String {
         val candidatures = loadCandidatures()
         val appels = getAppelsLast7Days()
@@ -936,7 +935,6 @@ class DataRepository(
         val graphId = "global_data_chart"
         return generate_graph(title, chartData, graphId, "bar", options)
     }
-
     private fun generate_graph(title: String, chartData: JSONObject, chartId: String, chartType: String, options: JSONObject): String {
         return """
     <html>
@@ -971,7 +969,6 @@ class DataRepository(
             })
         }
     }
-
     fun standardOptions(): JSONObject {
         return JSONObject().apply {
             put("responsive", true)
@@ -987,13 +984,7 @@ class DataRepository(
             })
         }
     }
-    fun <T> getLast7DaysData(
-        dayOffset: Int,
-        loadData: () -> List<T>,
-        dateExtractor: (T) -> Date,
-        label: String,
-        backgroundColor: String
-    ): String {
+    fun <T> getLast7DaysData(dayOffset: Int, loadData: () -> List<T>, dateExtractor: (T) -> Date, label: String, backgroundColor: String): String {
         val uniformColor = "#4BC0C0"
         val now = Calendar.getInstance()
         now.add(Calendar.DAY_OF_YEAR, dayOffset)
@@ -1031,14 +1022,7 @@ class DataRepository(
         return generate_graph(title, chartData, graphId, "bar", options)
     }
 
-    fun <T> getDataGroupedBy(
-        loadData: () -> List<T>,
-        groupByExtractor: (T) -> String,
-        title: String,
-        chartType: String = "pie",
-        colors: Array<String>? = null,
-        optionsCustomizer: (JSONObject) -> Unit = {}
-    ): String {
+    fun <T> getDataGroupedBy(loadData: () -> List<T>, groupByExtractor: (T) -> String, title: String, chartType: String = "pie", colors: Array<String>? = null, optionsCustomizer: (JSONObject) -> Unit = {}): String {
         val dataItems = loadData()
         val groupedData = dataItems.groupBy(groupByExtractor).mapValues { it.value.size }
 
@@ -1062,19 +1046,7 @@ class DataRepository(
         return generate_graph(title, chartData, graphId, chartType, options)
     }
 
-    fun getCustomizedCandidaturesChart(): String {
-        return getDataGroupedBy(
-            ::loadCandidatures,
-            { it.type_poste },
-            "Customized Candidatures Chart",
-            "bar",
-            arrayOf("#FF6384"),
-            { options ->
-                options.getJSONObject("scales").getJSONArray("yAxes").getJSONObject(0).getJSONObject("ticks").put("stepSize", 5)
-            }
-        )
-    }
-
+    fun getCustomizedCandidaturesChart(): String { return getDataGroupedBy(::loadCandidatures, { it.type_poste }, "Customized Candidatures Chart", "bar", arrayOf("#FF6384"),{ options -> options.getJSONObject("scales").getJSONArray("yAxes").getJSONObject(0).getJSONObject("ticks").put("stepSize", 5) } ) }
 
     fun getDataPerPlatform(loadData: () -> List<Any>, labelExtractor: (Any) -> String, title: String): String {
         val dataItems = loadData()
@@ -1097,7 +1069,6 @@ class DataRepository(
         val graphId = title.filter { it.isLetterOrDigit() }.toLowerCase() + "Chart"
         return generate_graph(title, chartData, graphId, "pie", options)
     }
-
 
     fun getCandidaturesPerLocation(): String {
         return getDataGroupedBy(

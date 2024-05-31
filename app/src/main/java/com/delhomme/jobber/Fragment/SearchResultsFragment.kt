@@ -9,29 +9,28 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Activity.Appel.DetailsAppelActivity
-import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.Activity.Calendrier.DetailsEvenementActivity
-import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Activity.Candidature.DetailsCandidatureActivity
-import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Activity.Contact.DetailsContactActivity
-import com.delhomme.jobber.Model.Contact
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.Activity.Entreprise.DetailsEntrepriseActivity
-import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.Activity.Entretien.DetailsEntretienActivity
-import com.delhomme.jobber.Model.Entretien
-import com.delhomme.jobber.R
 import com.delhomme.jobber.Activity.Relance.DetailsRelanceActivity
 import com.delhomme.jobber.Adapter.SearchResultsAdapter
+import com.delhomme.jobber.Api.Repository.SearchDataRepository
+import com.delhomme.jobber.Model.Appel
+import com.delhomme.jobber.Model.Candidature
+import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Model.Entreprise
+import com.delhomme.jobber.Model.Entretien
+import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Model.Relance
+import com.delhomme.jobber.R
 
 
 class SearchResultsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private var results: List<Any>? = null
-    private val dataRepository by lazy { DataRepository(requireContext()) }
-
+    private val searchDataRepository by lazy { SearchDataRepository(requireContext()) }
 
     companion object {
         fun newInstance(results: List<Any>) = SearchResultsFragment().apply {
@@ -58,7 +57,7 @@ class SearchResultsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = SearchResultsAdapter(results ?: emptyList(), dataRepository, this::onItemClicked)
+        recyclerView.adapter = SearchResultsAdapter(results ?: emptyList(), searchDataRepository, this::onItemClicked)
     }
 
     private fun onItemClicked(item: Any) {

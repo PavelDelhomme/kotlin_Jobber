@@ -4,6 +4,8 @@ import android.content.Context
 import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Model.EventType
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.UUID
 
 class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidature>(context, "candidatures") {
@@ -105,5 +107,43 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
             it.entretiens.add(entretienId)
             saveItemsToPrefs(items!!)
         }
+    }
+
+    fun getCandidaturesLast7Days(dayOffset: Int): String {
+        val endDate = Calendar.getInstance()
+        endDate.add(Calendar.DATE, dayOffset)
+        val startDate = endDate.clone() as Calendar
+        startDate.add(Calendar.DATE, -7)
+
+        val filteredItems = items?.filter {
+            it.date_candidature.after(startDate.time) && it.date_candidature.before(endDate.time)
+        }?.groupingBy { SimpleDateFormat("yyyy-MM-dd").format(it.date_candidature) }
+            ?.eachCount() ?: emptyMap()
+
+        return generateHtmlForGraph("Candidatures des 7 derniers jours", "", filteredItems)
+    }
+    fun getCandidaturesPerPlateforme(dayOffset: Int): String {
+        return String()
+    }
+    fun getCandidaturesPerTypePoste(dayOffset: Int): String {
+        return String()
+    }
+
+    fun getCandidaturesPerCompany(): String {
+        val data = getItemsGroupedBy { it.entrepriseNom }
+            .mapValues { it.value.size }
+        return generateHtmlForGraph("Candidatures par Entreprise", "bar", data)
+    }
+
+    fun getCandidaturesPerLocation(): String {
+        val data = getItemsGroupedBy { it.lieuPoste }
+            .mapValues { it.value.size }
+        return generateHtmlForGraph("Candidatures par Lieu", "pie", data)
+    }
+
+    fun getCandidaturesPerState(): String {
+        val data = getItemsGroupedBy { it.state.toString() }
+            .mapValues { it.value.size }
+        return generateHtmlForGraph("Candidatures par Etat", "line", data)
     }
 }

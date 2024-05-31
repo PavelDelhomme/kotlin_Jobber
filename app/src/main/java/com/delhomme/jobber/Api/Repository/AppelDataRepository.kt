@@ -79,4 +79,9 @@ class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context,
         items?.removeAll { it.entrepriseNom == entrepriseId }
         saveItemsToPrefs(items ?: mutableListOf())
     }
+    fun getAppelsLast7DaysDatas(dayOffset: Int): String {
+        val data = getLast7DaysData(dayOffset) { appel -> appel.date_appel }
+        return generateHtmlForGraph("Appels des 7 derniers jours", "bar", data)
+    }
+
 }

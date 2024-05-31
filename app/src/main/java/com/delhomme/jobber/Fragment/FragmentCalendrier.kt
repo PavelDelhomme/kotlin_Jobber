@@ -10,8 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.delhomme.jobber.Adapter.EventsAdapter
+import com.delhomme.jobber.Api.Repository.EvenementDataRepository
 import com.delhomme.jobber.Model.Evenement
-import com.delhomme.jobber.Utils.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -23,6 +23,7 @@ class FragmentCalendrier : Fragment() {
     private lateinit var prevDayButton: Button
     private lateinit var nextDayButton: Button
     private var currentDate = Calendar.getInstance()
+    private lateinit var evenementDataRepository: EvenementDataRepository
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_calendrier, container, false)
@@ -35,6 +36,7 @@ class FragmentCalendrier : Fragment() {
         currentDayTextView = view.findViewById(R.id.currentDay)
         prevDayButton = view.findViewById(R.id.prevDayButton)
         nextDayButton = view.findViewById(R.id.nextDayButton)
+        evenementDataRepository = EvenementDataRepository(requireContext())
 
         updateDateInView()
         setupDayView()
@@ -60,7 +62,7 @@ class FragmentCalendrier : Fragment() {
         currentDayTextView.text = dateFormat.format(currentDate.time)
     }
     private fun setupDayView() {
-        val events = DataRepository(requireContext()).getEventsOn(currentDate.time)
+        val events = evenementDataRepository.getEventsOn(currentDate.time)
         eventsRecyclerView.layoutManager = LinearLayoutManager(context)
         eventsRecyclerView.adapter = EventsAdapter(events)
         scrollToNearestEvent(events)
