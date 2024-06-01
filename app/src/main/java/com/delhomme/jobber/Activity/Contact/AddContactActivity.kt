@@ -57,7 +57,7 @@ class AddContactActivity : AppCompatActivity() {
                 prenom = prenom,
                 email = email,
                 telephone = telephone,
-                entrepriseNom = entreprise.nom,
+                entreprise = entreprise.nom,
                 appelsIds = mutableListOf()  // Starting with an empty list of calls
             )
 

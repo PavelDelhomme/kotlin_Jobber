@@ -18,12 +18,12 @@ class EvenementDataRepository(context: Context) : BaseDataRepository<Evenement>(
     }
 
     fun findEventByRelatedId(relatedId: String): Evenement? {
-        return allItems?.find { it.relatedId == relatedId }
+        return allItems?.find { it.related_id == relatedId }
     }
 
     fun deleteEventByRelatedId(relatedId: String) {
         allItems?.let { evenements ->
-            val eventToRemove = evenements.firstOrNull { it.relatedId == relatedId }
+            val eventToRemove = evenements.firstOrNull { it.related_id == relatedId }
             eventToRemove?.let {
                 evenements.remove(it)
                 saveItemsToPrefs(evenements)
@@ -34,7 +34,7 @@ class EvenementDataRepository(context: Context) : BaseDataRepository<Evenement>(
     fun getEventsOn(date: Date): List<Evenement> {
         val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return findByCondition { evenement ->
-            format.format(evenement.startTime) == format.format(date)
+            format.format(evenement.start_time) == format.format(date)
         }
     }
 
@@ -45,7 +45,7 @@ class EvenementDataRepository(context: Context) : BaseDataRepository<Evenement>(
 
     fun deleteEventsByContactId(contactId: String) {
         allItems?.let { evenements ->
-            val eventsToRemove = evenements.filter { it.relatedId == contactId }
+            val eventsToRemove = evenements.filter { it.related_id == contactId }
             eventsToRemove.forEach { evenements.remove(it) }
             saveItemsToPrefs(evenements)
         }

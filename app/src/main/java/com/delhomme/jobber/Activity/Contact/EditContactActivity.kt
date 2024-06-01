@@ -69,7 +69,7 @@ class EditContactActivity : AppCompatActivity() {
             etContactNom = findViewById<EditText>(R.id.etContactNom).apply { setText(cont.nom) }
             etContactEmail = findViewById<EditText>(R.id.etContactEmail).apply { setText(cont.email) }
             etContactPhone = findViewById<EditText>(R.id.etContactPhone).apply { setText(cont.telephone) }
-            actvEntreprise.setText(cont.entrepriseNom)
+            actvEntreprise.setText(cont.entreprise)
         }
     }
 
@@ -88,7 +88,7 @@ class EditContactActivity : AppCompatActivity() {
             nom = nom,
             email = email,
             telephone = phone,
-            entrepriseNom = entreprise.nom
+            entreprise = entreprise.nom
         )
 
         contactDataRepository.addOrUpdateContact(updatedContact)

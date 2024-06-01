@@ -38,7 +38,7 @@ class CandidatureAdapter(
             val cardView: CardView = itemView.findViewById(R.id.cardView2)
             cardView.setBackgroundColor(itemView.context.resources.getColor(getStateColor(candidature.state), null))
 
-            val entrepriseNom = entrepriseDataRepository.findByCondition { it.nom == candidature.entrepriseNom }.firstOrNull()?.nom ?: "Unknown entreprise"
+            val entrepriseNom = entrepriseDataRepository.findByCondition { it.nom == candidature.entreprise }.firstOrNull()?.nom ?: "Unknown entreprise"
 
             nomPoste.text = candidature.titre_offre
             entreprise.text = entrepriseNom

@@ -34,13 +34,13 @@ class RelanceAdapter(
             deleteListener: (String) -> Unit,
             editListener: (String) -> Unit
         ) {
-            val entrepriseName = dataRepository.findByCondition { it.entrepriseNom == relance.entrepriseNom }.firstOrNull()?.entrepriseNom ?: "Entreprise inconnue"
-            val candidature = candidatureDataRepository.findByCondition { it.id == relance.candidatureId }
+            val entrepriseName = dataRepository.findByCondition { it.entreprise == relance.entreprise }.firstOrNull()?.entreprise ?: "Entreprise inconnue"
+            val candidature = candidatureDataRepository.findByCondition { it.id == relance.candidature }
                 .firstOrNull()?.titre_offre ?: "Offre inconnue"
             dateRelance.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)
             entreprise.text = entrepriseName
             candidatureTitre.text = candidature
-            plateformeUtilise.text = relance.plateformeUtilisee
+            plateformeUtilise.text = relance.plateforme_utilisee
             notesRelance.text = relance.notes ?: "Aucune note de relance"
 
             itemView.setOnClickListener { itemClickListener(relance) }

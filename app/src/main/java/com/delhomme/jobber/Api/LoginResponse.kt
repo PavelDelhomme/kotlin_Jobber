@@ -1,9 +1,7 @@
 package com.delhomme.jobber.Api
 
-import com.delhomme.jobber.Model.UserProfile
-
 data class LoginResponse(
-    val userProfile: UserProfile,
-    val token: String,
-    val refresh: String
+    //val userProfile: UserProfile,
+    val access: String?,
+    val refresh: String?
 )

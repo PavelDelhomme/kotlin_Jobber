@@ -32,13 +32,13 @@ class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(cont
         val eventRepo = EvenementDataRepository(context)
         val event = eventRepo.findEventByRelatedId(relance.id) ?: Evenement(
             id = UUID.randomUUID().toString(),
-            title = "Relance de ${relance.entrepriseNom}",
+            title = "Relance de ${relance.entreprise}",
             description = "Relance concernant ${relance.notes}",
-            startTime = relance.date_relance.time,
-            endTime = relance.date_relance.time + 600000,
+            start_time = relance.date_relance.time,
+            end_time = relance.date_relance.time + 600000,
             type = EventType.Relance,
-            relatedId = relance.id,
-            entrepriseId = relance.entrepriseNom!!,
+            related_id = relance.id,
+            entreprise_id = relance.entreprise!!,
             color = "#909090"
         )
         eventRepo.saveItem(event)
@@ -50,13 +50,13 @@ class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(cont
     }
 
     fun loadRelancesForCandidature(candidatureId: String): List<Relance> {
-        return findByCondition { it.candidatureId == candidatureId }
+        return findByCondition { it.candidature == candidatureId }
     }
     fun loadRelancesForEntreprise(entrepriseNom: String): List<Relance> {
-        return findByCondition { it.entrepriseNom == entrepriseNom }
+        return findByCondition { it.entreprise == entrepriseNom }
     }
     fun loadRelancesForContact(contactId: String): List<Relance> {
-        return findByCondition { it.contactId == contactId }
+        return findByCondition { it.contact == contactId }
     }
 
     // TODO : Implement getTypeRelanceOptions
@@ -65,7 +65,7 @@ class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(cont
     }
 
     fun getRelancesPerPlateforme(): String {
-        val data = getItemsGroupedBy { it.plateformeUtilisee }
+        val data = getItemsGroupedBy { it.plateforme_utilisee }
             .mapValues { it.value.size }
         return generateHtmlForGraph("Relances par Plateformes", "pie", data)
     }

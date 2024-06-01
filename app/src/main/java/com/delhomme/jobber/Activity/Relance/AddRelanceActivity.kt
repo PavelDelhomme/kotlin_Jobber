@@ -90,7 +90,7 @@ class AddRelanceActivity : AppCompatActivity() {
         } ?: candidatureId?.let {
             val candidature = candidatureDataRepository.findByCondition { it.id == candidatureId }.firstOrNull()
             candidature?.let { cand ->
-                entrepriseDataRepository.findByCondition { it.nom == cand.entrepriseNom }.firstOrNull()
+                entrepriseDataRepository.findByCondition { it.nom == cand.entreprise }.firstOrNull()
             }
         }
 
@@ -154,10 +154,10 @@ class AddRelanceActivity : AppCompatActivity() {
 
         val relance = Relance(
             date_relance = date,
-            plateformeUtilisee = plateforme,
-            entrepriseNom = entrepriseNom,
-            contactId = contact?.id,
-            candidatureId = candidatureId,
+            plateforme_utilisee = plateforme,
+            entreprise = entrepriseNom,
+            contact = contact?.id,
+            candidature = candidatureId,
             notes = notes
         )
 

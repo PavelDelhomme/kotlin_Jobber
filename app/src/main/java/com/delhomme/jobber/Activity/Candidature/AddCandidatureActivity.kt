@@ -89,10 +89,10 @@ class AddCandidatureActivity : AppCompatActivity() {
 
         val newCandidature = Candidature(
             titre_offre = titreOffre,
-            entrepriseNom = entreprise.nom,
+            entreprise = entreprise.nom,
             type_poste = typePoste,
             plateforme = plateformeUtilisee,
-            lieuPoste = lieuPoste,
+            lieu_poste = lieuPoste,
             state = CandidatureState.CANDIDATEE_ET_EN_ATTENTE,
             notes = notesCandidature,
             date_candidature = dateCandidature

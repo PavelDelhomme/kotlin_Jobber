@@ -28,10 +28,10 @@ abstract class BaseDataRepository<T>(val context: Context, private val sharedPre
         allItems = mutableItems
         saveItemsToPrefs(allItems!!)
     }
-
     fun loadItems(): MutableList<T> {
         val jsonString = context.getSharedPreferences("JobberPrefs", Context.MODE_PRIVATE).getString(sharedPrefsKey, null)
         return if (jsonString != null) {
+            val type = object : TypeToken<MutableList<T>>() {}.type
             gson.fromJson(jsonString, type)
         } else {
             mutableListOf()

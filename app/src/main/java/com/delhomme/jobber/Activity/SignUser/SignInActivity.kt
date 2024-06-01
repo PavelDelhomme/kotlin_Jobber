@@ -16,7 +16,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-
 class SignInActivity : AppCompatActivity() {
     private lateinit var userRepository: UserRepository
 
@@ -40,11 +39,12 @@ class SignInActivity : AppCompatActivity() {
             }
         }
     }
-    private fun registerUser(email: String, password: String) {
-        userRepository.registerUser(email, password, object : Callback<LoginResponse> {
+
+    private fun registerUser(username: String, password: String) {
+        userRepository.registerUser(username, password, object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
-                    response.body()?.token?.let {
+                    response.body()?.access?.let {
                         LocalStorageManager.saveJWT(it)
                         startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                         finish()

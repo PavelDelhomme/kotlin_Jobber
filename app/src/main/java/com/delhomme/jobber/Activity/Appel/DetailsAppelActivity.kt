@@ -45,7 +45,7 @@ class DetailsAppelActivity : AppCompatActivity() {
         val appelObjet = findViewById<TextView>(R.id.appelObjet)
         val appelNotes = findViewById<TextView>(R.id.appelNotes)
 
-        appelNomContact.text = appel.contact_id?.let { contactDataRepository.findByCondition { contact -> contact.id == it }.firstOrNull()?.getFullName() } ?: "No Contact"
+        appelNomContact.text = appel.contact?.let { contactDataRepository.findByCondition { contact -> contact.id == it }.firstOrNull()?.getFullName() } ?: "No Contact"
         appelNomEntreprise.text = appel.entrepriseNom?.let { entrepriseDataRepository.findByCondition { entreprise -> entreprise.nom == it }.firstOrNull()?.nom } ?: "No Entreprise"
         appelDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(appel.date_appel)
         appelObjet.text = appel.objet

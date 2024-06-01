@@ -28,21 +28,33 @@ class UserRepository(context: Context) : BaseDataRepository<User>(context, "user
         }
         saveItemsToPrefs(mutableItems)
     }
-
-    fun loginUser(email: String, password: String, callback: Callback<LoginResponse>) {
-        val loginInfo = mapOf("email" to email, "password" to password)
+    fun loginUser(username: String, password: String, callback: Callback<LoginResponse>) {
+        val loginInfo = mapOf("username" to username, "password" to password)
         Log.d("UserRepository", "loginUser : loginInfo : $loginInfo")
         userService.loginUser(loginInfo).enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                Log.d("UserRepository", "Réponse reçue: ${response.body()}")
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        LocalStorageManager.saveJWT(it.token)
-                        LocalStorageManager.saveRefreshToken(it.refresh)
-                        callback.onResponse(call, response)
+                        val token = it.access
+                        val refreshToken = it.refresh
+
+                        if (token != null && refreshToken != null) {
+                            LocalStorageManager.saveJWT(token)
+                            LocalStorageManager.saveRefreshToken(refreshToken)
+                            callback.onResponse(call, response)
+                        } else {
+                            Log.e("UserRepository", "Token ou Refresh Token manquant")
+                            // Informer l'utilisateur de l'erreur
+                            callback.onFailure(call, RuntimeException("Token ou Refresh Token manquant"))
+                        }
+                    } ?: run {
+                        Log.e("UserRepository", "Réponse vide du serveur")
+                        callback.onFailure(call, RuntimeException("Réponse vide du serveur"))
                     }
                 } else {
-                    Log.e("UserRepository", "Failed to log in: ${response.message()}")
-                    callback.onFailure(call, RuntimeException("Failed to log in: ${response.message()}"))
+                    Log.e("UserRepository", "Échec de la connexion: ${response.message()}")
+                    callback.onFailure(call, RuntimeException("Échec de la connexion: ${response.message()}"))
                 }
             }
 
@@ -53,15 +65,16 @@ class UserRepository(context: Context) : BaseDataRepository<User>(context, "user
         })
     }
 
-    fun registerUser(email: String, password: String, callback: Callback<LoginResponse>) {
-        val userProfile = UserProfile(email, password)
+
+    fun registerUser(username: String, password: String, callback: Callback<LoginResponse>) {
+        val userProfile = UserProfile(username, password)
         Log.d("registerUser UserRepository", "registerUser : userProfile : $userProfile")
         userService.createUserProfile(userProfile).enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        Log.d("UserRepository", "Token reçu: ${it.token}")
-                        LocalStorageManager.saveJWT(it.token)
+                        Log.d("UserRepository", "Token reçu: ${it.access}")
+                        LocalStorageManager.saveJWT(it.access!!)
                         callback.onResponse(call, response)
                     }
                 } else {

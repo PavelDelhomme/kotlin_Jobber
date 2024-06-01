@@ -81,7 +81,7 @@ class DetailsContactActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
             startActivity(Intent(this, AddAppelActivity::class.java).apply {
                 putExtra("CONTACT_ID", contact.id)
-                putExtra("ENTREPRISE_ID", contact.entrepriseNom)
+                putExtra("ENTREPRISE_ID", contact.entreprise)
             })
         }
     }
@@ -92,7 +92,7 @@ class DetailsContactActivity : AppCompatActivity() {
         val contactPhone = findViewById<TextView>(R.id.telephoneContact)
         val contactEntreprise = findViewById<TextView>(R.id.contactEntreprise)
 
-        val entreprise = entrepriseDataRepository.getItems().find { it.nom == contact.entrepriseNom }
+        val entreprise = entrepriseDataRepository.getItems().find { it.nom == contact.entreprise }
 
         contactNomComplet.text = contact.getFullName()
         contactEmail.text = contact.email
@@ -183,7 +183,7 @@ class DetailsContactActivity : AppCompatActivity() {
         startActivity(Intent(this, EditAppelActivity::class.java).apply {
             putExtra("APPEL_ID", appelId)
             putExtra("CONTACT_ID", contact.id)
-            putExtra("ENTREPRISE_ID", contact.entrepriseNom)
+            putExtra("ENTREPRISE_ID", contact.entreprise)
         })
         updateAppelList()
     }

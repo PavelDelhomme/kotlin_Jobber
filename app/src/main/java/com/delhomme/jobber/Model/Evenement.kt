@@ -4,10 +4,10 @@ data class Evenement(
     val id: String,
     var title: String,
     var description: String,
-    var startTime: Long,
-    var endTime: Long,
+    var start_time: Long,
+    var end_time: Long,
     val type: EventType,
-    val relatedId: String,
-    val entrepriseId: String,
+    val related_id: String,
+    val entreprise_id: String,
     var color: String = "#FFFFFF"
 )

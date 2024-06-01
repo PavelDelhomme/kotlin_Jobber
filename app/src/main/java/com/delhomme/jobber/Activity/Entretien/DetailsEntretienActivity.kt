@@ -52,7 +52,7 @@ class DetailsEntretienActivity : AppCompatActivity() {
 
     private fun bindData(entretien: Entretien) {
         val entreprise = entrepriseDataRepository.findByCondition { it.nom == entretien.entrepriseNom }.firstOrNull()
-        val candidature = candidatureDataRepository.findByCondition { it.id == entretien.candidature_id }.firstOrNull()
+        val candidature = candidatureDataRepository.findByCondition { it.id == entretien.candidatureId }.firstOrNull()
 
         findViewById<TextView>(R.id.tvEntretienDate).text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(entretien.date_entretien)
         findViewById<TextView>(R.id.tvEntretienEntreprise).text = entreprise?.nom

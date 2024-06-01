@@ -99,25 +99,25 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     private fun setupButtons() {
         findViewById<Button>(R.id.btnAddContact).setOnClickListener {
             startActivity(Intent(this, AddContactActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
+                putExtra("ENTREPRISE_ID", candidature.entreprise)
                 putExtra("CANDIDATURE_ID", candidatureId)
             })
         }
         findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
             startActivity(Intent(this, AddAppelActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
+                putExtra("ENTREPRISE_ID", candidature.entreprise)
                 putExtra("CANDIDATURE_ID", candidature.id)
             })
         }
         findViewById<Button>(R.id.btnAddRelance).setOnClickListener {
             startActivity(Intent(this, AddRelanceActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
+                putExtra("ENTREPRISE_ID", candidature.entreprise)
                 putExtra("CANDIDATURE_ID", candidature.id)
             })
         }
         findViewById<Button>(R.id.btnAddEntretien).setOnClickListener {
             startActivity(Intent(this, AddEntretienActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", candidature.entrepriseNom)
+                putExtra("ENTREPRISE_ID", candidature.entreprise)
                 putExtra("CANDIDATURE8ID", candidature.id)
             })
         }
@@ -153,15 +153,15 @@ class DetailsCandidatureActivity : AppCompatActivity() {
 
     private fun displayCandidatureDetails() {
         findViewById<TextView>(R.id.titreoffre).text = candidature.titre_offre
-        findViewById<TextView>(R.id.tvEntrepriseCandidature).text = candidature.entrepriseNom
+        findViewById<TextView>(R.id.tvEntrepriseCandidature).text = candidature.entreprise
         findViewById<TextView>(R.id.tvNotesCandidature).text = candidature.notes
         findViewById<TextView>(R.id.tvDateCandidature).text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)
         findViewById<TextView>(R.id.tvTypePoste).text = candidature.type_poste
         findViewById<TextView>(R.id.tvPlateforme).text = candidature.plateforme
-        findViewById<TextView>(R.id.tvLieuPoste).text = candidature.lieuPoste
+        findViewById<TextView>(R.id.tvLieuPoste).text = candidature.lieu_poste
         findViewById<TextView>(R.id.tvEtatCandidature).text = getStateWithEmoji(candidature.state)
 
-        title = "$${candidature.titre_offre} - ${candidature.entrepriseNom}"
+        title = "$${candidature.titre_offre} - ${candidature.entreprise}"
     }
 
     private fun getStateWithEmoji(state: CandidatureState): String {
@@ -216,7 +216,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     }
 
     private fun setupContactRecyclerView() {
-        val contacts = contactDataRepository.findByCondition { it.entrepriseNom == candidature.entrepriseNom }
+        val contacts = contactDataRepository.findByCondition { it.entreprise == candidature.entreprise }
         val contactAdapter = ContactAdapter(contacts, contactDataRepository, entrepriseDataRepository, this::onContactClicked, this::onDeleteContactClicked, this::onEditContactClicked)
         findViewById<RecyclerView>(R.id.recyclerViewContacts).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)
@@ -286,11 +286,11 @@ class DetailsCandidatureActivity : AppCompatActivity() {
         (findViewById<RecyclerView>(R.id.recyclerViewAppels).adapter as AppelAdapter).updateAppels(appels)
     }
     private fun updateEntretienList() {
-        val entretiens = entretienDataRepository.findByCondition { it.candidature_id == candidature.id }
+        val entretiens = entretienDataRepository.findByCondition { it.candidatureId == candidature.id }
         (findViewById<RecyclerView>(R.id.recyclerViewEntretiens).adapter as EntretienAdapter).updateEntretiens(entretiens)
     }
     private fun updateRelanceList() {
-        val relances = relanceDataRepository.findByCondition { it.candidatureId == candidature.id }
+        val relances = relanceDataRepository.findByCondition { it.candidature == candidature.id }
         (findViewById<RecyclerView>(R.id.recyclerViewRelances).adapter as RelanceAdapter).updateRelances(relances)
     }
 
@@ -300,7 +300,7 @@ class DetailsCandidatureActivity : AppCompatActivity() {
     }
 
     private fun setupEntretienRecyclerView() {
-        val entretiens = entretienDataRepository.findByCondition { it.candidature_id == candidature.id }
+        val entretiens = entretienDataRepository.findByCondition { it.candidatureId == candidature.id }
         val entretienAdapter = EntretienAdapter(entretiens, entretienDataRepository, entrepriseDataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
         findViewById<RecyclerView>(R.id.recyclerViewEntretiens).apply {
             layoutManager = LinearLayoutManager(this@DetailsCandidatureActivity)

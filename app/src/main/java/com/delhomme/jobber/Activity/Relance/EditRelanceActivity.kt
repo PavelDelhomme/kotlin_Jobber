@@ -103,8 +103,8 @@ class EditRelanceActivity : AppCompatActivity() {
                 val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                 etDateRelance.setText(dateFormat.format(r.date_relance))
                 etNotesRelance.setText(r.notes)
-                spPlateformeRelance.setSelection((spPlateformeRelance.adapter as ArrayAdapter<String>).getPosition(r.plateformeUtilisee))
-                val contactIndex = (spContact.adapter as ArrayAdapter<String>).getPosition(contactDataRepository.findByCondition { contact -> contact.id == r.contactId }.firstOrNull()?.getFullName() ?: "")
+                spPlateformeRelance.setSelection((spPlateformeRelance.adapter as ArrayAdapter<String>).getPosition(r.plateforme_utilisee))
+                val contactIndex = (spContact.adapter as ArrayAdapter<String>).getPosition(contactDataRepository.findByCondition { contact -> contact.id == r.contact }.firstOrNull()?.getFullName() ?: "")
                 spContact.setSelection(maxOf(0, contactIndex))
             }
         }
@@ -121,10 +121,10 @@ class EditRelanceActivity : AppCompatActivity() {
             val updatedRelance = Relance(
                 id = it,
                 date_relance = dateRelance,
-                plateformeUtilisee = plateforme,
-                entrepriseNom = autoCompleteEntreprise.text.toString(),
-                contactId = contact?.id,
-                candidatureId = intent.getStringExtra("CANDIDATURE_ID").toString(), // Adjust as necessary
+                plateforme_utilisee = plateforme,
+                entreprise = autoCompleteEntreprise.text.toString(),
+                contact = contact?.id,
+                candidature = intent.getStringExtra("CANDIDATURE_ID").toString(), // Adjust as necessary
                 notes = notes
             )
             relanceDataRepository.updateOrAddItem(relanceDataRepository.getItems().toMutableList(), updatedRelance)

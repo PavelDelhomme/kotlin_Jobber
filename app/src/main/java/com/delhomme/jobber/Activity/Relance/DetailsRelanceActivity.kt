@@ -46,9 +46,9 @@ class DetailsRelanceActivity : AppCompatActivity() {
     }
     private fun displayRelanceDetails() {
         findViewById<TextView>(R.id.tvDateRelance).text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)
-        findViewById<TextView>(R.id.tvPlateforme).text = relance.plateformeUtilisee
-        findViewById<TextView>(R.id.tvEntreprise).text = relance.entrepriseNom
-        findViewById<TextView>(R.id.tvContact).text = relance.contactId ?: "Aucun contact"
+        findViewById<TextView>(R.id.tvPlateforme).text = relance.plateforme_utilisee
+        findViewById<TextView>(R.id.tvEntreprise).text = relance.entreprise
+        findViewById<TextView>(R.id.tvContact).text = relance.contact ?: "Aucun contact"
         findViewById<TextView>(R.id.tvNotes).text = relance.notes ?: "Aucune note"
     }
 
@@ -56,8 +56,8 @@ class DetailsRelanceActivity : AppCompatActivity() {
     private fun navigateToEditRelance() {
         Intent(this, EditRelanceActivity::class.java).also {
             it.putExtra("RELANCE_ID", relance.id)
-            it.putExtra("ENTREPRISE_ID", relance.entrepriseNom)
-            it.putExtra("CANDIDATURE_ID", relance.candidatureId)
+            it.putExtra("ENTREPRISE_ID", relance.entreprise)
+            it.putExtra("CANDIDATURE_ID", relance.candidature)
             startActivity(it)
         }
     }

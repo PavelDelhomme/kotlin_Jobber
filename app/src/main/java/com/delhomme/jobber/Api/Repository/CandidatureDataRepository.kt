@@ -37,11 +37,11 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
             id = UUID.randomUUID().toString(),
             title = "Candidature pour ${candidature.titre_offre} chez ${candidature.date_candidature}",
             description = "Candidature concernant ${candidature.notes}",
-            startTime = candidature.date_candidature.time,
-            endTime = candidature.date_candidature.time + 600000,
+            start_time = candidature.date_candidature.time,
+            end_time = candidature.date_candidature.time + 600000,
             type = EventType.Candidature,
-            relatedId = candidature.id,
-            entrepriseId = candidature.entrepriseNom,
+            related_id = candidature.id,
+            entreprise_id = candidature.entreprise,
             color = "#202020"
         )
         eventRepo.saveItem(event)
@@ -97,7 +97,7 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
     }
 
     fun loadCandidaturesForEntreprise(entrepriseNom: String): List<Candidature> {
-        return loadRelatedItemsById2({ it.entrepriseNom }, entrepriseNom)
+        return loadRelatedItemsById2({ it.entreprise }, entrepriseNom)
     }
 
     fun addEntretienToCandidature(candidatureId: String, entretienId: String) {
@@ -131,13 +131,13 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
     }
 
     fun getCandidaturesPerCompany(): String {
-        val data = getItemsGroupedBy { it.entrepriseNom }
+        val data = getItemsGroupedBy { it.entreprise }
             .mapValues { it.value.size }
         return generateHtmlForGraph("Candidatures par Entreprise", "bar", data)
     }
 
     fun getCandidaturesPerLocation(): String {
-        val data = getItemsGroupedBy { it.lieuPoste }
+        val data = getItemsGroupedBy { it.lieu_poste }
             .mapValues { it.value.size }
         return generateHtmlForGraph("Candidatures par Lieu", "pie", data)
     }

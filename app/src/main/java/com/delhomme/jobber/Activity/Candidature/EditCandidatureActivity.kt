@@ -94,10 +94,10 @@ class EditCandidatureActivity : AppCompatActivity() {
                 findViewById<EditText>(R.id.etTitreOffre).setText(cand.titre_offre)
                 findViewById<EditText>(R.id.etNotes).setText(cand.notes)
                 setupDatePicker(cand.date_candidature)
-                findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).setText(cand.entrepriseNom)
+                findViewById<AutoCompleteTextView>(R.id.actvNomEntreprise).setText(cand.entreprise)
                 findViewById<Spinner>(R.id.spinner_plateforme).setSelection((findViewById<Spinner>(R.id.spinner_plateforme).adapter as ArrayAdapter<String>).getPosition(cand.plateforme))
                 findViewById<Spinner>(R.id.spinner_type_poste).setSelection((findViewById<Spinner>(R.id.spinner_type_poste).adapter as ArrayAdapter<String>).getPosition(cand.type_poste))
-                findViewById<EditText>(R.id.etLieuPoste).setText(cand.lieuPoste)
+                findViewById<EditText>(R.id.etLieuPoste).setText(cand.lieu_poste)
                 findViewById<Spinner>(R.id.spinnerState).setSelection(cand.state.ordinal)
                 findViewById<EditText>(R.id.etNotes).setText(cand.notes)
             }
@@ -119,11 +119,11 @@ class EditCandidatureActivity : AppCompatActivity() {
         val updatedCandidature = Candidature(
             id = candidatureId!!,
             titre_offre = titre,
-            entrepriseNom = entreprise.nom,
+            entreprise = entreprise.nom,
             date_candidature = dateCandidature,
             plateforme = plateforme,
             type_poste = typePoste,
-            lieuPoste = lieuPoste,
+            lieu_poste = lieuPoste,
             state = state,
             notes = notes
         )

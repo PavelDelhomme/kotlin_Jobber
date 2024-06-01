@@ -19,15 +19,15 @@ class ContactDataRepository(context: Context) : BaseDataRepository<Contact>(cont
 
 
     fun loadContactsForEntreprise(entrepriseNom: String): List<Contact> {
-        return findByCondition { it.entrepriseNom == entrepriseNom }
+        return findByCondition { it.entreprise == entrepriseNom }
     }
 
     fun loadContactsForCandidature(candidatureId: String): List<Contact> {
         return findByCondition { it.candidatureIds!!.contains(candidatureId) }
     }
     fun getOrCreateContact(nom: String, prenom: String, entrepriseNom: String): Contact {
-        val contact = allItems?.find { it.nom == nom && it.prenom == prenom && it.entrepriseNom == entrepriseNom }
-        return contact ?: Contact(nom = nom, prenom = prenom, email = "", telephone = "", entrepriseNom = entrepriseNom).also {
+        val contact = allItems?.find { it.nom == nom && it.prenom == prenom && it.entreprise == entrepriseNom }
+        return contact ?: Contact(nom = nom, prenom = prenom, email = "", telephone = "", entreprise = entrepriseNom).also {
             updateOrAddItem(allItems ?: mutableListOf(), it)
         }
     }

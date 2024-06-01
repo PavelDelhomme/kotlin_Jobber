@@ -124,7 +124,7 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
         }
     }
     private fun setupCandidatureRecyclerView() {
-        val candidatures = candidatureDataRepository.findByCondition { it.entrepriseNom == entreprise.nom }
+        val candidatures = candidatureDataRepository.findByCondition { it.entreprise == entreprise.nom }
         val candidaturesAdapter = CandidatureAdapter(candidatures, candidatureDataRepository, entrepriseDataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked, this::onEditCandidatureClicked)
         findViewById<RecyclerView>(R.id.rvCandidatures).apply {
             layoutManager = LinearLayoutManager(context)
@@ -171,7 +171,7 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
     }
     private fun onDeleteCandidatureClicked(candidatureId: String) {
         candidatureDataRepository.deleteCandidature(candidatureId)
-        candidaturesAdapter.updateCandidatures(candidatureDataRepository.findByCondition { it.entrepriseNom == entreprise.nom })
+        candidaturesAdapter.updateCandidatures(candidatureDataRepository.findByCondition { it.entreprise == entreprise.nom })
     }
     private fun onDeleteRelanceClicked(relanceId: String) {
         relanceDataRepository.deleteRelance(relanceId)
@@ -207,7 +207,7 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
     }
 
     private fun updateCandidaturesList() {
-        val candidatures = candidatureDataRepository.loadRelatedItemsById2({ it.entrepriseNom }, entreprise.nom)
+        val candidatures = candidatureDataRepository.loadRelatedItemsById2({ it.entreprise }, entreprise.nom)
         if (candidatures.isNotEmpty()) {
             candidaturesAdapter.updateCandidatures(candidatures)
         } else {

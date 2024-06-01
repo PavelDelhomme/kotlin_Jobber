@@ -73,7 +73,7 @@ class SearchResultsAdapter(private val items: List<Any>,
 
         fun bind(candidature: Candidature) {
             nomPoste.text = candidature.titre_offre
-            entreprise.text = candidature.entrepriseNom
+            entreprise.text = candidature.entreprise
             date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(candidature.date_candidature)
             etat.text = candidature.state.toString()
             typePoste.text = candidature.type_poste
@@ -90,7 +90,7 @@ class SearchResultsAdapter(private val items: List<Any>,
 
         fun bind(contact: Contact) {
             fullName.text = contact.getFullName()
-            company.text = contact.entrepriseNom
+            company.text = contact.entreprise
             phone.text = contact.telephone
             email.text = contact.email
         }
@@ -121,7 +121,7 @@ class SearchResultsAdapter(private val items: List<Any>,
 
         fun bind(evenement: Evenement) {
             title.text = evenement.title
-            date.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(Date(evenement.startTime))
+            date.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(Date(evenement.start_time))
         }
     }
     class AppelViewHolder(view: View, private val searchDataRepository: SearchDataRepository) : RecyclerView.ViewHolder(view) {
@@ -135,7 +135,7 @@ class SearchResultsAdapter(private val items: List<Any>,
             date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(appel.date_appel)
             objet.text = appel.objet
             company.text = appel.entrepriseNom
-            val contactName = appel.contact_id?.let { searchDataRepository.getContactById(it)?.getFullName() } ?: "Unknown Contact"
+            val contactName = appel.contact?.let { searchDataRepository.getContactById(it)?.getFullName() } ?: "Unknown Contact"
             contact.text = contactName
             notes.text = appel.notes
         }
@@ -150,9 +150,9 @@ class SearchResultsAdapter(private val items: List<Any>,
 
         fun bind(relance: Relance) {
             date.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(relance.date_relance)
-            entreprise.text = relance.entrepriseNom
-            candidatureRelance.text = relance.candidatureId.let { searchDataRepository.getCandidatureById(it)?.titre_offre } ?: "Unknown Candidature"
-            plateformeRelance.text = relance.plateformeUtilisee
+            entreprise.text = relance.entreprise
+            candidatureRelance.text = relance.candidature.let { searchDataRepository.getCandidatureById(it)?.titre_offre } ?: "Unknown Candidature"
+            plateformeRelance.text = relance.plateforme_utilisee
             notesRelance.text = relance.notes
         }
     }

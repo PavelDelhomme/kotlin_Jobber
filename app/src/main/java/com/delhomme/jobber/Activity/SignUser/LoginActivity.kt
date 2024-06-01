@@ -44,13 +44,13 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginUser(email: String, password: String) {
-        Log.d("LoginActivity", "loginUser : email : $email, password : $password")
-        userRepository.loginUser(email, password, object : Callback<LoginResponse> {
+    private fun loginUser(username: String, password: String) {
+        Log.d("LoginActivity", "loginUser : username : $username, password : $password")
+        userRepository.loginUser(username, password, object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        LocalStorageManager.saveJWT(it.token)
+                        LocalStorageManager.saveJWT(it.access!!)
                         Log.d("LoginActivity", "LoginActivity : token saved to Storage")
                         Log.d("LoginActivity", "LoginActivity : starting MainActivity")
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
@@ -63,7 +63,6 @@ class LoginActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                Log.e("LoginActivity", "Erreur réseau : ${t.message}")
                 Log.e("LoginActivity", "Erreur réseau : ${t.message}")
                 Toast.makeText(this@LoginActivity, "Erreur réseau : ${t.message}", Toast.LENGTH_LONG).show()
             }

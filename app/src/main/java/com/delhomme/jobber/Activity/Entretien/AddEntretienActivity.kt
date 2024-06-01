@@ -79,15 +79,9 @@ class AddEntretienActivity : AppCompatActivity() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerModeEntretien.adapter = adapter
         }
-        /*
-        findViewById<Button>(R.id.btnAddNewContact).setOnClickListener {
-            toggleNewContactFields()
-        }*/
-
 
         setupEntrepriseAutoComplete()
         setupContactAutoComplete()
-        /*setupNewContactFields()*/
         setupDateTimePicker()
         setupListeners()
     }
@@ -103,34 +97,6 @@ class AddEntretienActivity : AppCompatActivity() {
         val contactAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, contacts)
         autoCompleteTextViewContact.setAdapter(contactAdapter)
     }
-    /*
-    private fun toggleNewContactFields() {
-        val visibility = if (findViewById<EditText>(R.id.newContactFirstName).visibility == View.GONE) View.VISIBLE else View.GONE
-        findViewById<EditText>(R.id.newContactFirstName).visibility = visibility
-        findViewById<EditText>(R.id.newContactLastName).visibility = visibility
-        //findViewById<EditText>(R.id.newContactEmail).visibility = visibility
-        //findViewById<EditText>(R.id.newContactPhone).visibility = visibility
-    }*/
-
-    /*
-    private fun showContactPicker() {
-        val contacts = contactDataRepository.loadContactsForEntreprise(autoCompleteTextViewEntreprise.text.toString())
-        val contactNames = contacts.map { "${it.prenom} ${it.nom}" }.toTypedArray()
-        val selectedContacts = BooleanArray(contactNames.size)
-        AlertDialog.Builder(this)
-            .setTitle("Sélectionnez les contacts")
-            .setMultiChoiceItems(contactNames, selectedContacts) { _, which, isChecked ->
-                selectedContacts[which] = isChecked
-            }
-            .setPositiveButton("OK") { dialog, _ ->
-                val selectedContactIds = contacts.filterIndexed { index, _ -> selectedContacts[index] }.map { it.id }
-                dialog.dismiss()
-            }
-            .setNegativeButton("Annuler") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
-    }*/
 
     private fun setupDateTimePicker() {
         etDateEntretien.setOnClickListener {
@@ -145,11 +111,13 @@ class AddEntretienActivity : AppCompatActivity() {
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
         }
     }
+
     private fun setupListeners() {
         findViewById<Button>(R.id.button_add_entretien).setOnClickListener {
             addEntretien()
         }
     }
+
     private fun addEntretien() {
         val nomEntreprise = autoCompleteTextViewEntreprise.text.toString()
         val parts = autoCompleteTextViewContact.text.toString().split(" ")
@@ -164,7 +132,6 @@ class AddEntretienActivity : AppCompatActivity() {
         createEntretien(contact, entreprise, candidatureId)
     }
 
-
     private fun createEntretien(contact: Contact, entreprise: Entreprise, candidatureId: String) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
         val dateEntretien = dateFormat.parse(etDateEntretien.text.toString()) ?: Date()
@@ -178,9 +145,8 @@ class AddEntretienActivity : AppCompatActivity() {
             mode = modeEntretien,
             notes_pre_entretien = notesPreEntretien,
             entrepriseNom = entreprise.nom,
-            contact_id = contact.id,
-            candidature_id = candidatureId ?: "",
-            contact = contact
+            contacts = mutableListOf(contact.id),
+            candidatureId = candidatureId
         )
 
         entretienDataRepository.updateOrAddItem(entretienDataRepository.getItems().toMutableList(), entretien)

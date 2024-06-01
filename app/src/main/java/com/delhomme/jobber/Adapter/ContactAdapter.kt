@@ -28,7 +28,7 @@ class ContactAdapter(
         val email: TextView = view.findViewById(R.id.emailContact)
 
         fun bind(contact: Contact, entrepriseDataRepository: EntrepriseDataRepository, clickListener: (Contact) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
-            val entrepriseName = entrepriseDataRepository.findByCondition { it.nom == contact.entrepriseNom }.firstOrNull()?.nom ?: "Entreprise inconnue"
+            val entrepriseName = entrepriseDataRepository.findByCondition { it.nom == contact.entreprise }.firstOrNull()?.nom ?: "Entreprise inconnue"
             fullNameContact.text = contact.getFullName()
             entreprise.text = entrepriseName
             telephone.text = contact.telephone

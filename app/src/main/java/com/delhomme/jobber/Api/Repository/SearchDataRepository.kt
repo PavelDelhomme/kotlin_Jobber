@@ -37,7 +37,7 @@ class SearchDataRepository(context: Context) {
         contactDataRepository.getItems().filter {
             it.getFullName().contains(query ?: "", ignoreCase = true) ||
                     it.email.contains(query ?: "", ignoreCase = true) ||
-                    it.entrepriseNom.contains(query ?: "", ignoreCase = true) ||
+                    it.entreprise.contains(query ?: "", ignoreCase = true) ||
                     it.telephone.contains(query ?: "", ignoreCase = true)
         }
 
@@ -58,9 +58,9 @@ class SearchDataRepository(context: Context) {
 
     private fun searchRelances(query: String?): List<Relance> =
         relanceDataRepository.getItems().filter {
-            it.entrepriseNom.contains(query ?: "", ignoreCase = true) ||
+            it.entreprise.contains(query ?: "", ignoreCase = true) ||
                     it.notes?.contains(query ?: "", ignoreCase = true) == true ||
-                    it.plateformeUtilisee.contains(query ?: "", ignoreCase = true)
+                    it.plateforme_utilisee.contains(query ?: "", ignoreCase = true)
         }
 
     private fun searchEvenements(query: String?): List<Evenement> =

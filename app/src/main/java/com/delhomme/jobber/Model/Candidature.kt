@@ -7,18 +7,18 @@ import java.util.UUID
 data class Candidature(
     val id : String = UUID.randomUUID().toString(),
     val titre_offre: String,
-    val entrepriseNom: String,
+    val entreprise: String,
     val date_candidature: Date,
     val plateforme: String,
     val type_poste: String,
-    val lieuPoste: String,
+    val lieu_poste: String,
     var state: CandidatureState,
     var notes: String,
-    val retourPostEntretien: Boolean = false,
+    val retour_post_entretien: Boolean = false,
     var archivee: Boolean = false,
     val entretiens: MutableList<String> = mutableListOf(),
     val appels: MutableList<String> = mutableListOf(),
     var relances: MutableList<String> = mutableListOf(),
-    var etatManuel: Boolean = false,
+    var etat_manuel: Boolean = false,
     var contacts: MutableList<String> = mutableListOf()
 )

@@ -31,12 +31,12 @@ class EntretienDataRepository(context: Context) : BaseDataRepository<Entretien>(
         val event = eventRepo.findEventByRelatedId(entretien.id) ?: Evenement(
             id = UUID.randomUUID().toString(),
             title = "Entretien : ${entretien.entrepriseNom} ${entretien.type}",
+            start_time = entretien.date_entretien.time,
             description = "Entretien pour ${entretien.entrepriseNom} de type ${entretien.type} en mode ${entretien.mode} \nNotes de pré entretien : \n${entretien.notes_pre_entretien}\n\nNotes de post-entretien : \n${entretien.notes_post_entretien}",
-            startTime = entretien.date_entretien.time,
-            endTime = entretien.date_entretien.time + 600000,
+            end_time = entretien.date_entretien.time + 600000,
             type = EventType.Entretien,
-            relatedId = entretien.id,
-            entrepriseId = entretien.entrepriseNom,
+            related_id = entretien.id,
+            entreprise_id = entretien.entrepriseNom,
             color = "#909090"
         )
         eventRepo.saveItem(event)
@@ -61,7 +61,7 @@ class EntretienDataRepository(context: Context) : BaseDataRepository<Entretien>(
         return loadRelatedItemsById2({ entrepriseNom }, entrepriseNom)
     }
     fun loadEntretiensForCandidature(candidatureId: String): List<Entretien> {
-        return loadRelatedItemsById2({ it.candidature_id }, candidatureId)
+        return loadRelatedItemsById2({ it.candidatureId }, candidatureId)
     }
 
     fun getEntretiensPerTypeDatas(): String {

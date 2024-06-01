@@ -92,7 +92,7 @@ class EditAppelActivity : AppCompatActivity() {
     private fun setupContactSpinner() {
         val contacts = entrepriseNom?.let {
             entrepriseDataRepository.findByCondition { it.nom == entrepriseNom }.flatMap {
-                contactDataRepository.findByCondition { contact -> contact.entrepriseNom == it.nom }
+                contactDataRepository.findByCondition { contact -> contact.entreprise == it.nom }
             }
         } ?: contactDataRepository.getItems()
         val contactNames = contacts.map { it.getFullName() }.toMutableList()
@@ -139,8 +139,8 @@ class EditAppelActivity : AppCompatActivity() {
             appelId?.let {
                 val updatedAppel = Appel(
                     it,
-                    candidature_id = candidatureId,
-                    contact_id = selectedContctId,
+                    candidature = candidatureId,
+                    contact = selectedContctId,
                     entrepriseNom = entrepriseNom,
                     date_appel = date,
                     objet = objet,

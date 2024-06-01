@@ -77,7 +77,7 @@ class FragmentCalendrier : Fragment() {
 
     private fun findNearestEventIndex(events: List<Evenement>): Int {
         val now = System.currentTimeMillis()
-        return events.indexOfFirst { it.startTime > now }
+        return events.indexOfFirst { it.start_time > now }
     }
 
 }

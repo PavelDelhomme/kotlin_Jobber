@@ -6,21 +6,32 @@ import android.util.Log
 import com.auth0.android.jwt.JWT
 
 object LocalStorageManager {
+    private const val PREFS_NAME = "JobberPrefs"
+    private const val JWT_TOKEN_KEY = "JWT_TOKEN_KEY"
+    private const val REFRESH_TOKEN_KEY = "REFRESH_TOKEN_KEY"
     private lateinit var sharedPreferences: SharedPreferences
 
     fun initialize(context: Context) {
-        sharedPreferences = context.getSharedPreferences("JobberAppPrefs", Context.MODE_PRIVATE)
+        sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         Log.d("LocalStorageManager", "initialiaze : shared¨Preferences: $sharedPreferences")
     }
 
     fun saveJWT(token: String) {
-        sharedPreferences.edit().putString("JWT_TOKEN", token).apply()
-        Log.d("LocalStorageManager", "saveJWT : JWT_TOKEN : ${sharedPreferences.getString("JWT_TOKEN", "Non trouvé")} saved")
+        sharedPreferences.edit().putString(JWT_TOKEN_KEY, token).apply()
     }
 
+    fun saveRefreshToken(refreshToken: String) {
+        Log.d("LocalStorageManager", "saveRefreshToken, refreshToken : $refreshToken")
+        sharedPreferences.edit().putString(REFRESH_TOKEN_KEY, refreshToken).apply()
+    }
+
+
     fun getJWT(): String? {
-        Log.d("LocalStorageManager", "getJWT : JWT_TOKEN: ${sharedPreferences.getString("JWT_TOKEN", "Non trouvé")}")
-        return sharedPreferences.getString("JWT_TOKEN", null)
+        return sharedPreferences.getString(JWT_TOKEN_KEY, null)
+    }
+    fun getRefreshToken(): String? {
+        Log.d("LocalStorageManager", "getRefreshToken, refresh_token: ${sharedPreferences.getString("REFRESH_TOKEN", "No token refresh getted")}")
+        return sharedPreferences.getString(REFRESH_TOKEN_KEY, null)
     }
 
     fun saveData(key: String, value: String) {
@@ -44,15 +55,6 @@ object LocalStorageManager {
         sharedPreferences.edit().remove(key).apply()
     }
 
-    fun saveRefreshToken(token: String) {
-        Log.d("LocalStorageManager", "saveRefreshToken, token : $token")
-        sharedPreferences.edit().putString("REFRESH_TOKEN", token).apply()
-    }
-
-    fun getRefreshToken(): String? {
-        Log.d("LocalStorageManager", "getRefreshToken, refresh_token: ${sharedPreferences.getString("REFRESH_TOKEN", "No token refresh getted")}")
-        return sharedPreferences.getString("REFRESH_TOKEN", null)
-    }
 
     fun clearRefreshToken() {
         Log.d("LocalStorageManager", "clearRefreshToken")

@@ -6,10 +6,10 @@ import java.util.UUID
 data class Relance(
     val id: String = UUID.randomUUID().toString(),
     val date_relance: Date,
-    val plateformeUtilisee: String,
-    val entrepriseNom: String,
-    val contactId: String?,
-    val candidatureId: String,
+    val plateforme_utilisee: String,
+    val entreprise: String,
+    val contact: String?,
+    val candidature: String,
     val notes: String?,
 
 )

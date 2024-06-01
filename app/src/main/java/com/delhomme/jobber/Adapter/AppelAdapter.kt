@@ -29,7 +29,7 @@ class AppelAdapter(
         private val textViewEntreprise: TextView = view.findViewById(R.id.tvEntrepriseAppel)
 
         fun bind(appel: Appel, appelDataRepository: AppelDataRepository, contactDataRepository: ContactDataRepository, clickListener: (Appel) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
-            val contactName = appel.contact_id?.let { contactId ->
+            val contactName = appel.contact?.let { contactId ->
                 contactDataRepository.getItems().find { it.id == contactId }?.getFullName() ?: "No Contact"
             } ?: "No Contact"
 

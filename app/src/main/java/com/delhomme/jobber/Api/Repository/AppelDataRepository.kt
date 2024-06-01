@@ -32,16 +32,16 @@ class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context,
 
     private fun updateEventForAppel(appel: Appel) {
         val eventRepo = EvenementDataRepository(context)
-        val existingEvent = eventRepo.findByCondition { it.relatedId == appel.id }.firstOrNull()
+        val existingEvent = eventRepo.findByCondition { it.related_id == appel.id }.firstOrNull()
         val event = existingEvent ?: Evenement(
             id = UUID.randomUUID().toString(),
             title = "Appel: ${appel.objet}",
             description = "Appel concernant : ${appel.notes}",
-            startTime = appel.date_appel.time,
-            endTime = appel.date_appel.time + 600000,
+            start_time = appel.date_appel.time,
+            end_time = appel.date_appel.time + 600000,
             type = EventType.Appel,
-            relatedId = appel.id,
-            entrepriseId = appel.entrepriseNom ?: "",
+            related_id = appel.id,
+            entreprise_id = appel.entrepriseNom ?: "",
             color = "#808080"
         )
         eventRepo.saveItem(event)
@@ -53,11 +53,11 @@ class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context,
     }
 
     fun loadAppelsForCandidature(candidatureId: String): List<Appel> {
-        return findByCondition { it.candidature_id == candidatureId }
+        return findByCondition { it.candidature == candidatureId }
     }
 
     fun loadAppelsForContact(contactId: String): List<Appel> {
-        return findByCondition { it.contact_id == contactId }
+        return findByCondition { it.contact == contactId }
     }
 
     fun loadAppelsForEntreprise(entrepriseNom: String): List<Appel> {
@@ -76,7 +76,7 @@ class AppelDataRepository(context: Context) : BaseDataRepository<Appel>(context,
 
     fun deleteAppelsByContactId(contactId: String) {
         allItems?.let { appels ->
-            val appelsToRemove = appels.filter { it.contact_id == contactId }
+            val appelsToRemove = appels.filter { it.contact == contactId }
             appelsToRemove.forEach {
                 deleteEventForAppel(it)
                 appels.remove(it)
