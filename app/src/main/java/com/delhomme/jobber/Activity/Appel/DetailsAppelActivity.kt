@@ -3,15 +3,18 @@ package com.delhomme.jobber.Activity.Appel
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.delhomme.jobber.Api.Repository.AppelDataRepository
 import com.delhomme.jobber.Api.Repository.ContactDataRepository
 import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Model.Appel
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class DetailsAppelActivity : AppCompatActivity() {
+    private lateinit var appel: Appel
     private lateinit var appelDataRepository: AppelDataRepository
     private lateinit var contactDataRepository: ContactDataRepository
     private lateinit var entrepriseDataRepository: EntrepriseDataRepository
@@ -29,7 +32,12 @@ class DetailsAppelActivity : AppCompatActivity() {
         entrepriseDataRepository = EntrepriseDataRepository(this)
 
         val appelId = intent.getStringExtra("APPEL_ID") ?: return
-        val appel = appelDataRepository.getAppelById(appelId) ?: return
+        if (appelDataRepository.getItems().find { it.id == appelId } == null) {
+            Toast.makeText(this, "Appel non trouvé !", Toast.LENGTH_LONG).show()
+            finish()
+        } else {
+            appel = appelDataRepository.getItems().find { it.id == appelId } ?: return
+        }
 
         val appelDate = findViewById<TextView>(R.id.appelDate)
         val appelNomContact = findViewById<TextView>(R.id.appelContactNom)

@@ -10,9 +10,6 @@ import java.util.UUID
 
 class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidature>(context, "candidatures") {
 
-    private lateinit var entrepriseRepository: EntrepriseDataRepository
-    private lateinit var candidatureRepository: CandidatureDataRepository
-
     override fun updateOrAddItem(mutableItems: MutableList<Candidature>, item: Candidature) {
         val index = mutableItems.indexOfFirst { it.id == item.id }
         if (index != -1) {
@@ -24,7 +21,7 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
     }
 
     fun deleteCandidature(candidatureId: String) {
-        items?.let { candidatures ->
+        allItems?.let { candidatures ->
             val candidatureToRemove = candidatures.firstOrNull { it.id == candidatureId }
             candidatureToRemove?.let {
                 candidatures.remove(it)
@@ -33,7 +30,6 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
             }
         }
     }
-
 
     private fun updateEventsForCandidature(candidature: Candidature) {
         val eventRepo = EvenementDataRepository(context)
@@ -55,14 +51,15 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
         val eventRepo = EvenementDataRepository(context)
         eventRepo.deleteEventByRelatedId(candidature.id)
     }
+
     fun addOrUpdateCandidature(candidature: Candidature) {
-        val index = items?.indexOfFirst { it.id == candidature.id }
+        val index = allItems?.indexOfFirst { it.id == candidature.id }
         if (index != null && index != -1) {
-            items!![index] = candidature
+            allItems!![index] = candidature
         } else {
-            items?.add(candidature)
+            allItems?.add(candidature)
         }
-        saveItemsToPrefs(items!!)
+        saveItemsToPrefs(allItems!!)
     }
 
     fun getTypePosteOptions(): List<String> {
@@ -98,14 +95,15 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
     fun loadCandidaturesForContact(contactId: String): List<Candidature> {
         return loadItemsWhereCollectionContains({ it.contacts }, contactId)
     }
+
     fun loadCandidaturesForEntreprise(entrepriseNom: String): List<Candidature> {
         return loadRelatedItemsById2({ it.entrepriseNom }, entrepriseNom)
     }
 
     fun addEntretienToCandidature(candidatureId: String, entretienId: String) {
-        items?.find { it.id == candidatureId }?.let {
+        allItems?.find { it.id == candidatureId }?.let {
             it.entretiens.add(entretienId)
-            saveItemsToPrefs(items!!)
+            saveItemsToPrefs(allItems!!)
         }
     }
 
@@ -115,16 +113,19 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
         val startDate = endDate.clone() as Calendar
         startDate.add(Calendar.DATE, -7)
 
-        val filteredItems = items?.filter {
+        val filteredItems = allItems?.filterIsInstance<Candidature>()?.filter {
             it.date_candidature.after(startDate.time) && it.date_candidature.before(endDate.time)
-        }?.groupingBy { SimpleDateFormat("yyyy-MM-dd").format(it.date_candidature) }
-            ?.eachCount() ?: emptyMap()
+        }?.groupingBy {
+            SimpleDateFormat("yyyy-MM-dd").format(it.date_candidature)
+        }?.eachCount() ?: emptyMap()
 
-        return generateHtmlForGraph("Candidatures des 7 derniers jours", "", filteredItems)
+        return generateHtmlForGraph("Candidatures des 7 derniers jours", "bar", filteredItems)
     }
+
     fun getCandidaturesPerPlateforme(dayOffset: Int): String {
         return String()
     }
+
     fun getCandidaturesPerTypePoste(dayOffset: Int): String {
         return String()
     }

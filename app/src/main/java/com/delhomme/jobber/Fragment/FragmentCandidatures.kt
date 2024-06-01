@@ -36,8 +36,13 @@ class FragmentCandidatures : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.title = "Candidatures"
 
-        candidatureDataRepository = CandidatureDataRepository(requireContext())
+        initRepository()
         initUI(view)
+    }
+
+    private fun initRepository() {
+        candidatureDataRepository = CandidatureDataRepository(requireContext())
+        entrepriseDataRepository = EntrepriseDataRepository(requireContext())
     }
 
     private fun initUI(view: View) {

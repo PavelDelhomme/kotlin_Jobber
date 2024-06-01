@@ -16,7 +16,7 @@ class EntretienDataRepository(context: Context) : BaseDataRepository<Entretien>(
     }
 
     fun deleteEntretien(entretienId: String) {
-        items?.let { entretiens ->
+        allItems?.let { entretiens ->
             val entretienToRemove = entretiens.firstOrNull { it.id == entretienId }
             entretienToRemove?.let {
                 entretiens.remove(it)

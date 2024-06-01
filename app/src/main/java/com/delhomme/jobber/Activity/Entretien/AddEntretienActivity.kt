@@ -161,7 +161,7 @@ class AddEntretienActivity : AppCompatActivity() {
         val entreprise = entrepriseDataRepository.getOrCreateEntreprise(nomEntreprise)
         val candidatureId = intent.getStringExtra("CANDIDATURE_ID") ?: ""
 
-        val entretien = createEntretien(contact, entreprise, candidatureId)
+        createEntretien(contact, entreprise, candidatureId)
     }
 
 
@@ -187,7 +187,7 @@ class AddEntretienActivity : AppCompatActivity() {
         entreprise.entretiens.add(entretien.id)
         entrepriseDataRepository.saveItem(entreprise)
 
-        candidatureId?.let {
+        candidatureId.let {
             // Associer cet entretien à la candidature si spécifié
             candidatureDataRepository.addEntretienToCandidature(it, entretien.id)
         }

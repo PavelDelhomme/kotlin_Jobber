@@ -4,5 +4,6 @@ import com.delhomme.jobber.Model.UserProfile
 
 data class LoginResponse(
     val userProfile: UserProfile,
-    val token: String
+    val token: String,
+    val refresh: String
 )

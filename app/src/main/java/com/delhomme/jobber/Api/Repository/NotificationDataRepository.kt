@@ -20,7 +20,7 @@ class NotificationDataRepository(context: Context) : BaseDataRepository<Notifica
     }
 
     fun getNotifications(): List<Notification> {
-        return items?.sortedByDescending { it.date } ?: emptyList()
+        return allItems?.sortedByDescending { it.date } ?: emptyList()
     }
 
     fun deleteNotification(notification: Notification) {

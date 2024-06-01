@@ -19,14 +19,14 @@ class EntrepriseDataRepository(context: Context) : BaseDataRepository<Entreprise
     }
 
     fun loadEntreprises(): List<Entreprise> {
-        return items?: listOf()
+        return allItems?: listOf()
     }
     fun getOrCreateEntreprise(nom: String): Entreprise {
-        return items?.find { it.nom == nom } ?: Entreprise(nom).also {
-            updateOrAddItem(items ?: mutableListOf(), it)
+        return allItems?.find { it.nom == nom } ?: Entreprise(nom).also {
+            updateOrAddItem(allItems ?: mutableListOf(), it)
         }
     }
     fun reloadEntreprises() {
-        items = loadItems().toMutableList()
+        allItems = loadItems().toMutableList()
     }
 }

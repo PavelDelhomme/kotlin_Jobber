@@ -18,7 +18,7 @@ class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(cont
     }
 
     fun deleteRelance(relanceId: String) {
-        items?.let { relances ->
+        allItems?.let { relances ->
             val relanceToRemove = relances.firstOrNull { it.id == relanceId }
             relanceToRemove?.let {
                 relances.remove(it)

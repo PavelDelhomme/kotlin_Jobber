@@ -3,55 +3,53 @@ package com.delhomme.jobber.Api.Repository
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 
 abstract class BaseDataRepository<T>(val context: Context, private val sharedPrefsKey: String) {
-    protected var items: MutableList<T>? = null
+    protected var allItems: MutableList<T>? = null
     private val gson = Gson()
+    private val type: Type
 
     init {
-        items = loadItems().toMutableList()
+        type = object : TypeToken<MutableList<T>>() {}.type
+        allItems = loadItems().toMutableList()
     }
 
     fun getItems(): List<T> {
-        return items ?: emptyList()
+        return allItems ?: emptyList()
     }
 
     fun saveItem(item: T) {
-        val mutableItems = items ?: mutableListOf()
+        val mutableItems = allItems ?: mutableListOf()
         updateOrAddItem(mutableItems, item)
-        items = mutableItems
-        saveItemsToPrefs(items!!)
+        allItems = mutableItems
+        saveItemsToPrefs(allItems!!)
     }
 
-    fun loadItems(): List<T> {
+    fun loadItems(): MutableList<T> {
         val jsonString = context.getSharedPreferences("JobberPrefs", Context.MODE_PRIVATE).getString(sharedPrefsKey, null)
         return if (jsonString != null) {
-            val type = object : TypeToken<List<T>>() {}.type
             gson.fromJson(jsonString, type)
         } else {
-            emptyList()
+            mutableListOf()
         }
     }
 
-    protected fun saveItemsToPrefs(items: List<T>) {
+    protected fun saveItemsToPrefs(items: MutableList<T>) {
         val jsonString = gson.toJson(items)
         context.getSharedPreferences("JobberPrefs", Context.MODE_PRIVATE).edit().putString(sharedPrefsKey, jsonString).apply()
     }
 
     abstract fun updateOrAddItem(mutableItems: MutableList<T>, item: T)
     fun findByCondition(predicate: (T) -> Boolean): List<T> {
-        return items?.filter(predicate) ?: emptyList()
-    }
-
-    fun <R> loadRelatedItemsById(fieldAccessor: (T) -> R?, id: R): List<T> {
-        return items?.filter { fieldAccessor(it) == id } ?: emptyList()
+        return allItems?.filter(predicate) ?: emptyList()
     }
 
     fun deleteItem(predicate: (T) -> Boolean) {
-        items?.let { itemList ->
+        allItems?.let { itemList ->
             val itemToRemove = itemList.firstOrNull(predicate)
             itemToRemove?.let {
                 itemList.remove(it)
@@ -60,20 +58,20 @@ abstract class BaseDataRepository<T>(val context: Context, private val sharedPre
         }
     }
     fun <R> loadItemsWhereCollectionContains(fieldAccessor: (T) -> Collection<R>, value: R): List<T> {
-        return items?.filter { value in fieldAccessor(it) } ?: emptyList()
+        return allItems?.filter { value in fieldAccessor(it) } ?: emptyList()
     }
     // TODO normalement cette méthode fonctionne si une Collection est passé ou simplement un objet unique
     fun <R> loadRelatedItemsById2(fieldAccessor: (T) -> Any?, id: R): List<T> {
-        return items?.filter { item ->
+        return allItems?.filter { item ->
             val fieldValue = fieldAccessor(item)
             when (fieldValue) {
                 is Collection<*> -> id in fieldValue
                 else -> id == fieldValue
             }
-        } ?: emptyList()
+        } ?: mutableListOf()
     }
     fun <R> getItemsGroupedBy(fieldSelector: (T) -> R): Map<R, List<T>> {
-        return items?.groupBy(fieldSelector) ?: emptyMap()
+        return allItems?.groupBy(fieldSelector) ?: emptyMap()
     }
 
     // Generic method to generate HTML for graphs
@@ -126,7 +124,7 @@ abstract class BaseDataRepository<T>(val context: Context, private val sharedPre
 
         for (i in 0..6) {
             val dateString = format.format(startDate.time)
-            counts[dateString] = items?.count {
+            counts[dateString] = allItems?.count {
                 val itemDate = format.format(dateExtractor(it))
                 itemDate == dateString
             } ?: 0

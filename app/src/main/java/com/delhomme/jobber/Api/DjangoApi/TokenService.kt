@@ -10,4 +10,7 @@ interface TokenService {
 }
 
 
-data class TokenResponse(val accessToken: String)
+data class TokenResponse(
+    val accessToken: String,
+    val refreshToken: String
+)

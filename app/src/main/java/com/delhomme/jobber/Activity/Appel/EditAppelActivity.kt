@@ -54,9 +54,6 @@ class EditAppelActivity : AppCompatActivity() {
         setupUI()
         loadData()
 
-        findViewById<Button>(R.id.btnCancelAppelChanges).setOnClickListener {
-            cancelChanges()
-        }
     }
 
     private fun setupUI() {
@@ -72,6 +69,9 @@ class EditAppelActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnSaveAppelEdit).setOnClickListener {
             saveAppelChanges()
+        }
+        findViewById<Button>(R.id.btnCancelAppelChanges).setOnClickListener {
+            cancelChanges()
         }
     }
 
