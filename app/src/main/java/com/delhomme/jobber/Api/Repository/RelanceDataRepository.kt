@@ -1,12 +1,19 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
+import android.util.Log
 import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Model.EventType
 import com.delhomme.jobber.Model.Relance
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import java.util.UUID
 
 class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(context, "relances") {
+    private val listType: Type = object : TypeToken<List<Relance>>() {}.type
+    private val gson = Gson()
+
     override fun updateOrAddItem(mutableItems: MutableList<Relance>, item: Relance) {
         val index = mutableItems.indexOfFirst { it.id == item.id }
         if (index != -1) {
@@ -15,6 +22,14 @@ class RelanceDataRepository(context: Context) : BaseDataRepository<Relance>(cont
             mutableItems.add(item)
         }
         updateEventsForRelance(item)
+    }
+    fun convertJsonToItems(jsonString: String): MutableList<Relance> {
+        return try {
+            gson.fromJson(jsonString, listType)
+        } catch (e: Exception) {
+            Log.e("RelanceDataRepository", "Error parsing JSON", e)
+            mutableListOf()
+        }
     }
 
     fun deleteRelance(relanceId: String) {

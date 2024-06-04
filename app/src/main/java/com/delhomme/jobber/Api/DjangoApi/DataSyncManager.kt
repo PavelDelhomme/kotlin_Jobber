@@ -6,27 +6,17 @@ import android.util.Log
 import android.widget.Toast
 import com.delhomme.jobber.Activity.SignUser.LoginActivity
 import com.delhomme.jobber.Api.LocalApi.LocalStorageManager
-import com.delhomme.jobber.Api.Repository.AppelDataRepository
-import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
-import com.delhomme.jobber.Api.Repository.ContactDataRepository
-import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
-import com.delhomme.jobber.Api.Repository.EntretienDataRepository
-import com.delhomme.jobber.Api.Repository.EvenementDataRepository
-import com.delhomme.jobber.Api.Repository.RelanceDataRepository
-import com.delhomme.jobber.Api.Repository.UserRepository
-import com.delhomme.jobber.Model.Appel
-import com.delhomme.jobber.Model.Candidature
-import com.delhomme.jobber.Model.Contact
-import com.delhomme.jobber.Model.Entreprise
-import com.delhomme.jobber.Model.Entretien
-import com.delhomme.jobber.Model.Evenement
-import com.delhomme.jobber.Model.Relance
-import com.delhomme.jobber.Model.User
+import com.delhomme.jobber.Api.Repository.*
+import com.delhomme.jobber.Model.*
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 interface ApiService {
     @POST("candidatures/sync/")
@@ -53,84 +43,156 @@ interface ApiService {
 }
 
 class DataSyncManager(private val apiService: ApiService, private val context: Context) {
+
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     fun syncData() {
-        val candidatures = fetchLocalCandidatures()
-        Log.d("DataSyncManager", "DataSyncedManager : syncData() : candidatures : $candidatures")
-        val entreprises = fetchLocalEntreprises()
-        Log.d("DataSyncManager", "DataSyncedManager : syncData() : entreprises : $entreprises")
-        val contacts = fetchLocalContacts()
-        Log.d("DataSyncManager", "DataSyncedManager : syncData() : contacts: $contacts")
-        val appels = fetchLocalAppels()
-        Log.d("DataSyncManager", "DataSyncedManager : syncData() : appels : $appels")
-        val relances = fetchLocalRelances()
-        Log.d("DataSyncManager", "DataSyncedManager : syncData() : relances : $relances")
-        val evenements = fetchLocalEvenements()
-        Log.d("DataSyncManager", "DataSyncedManager : syncData() : evenements : $evenements")
-        val users = fetchLocalUsers()
-        Log.d("DataSyncManager", "DataSyncedManager : syncData() : users : $users")
-        val entretiens = fetchLocalEntretiens()
-        Log.d("DataSyncManager", "DataSyncedManager : syncData() : entretiens : $entretiens")
-
-        apiService.syncCandidatures(candidatures).enqueue(handleApiResponse())
-        apiService.syncEntreprises(entreprises).enqueue(handleApiResponse())
-        apiService.syncContacts(contacts).enqueue(handleApiResponse())
-        apiService.syncAppels(appels).enqueue(handleApiResponse())
-        apiService.syncRelances(relances).enqueue(handleApiResponse())
-        apiService.syncEntretiens(entretiens).enqueue(handleApiResponse())
-        apiService.syncEvenements(evenements).enqueue(handleApiResponse())
-        apiService.syncUsers(users).enqueue(handleApiResponse())
-    }
-
-    private fun handleApiResponse(): Callback<ApiResponse> = object : Callback<ApiResponse> {
-        override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
-
-            if (!response.isSuccessful && response.code() == 401) {
-                refreshToken { isSuccess ->
-                    if (isSuccess) {
-                        syncData()
-                        Toast.makeText(context, "Données synchronisées avec succès", Toast.LENGTH_SHORT).show()
-                        Log.d("DataSyncManager", "DataSyncManager : données synchronisé avec succes.")
-                    } else {
-                        redirectToLogin()
-                    }
+        coroutineScope.launch {
+            try {
+                syncCandidatures()
+                syncEntreprises()
+                syncContacts()
+                syncAppels()
+                syncRelances()
+                syncEvenements()
+                syncUsers()
+                syncEntretiens()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Données synchronisées avec succès", Toast.LENGTH_SHORT).show()
                 }
-            } else if (response.code() == 401) {
-                // Si le token est expirée essayer de le rafraîchir
-                refreshToken { isSuccess ->
-                    if (isSuccess) {
-
-                        syncData()
-                    } else {
-                        redirectToLogin()
-                    }
+            } catch (e: Exception) {
+                Log.e("DataSyncManager", "Erreur lors de la synchronisation : ${e.message}")
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Erreur lors de la synchronisation : ${e.message}", Toast.LENGTH_LONG).show()
                 }
-            } else {
-                Log.d("DataSyncManager", "DataSyncManager : echec de la synchronisation : ${response.body().toString()}")
-                // Gérer les autres type d'errerus
-                Toast.makeText(context, "Echec de la synchronisation : ${response.errorBody().toString()}", Toast.LENGTH_LONG).show()
+                redirectToLogin()
             }
         }
+    }
 
-        override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
-            Toast.makeText(context, "Erreur réseaux: ${t.message}", Toast.LENGTH_LONG).show()
-            Log.e("DataSyncManager", "Erreur onFailure into handleApiResponse : ${t.message}")
-            Log.e("DataSyncManager", "Erreur réseaux: ${t.message}")
+    private suspend fun syncCandidatures() {
+        val candidatures = fetchLocalCandidatures()
+        Log.d("DataSyncManager", "syncCandidatures : $candidatures")
+        handleApiResponse(apiService.syncCandidatures(candidatures))
+    }
+
+    private suspend fun syncEntreprises() {
+        val entreprises = fetchLocalEntreprises()
+        Log.d("DataSyncManager", "syncEntreprises : $entreprises")
+        handleApiResponse(apiService.syncEntreprises(entreprises))
+    }
+
+    private suspend fun syncContacts() {
+        val contacts = fetchLocalContacts()
+        Log.d("DataSyncManager", "syncContacts : $contacts")
+        handleApiResponse(apiService.syncContacts(contacts))
+    }
+
+    private suspend fun syncAppels() {
+        val appels = fetchLocalAppels()
+        Log.d("DataSyncManager", "syncAppels : $appels")
+        handleApiResponse(apiService.syncAppels(appels))
+    }
+
+    private suspend fun syncRelances() {
+        val relances = fetchLocalRelances()
+        Log.d("DataSyncManager", "syncRelances : $relances")
+        handleApiResponse(apiService.syncRelances(relances))
+    }
+
+    private suspend fun syncEvenements() {
+        val evenements = fetchLocalEvenements()
+        Log.d("DataSyncManager", "syncEvenements : $evenements")
+        handleApiResponse(apiService.syncEvenements(evenements))
+    }
+
+    private suspend fun syncUsers() {
+        val users = fetchLocalUsers()
+        Log.d("DataSyncManager", "syncUsers : $users")
+        handleApiResponse(apiService.syncUsers(users))
+    }
+
+    private suspend fun syncEntretiens() {
+        val entretiens = fetchLocalEntretiens()
+        Log.d("DataSyncManager", "syncEntretiens : $entretiens")
+        handleApiResponse(apiService.syncEntretiens(entretiens))
+    }
+
+    private fun fetchLocalCandidatures(): List<Candidature> {
+        return CandidatureDataRepository(context).getItems()
+    }
+
+    private fun fetchLocalEntreprises(): List<Entreprise> {
+        return EntrepriseDataRepository(context).getItems()
+    }
+
+    private fun fetchLocalAppels(): List<Appel> {
+        return AppelDataRepository(context).getItems()
+    }
+
+    private fun fetchLocalContacts(): List<Contact> {
+        return ContactDataRepository(context).getItems()
+    }
+
+    private fun fetchLocalEvenements(): List<Evenement> {
+        return EvenementDataRepository(context).getItems()
+    }
+
+    private fun fetchLocalRelances(): List<Relance> {
+        return RelanceDataRepository(context).getItems()
+    }
+
+    private fun fetchLocalUsers(): List<User> {
+        return UserRepository(context).getItems()
+    }
+
+    private fun fetchLocalEntretiens(): List<Entretien> {
+        return EntretienDataRepository(context).getItems()
+    }
+    private suspend fun <T> handleApiResponse(call: Call<T>) {
+        return suspendCoroutine { continuation ->
+            call.enqueue(object : Callback<T> {
+                override fun onResponse(call: Call<T>, response: Response<T>) {
+                    if (response.isSuccessful) {
+                        Log.d("DataSyncManager", "Response successful: ${response.body()}")
+                        continuation.resume(Unit)
+                    } else {
+                        if (response.code() == 401) {
+                            refreshToken { isSuccess ->
+                                if (isSuccess) {
+                                    continuation.resume(Unit)
+                                } else {
+                                    continuation.resumeWithException(RuntimeException("Token expired"))
+                                }
+                            }
+                        } else {
+                            val errorMessage = response.errorBody()?.string() ?: "Unknown error"
+                            Log.e("DataSyncManager", "Error response: $errorMessage")
+                            continuation.resumeWithException(RuntimeException("Error: ${response.message()}, $errorMessage"))
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<T>, t: Throwable) {
+                    Log.e("DataSyncManager", "API call failure: ${t.message}")
+                    continuation.resumeWithException(t)
+                }
+            })
         }
     }
+
+
     private fun refreshToken(onComplete: (Boolean) -> Unit) {
         val refreshToken = LocalStorageManager.getRefreshToken()
         Log.d("DataSyncManager", "refreshToken : $refreshToken")
         if (refreshToken != null) {
             Log.d("DataSyncManager", "refreshToken != null call refreshToken so")
             RetrofitClient.createService(TokenService::class.java).refreshToken(mapOf("refresh" to refreshToken))
-                .enqueue(object: Callback<TokenResponse> {
-                    override fun onResponse(
-                        call: Call<TokenResponse>,
-                        response: Response<TokenResponse>
-                    ) {
+                .enqueue(object : Callback<TokenResponse> {
+                    override fun onResponse(call: Call<TokenResponse>, response: Response<TokenResponse>) {
                         if (response.isSuccessful) {
                             response.body()?.let {
-                                Log.d("DataSyncManager", "refrehToken : it.accessToken saved : ${it.accessToken}")
+                                Log.d("DataSyncManager", "refreshToken : it.accessToken saved : ${it.accessToken}")
                                 LocalStorageManager.saveJWT(it.accessToken)
                                 onComplete(true)
                             }
@@ -157,13 +219,4 @@ class DataSyncManager(private val apiService: ApiService, private val context: C
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         context.startActivity(intent)
     }
-
-    private fun fetchLocalCandidatures(): List<Candidature> {return CandidatureDataRepository(context).getItems()}
-    private fun fetchLocalEntreprises(): List<Entreprise> {return EntrepriseDataRepository(context).getItems()}
-    private fun fetchLocalAppels(): List<Appel> {return AppelDataRepository(context).getItems()}
-    private fun fetchLocalContacts(): List<Contact> {return ContactDataRepository(context).getItems()}
-    private fun fetchLocalEvenements(): List<Evenement> {return EvenementDataRepository(context).getItems()}
-    private fun fetchLocalRelances(): List<Relance> {return RelanceDataRepository(context).getItems()}
-    private fun fetchLocalUsers(): List<User> {return UserRepository(context).getItems()}
-    private fun fetchLocalEntretiens(): List<Entretien> {return EntretienDataRepository(context).getItems()}
 }

@@ -1,3 +1,3 @@
 package com.delhomme.jobber.Api.DjangoApi
 
-data class ApiResponse(val success: Boolean, val message: String)
+data class ApiResponse(val status: String, val message: String)

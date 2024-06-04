@@ -1,14 +1,21 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
+import android.util.Log
 import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Model.EventType
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.UUID
 
 class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidature>(context, "candidatures") {
+
+    private val gson = Gson()
+    private val listType: Type = object : TypeToken<List<Candidature>>() {}.type
 
     override fun updateOrAddItem(mutableItems: MutableList<Candidature>, item: Candidature) {
         val index = mutableItems.indexOfFirst { it.id == item.id }
@@ -147,4 +154,14 @@ class CandidatureDataRepository(context: Context) : BaseDataRepository<Candidatu
             .mapValues { it.value.size }
         return generateHtmlForGraph("Candidatures par Etat", "line", data)
     }
+    fun convertJsonToCandidatures(json: String): List<Candidature> {
+        return try {
+            gson.fromJson(json, listType)
+        } catch (e: Exception) {
+            Log.e("CandidatureDataRepository", "Error parsing JSON", e)
+            emptyList()
+        }
+    }
+
+
 }

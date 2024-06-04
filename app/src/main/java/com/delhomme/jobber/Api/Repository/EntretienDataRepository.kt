@@ -1,12 +1,30 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
+import android.util.Log
 import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.Model.EventType
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import java.util.UUID
 
 class EntretienDataRepository(context: Context) : BaseDataRepository<Entretien>(context, "entretiens") {
+
+    private val listType: Type = object : TypeToken<List<Entretien>>() {}.type
+    private val gson = Gson()
+
+
+    fun convertJsonToItems(jsonString: String): MutableList<Entretien> {
+        return try {
+            gson.fromJson(jsonString, listType)
+        } catch (e: Exception) {
+            Log.e("EntretienDataRepository", "Error parsing JSON", e)
+            mutableListOf()
+        }
+    }
+
     override fun updateOrAddItem(mutableItems: MutableList<Entretien>, item: Entretien) {
         val index = mutableItems.indexOfFirst { it.id == item.id }
         if (index != -1) {

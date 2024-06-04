@@ -1,22 +1,36 @@
 package com.delhomme.jobber.Api.Repository
 
 import android.content.Context
+import android.util.Log
 import com.delhomme.jobber.Model.Contact
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
 class ContactDataRepository(context: Context) : BaseDataRepository<Contact>(context, "contacts") {
 
+    private val listType: Type = object : TypeToken<List<Contact>>() {}.type
+    private val gson = Gson()
+
+
     override fun updateOrAddItem(mutableItems: MutableList<Contact>, item: Contact) {
-        val mutableItems = allItems ?: mutableListOf()
         val index = mutableItems.indexOfFirst { it.id == item.id }
         if (index != -1) {
             mutableItems[index] = item
         } else {
             mutableItems.add(item)
         }
-        allItems = mutableItems
-        saveItemsToPrefs(allItems!!)
+        saveItemsToPrefs(mutableItems)
     }
 
+    fun convertJsonToItems(jsonString: String): MutableList<Contact> {
+        return try {
+            gson.fromJson(jsonString, listType)
+        } catch (e: Exception) {
+            Log.e("ContactDataRepository", "Error parsing JSON", e)
+            mutableListOf()
+        }
+    }
 
     fun loadContactsForEntreprise(entrepriseNom: String): List<Contact> {
         return findByCondition { it.entreprise == entrepriseNom }
