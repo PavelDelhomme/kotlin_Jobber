@@ -1,34 +1,39 @@
-package com.delhomme.jobber
+package com.delhomme.jobber.Utils
 
-import com.delhomme.jobber.Contact.model.Contact
+import android.util.JsonReader
+import android.util.Log
+import com.delhomme.jobber.Model.Candidature
+import com.delhomme.jobber.Model.Contact
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.TypeAdapter
 import com.google.gson.TypeAdapterFactory
 import com.google.gson.reflect.TypeToken
-import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.POST
 import java.nio.charset.StandardCharsets
 
 interface ApiService {
     @POST("sync/check_hashes")
-    fun checkHashes(@Body hahList: List<HashModel>): Call<List<DataUpdateModel>>
+    fun checkHashes(@Body hashList: List<HashModel>): Call<List<DataUpdateModel>>
 }
 
 interface SyncableData {
     fun getId(): String
-    //Autres méthodes communes
+    // Autres méthode communes a faire
 }
 
-data class Candidature(
-    val id: String,
-    val titre: String,
-    val entreprise: String,
-) : SyncableData {
-    override fun getId() = id
-}
+val candidature : Candidature
 
+class HashBasedSyncro {
+}
 
 data class HashModel(
     val id: String,
@@ -43,16 +48,18 @@ data class DataUpdateModel(
 fun sendHashesToServer() {
     val hashes = getAllData().map { HashModel(it.id, generateHash(it)) }
     apiService.checkHashes(hashes).enqueue(object: Callback<List<DataUpdateModel>> {
-        override fun onResponse(call: Call<List<DataUpdateModel>>, response: Response<List<DataUpdateModel>>) {
-            if (response.isSuccessful) {
-                updateLocalDatabase(response.body())
-            }
+        override fun onResponse(
+            call: Call<List<DataUpdateModel>>,
+            response: Response<List<DataUpdateModel>>
+        ) {
+            updateLocalDatabase(response.body())
         }
 
-        override fun onFailure(call: Call<List<DataUpdateModel>>, t:Throwable) {
+        override fun onFailure(call: Call<List<DataUpdateModel>>, t: Throwable) {
             Log.e("Sync", "Error syncing : ${t.message}")
         }
-    })
+    }
+    )
 }
 
 fun generateHash(data: DataType): String {
@@ -65,7 +72,8 @@ fun updateLocalDatabase(updates: List<DataUpdateModel>?) {
     }
 }
 
-class HashBasedSyncro {
+class HashBasecSyncro {
+
 }
 
 class SyncableDataAdapterFactory : TypeAdapterFactory {
@@ -78,7 +86,7 @@ class SyncableDataAdapterFactory : TypeAdapterFactory {
         val elementAdapter = gson.getAdapter(JsonElement::class.java)
 
         return object : TypeAdapter<T>() {
-            override fun write(out: JsonWriter, value: T) {
+            override fun write(out: JsonWriter?, value: T) {
                 delegate.write(out, value)
             }
 
@@ -87,11 +95,10 @@ class SyncableDataAdapterFactory : TypeAdapterFactory {
                 val jsonObject = jsonElement.asJsonObject
                 val id = jsonObject.get("id").asString
 
-                // Détermine le type basé sur id ou autres
                 val specificTypeAdapter = when {
                     "Condition Candidature" -> gson.getDelegateAdapter(this, TypeToken.get(Candidature::class.java))
                     "Condition Contact" -> gson.getDelegateAdapter(this, TypeToken.get(Contact::class.java))
-                    // Etc
+                    //ETC
                     else -> throw IllegalStateException("Type non géré")
                 }
                 return specificTypeAdapter.fromJsonTree(jsonElement)
