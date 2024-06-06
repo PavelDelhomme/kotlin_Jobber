@@ -6,7 +6,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.delhomme.jobber.Candidature.DetailsCandidatureActivity
+import com.delhomme.jobber.Activity.Candidature.DetailsCandidatureActivity
 class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".Entretien.EditEntretienActivity">
+    tools:context=".Activity.Entretien.EditEntretienActivity">
 
     <EditText
         android:id="@+id/dateEntretien"
@@ -17,17 +17,17 @@
         android:drawableRight="@android:drawable/ic_menu_today" />
 
     <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextViewEntretien"
+        android:id="@+id/autoCompleteTextViewEntrepriseEntretien"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nom de l'entreprise"
-        android:inputType="text"/>
+        android:inputType="text" />
 
-    <Spinner
-        android:id="@+id/spinnerContact"
+    <MultiAutoCompleteTextView
+        android:id="@+id/multiAutoCompleteTextViewContacts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nom du contact" />
+        android:hint="Select Contacts" />
 
     <Spinner
         android:id="@+id/spinner_type_entretien"
@@ -62,5 +62,5 @@
         android:id="@+id/btnCancelEntretienChanges"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Annuler"/>
+        android:text="Annuler" />
 </LinearLayout>

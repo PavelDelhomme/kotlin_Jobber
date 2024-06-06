@@ -16,16 +16,22 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.DetailsEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.EditEntretienActivity
+import com.delhomme.jobber.Adapter.EntretienAdapter
+import com.delhomme.jobber.Api.Repository.EntretienDataRepository
 import com.delhomme.jobber.Candidature.SwipeCallback
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entretien.adapter.EntretienAdapter
 import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FragmentEntretiens : Fragment() {
     private lateinit var adapter: EntretienAdapter
-    private val dataRepository by lazy { DataRepository(requireContext()) }
+    private val dataRepository by lazy { EntretienDataRepository(requireContext()) }
     private lateinit var broadcastReceiver: BroadcastReceiver
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

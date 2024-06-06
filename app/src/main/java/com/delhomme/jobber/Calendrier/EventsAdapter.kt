@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Calendrier
+package com.delhomme.jobber.Adapter
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Model.Evenement
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,10 +32,10 @@ class EventsAdapter(private val events: List<Evenement>) : RecyclerView.Adapter<
         fun bind(event: Evenement) {
             titleText.text = event.title
             val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
-            dateText.text = "${dateFormat.format(Date(event.startTime))} - ${dateFormat.format(Date(event.endTime))}"
+            dateText.text = "${dateFormat.format(Date(event.start_time))} - ${dateFormat.format(Date(event.end_time))}"
             Log.d("EventsAdapter", "event : $event")
-            Log.d("EventsAdapter", "event.startTime : ${event.startTime}")
-            Log.d("EventsAdapter", "event.endTime : ${event.endTime}")
+            Log.d("EventsAdapter", "event.startTime : ${event.start_time}")
+            Log.d("EventsAdapter", "event.endTime : ${event.end_time}")
             Log.d("EventsAdapter", "event.title : ${event.title}")
         }
     }

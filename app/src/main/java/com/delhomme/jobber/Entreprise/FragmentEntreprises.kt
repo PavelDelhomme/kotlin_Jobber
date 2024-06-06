@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Activity.Entreprise.DetailsEntrepriseActivity
 import com.delhomme.jobber.Candidature.SwipeCallback
 import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entreprise.model.Entreprise

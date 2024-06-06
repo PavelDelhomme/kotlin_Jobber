@@ -1,6 +1,5 @@
-package com.delhomme.jobber.Entreprise
+package com.delhomme.jobber.Activity.Entreprise
 
-import RelanceAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,36 +9,47 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.delhomme.jobber.Activity.Appel.DetailsAppelActivity
+import com.delhomme.jobber.Activity.Appel.EditAppelActivity
+import com.delhomme.jobber.Activity.Candidature.DetailsCandidatureActivity
+import com.delhomme.jobber.Activity.Candidature.EditCandidatureActivity
+import com.delhomme.jobber.Activity.Contact.AddContactActivity
+import com.delhomme.jobber.Activity.Contact.DetailsContactActivity
+import com.delhomme.jobber.Activity.Contact.EditContactActivity
+import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.DetailsEntretienActivity
+import com.delhomme.jobber.Activity.Entretien.EditEntretienActivity
+import com.delhomme.jobber.Activity.Relance.AddRelanceActivity
+import com.delhomme.jobber.Activity.Relance.DetailsRelanceActivity
+import com.delhomme.jobber.Activity.Relance.EditRelanceActivity
+import com.delhomme.jobber.Adapter.AppelAdapter
+import com.delhomme.jobber.Adapter.CandidatureAdapter
+import com.delhomme.jobber.Adapter.ContactAdapter
+import com.delhomme.jobber.Adapter.EntretienAdapter
+import com.delhomme.jobber.Adapter.RelanceAdapter
+import com.delhomme.jobber.Api.Repository.AppelDataRepository
+import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Api.Repository.EntretienDataRepository
+import com.delhomme.jobber.Api.Repository.RelanceDataRepository
 import com.delhomme.jobber.Appel.AddAppelActivity
-import com.delhomme.jobber.Appel.DetailsAppelActivity
-import com.delhomme.jobber.Appel.EditAppelActivity
-import com.delhomme.jobber.Appel.adapter.AppelAdapter
-import com.delhomme.jobber.Appel.model.Appel
-import com.delhomme.jobber.Candidature.DetailsCandidatureActivity
-import com.delhomme.jobber.Candidature.EditCandidatureActivity
-import com.delhomme.jobber.Candidature.adapter.CandidatureAdapter
-import com.delhomme.jobber.Candidature.model.Candidature
-import com.delhomme.jobber.Contact.AddContactActivity
-import com.delhomme.jobber.Contact.DetailsContactActivity
-import com.delhomme.jobber.Contact.EditContactActivity
-import com.delhomme.jobber.Contact.adapter.ContactAdapter
 import com.delhomme.jobber.Contact.model.Contact
-import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.Entreprise.model.Entreprise
-import com.delhomme.jobber.Entretien.AddEntretienActivity
-import com.delhomme.jobber.Entretien.DetailsEntretienActivity
-import com.delhomme.jobber.Entretien.EditEntretienActivity
-import com.delhomme.jobber.Entretien.adapter.EntretienAdapter
-import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.Model.Appel
+import com.delhomme.jobber.Model.Candidature
+import com.delhomme.jobber.Model.Entretien
+import com.delhomme.jobber.Model.Relance
 import com.delhomme.jobber.R
-import com.delhomme.jobber.Relance.AddRelanceActivity
-import com.delhomme.jobber.Relance.DetailsRelanceActivity
-import com.delhomme.jobber.Relance.EditRelanceActivity
-import com.delhomme.jobber.Relance.model.Relance
 
 class DetailsEntrepriseActivity : AppCompatActivity() {
+    private lateinit var candidatureDataRepository: CandidatureDataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
+    private lateinit var contactDataRepository: ContactDataRepository
+    private lateinit var appelDataRepository: AppelDataRepository
+    private lateinit var entretienDataRepository: EntretienDataRepository
+    private lateinit var relanceDataRepository: RelanceDataRepository
 
-    private lateinit var dataRepository: DataRepository
     private lateinit var entreprise: Entreprise
     private lateinit var contactsAdapter: ContactAdapter
     private lateinit var appelsAdapter: AppelAdapter
@@ -50,27 +60,27 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details_entreprise)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        if(supportActionBar != null) {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
-
-        val entrepriseNom = intent.getStringExtra("ENTREPRISE_ID") ?: return
-        dataRepository = DataRepository(this)
-        entreprise = dataRepository.getEntrepriseByNom(entrepriseNom) ?: return
-
-        contactsAdapter = ContactAdapter(emptyList(), dataRepository, this::onContactClicked, this::onDeleteContactClicked, this::onEditContactClicked)
-        appelsAdapter = AppelAdapter(emptyList(), dataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
-        relancesAdapter = RelanceAdapter(emptyList(), dataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked, this::onEditRelanceClicked)
-        entretiensAdapter = EntretienAdapter(emptyList(),dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
-
-        findViewById<TextView>(R.id.tvEntrepriseName).text = entreprise.nom
-
+        val entrepriseId = intent.getStringExtra("ENTREPRISE_ID") ?: return
+        initRepositories()
+        fetchAndDisplayEntrepriseDetails(entrepriseId)
         setupRecyclerView()
-        setupAddContactButton()
-        setupAddAppelButton()
-        setupAddRelanceButton()
-        setupAddEntretienButton()
+        setupButtons()
+    }
+
+    private fun initRepositories() {
+        entrepriseDataRepository = EntrepriseDataRepository(applicationContext)
+        contactDataRepository = ContactDataRepository(applicationContext)
+        appelDataRepository = AppelDataRepository(applicationContext)
+        entretienDataRepository = EntretienDataRepository(applicationContext)
+        candidatureDataRepository = CandidatureDataRepository(applicationContext)
+        relanceDataRepository = RelanceDataRepository(applicationContext)
+    }
+
+    private fun fetchAndDisplayEntrepriseDetails(entrepriseId: String) {
+        entreprise = entrepriseDataRepository.findByCondition { it.nom == entrepriseId }.firstOrNull() ?: return
+        findViewById<TextView>(R.id.tvEntrepriseName).text = entreprise.nom
     }
 
     private fun setupRecyclerView() {
@@ -81,122 +91,114 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
         setupEntretienRecyclerView()
     }
     private fun setupContactRecyclerView() {
-        val contacts = dataRepository.loadContactsForEntreprise(entreprise.nom)
-        val contactsAdapter = ContactAdapter(contacts, dataRepository, this::onContactClicked, this::onDeleteContactClicked, this::onEditContactClicked)
+        val contacts = contactDataRepository.loadContactsForEntreprise(entreprise.nom)
+        val contactsAdapter = ContactAdapter(contacts, contactDataRepository, entrepriseDataRepository, this::onContactClicked, this::onDeleteContactClicked, this::onEditContactClicked)
         findViewById<RecyclerView>(R.id.rvContacts).apply {
             layoutManager = LinearLayoutManager(this@DetailsEntrepriseActivity)
             adapter = contactsAdapter
         }
     }
-
     private fun setupAppelRecyclerView() {
-        val appels = dataRepository.loadAppelsForEntreprise(entreprise.nom)
-        val appelsAdapter = AppelAdapter(appels, dataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
-
+        val appels = appelDataRepository.loadAppelsForEntreprise(entreprise.nom)
+        val appelsAdapter = AppelAdapter(appels, appelDataRepository, contactDataRepository, this::onAppelClicked, this::onDeleteAppelClicked, this::onEditAppelClicked)
         findViewById<RecyclerView>(R.id.rvAppels).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = appelsAdapter
         }
     }
-
     private fun setupEntretienRecyclerView() {
-        val entretiens = dataRepository.loadEntretiensForEntreprise(entreprise.nom)
-        val entretienAdapter = EntretienAdapter(entretiens, dataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
+        val entretiens = entretienDataRepository.loadEntretiensForEntreprise(entreprise.nom)
+        val entretienAdapter = EntretienAdapter(entretiens, entretienDataRepository, entrepriseDataRepository, this::onEntretienClicked, this::onDeleteEntretienClicked, this::onEditEntretienClicked)
 
         findViewById<RecyclerView>(R.id.rvEntretiens).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = entretienAdapter
         }
     }
-
     private fun setupRelanceRecyclerView() {
-        val relances = dataRepository.loadRelancesForEntreprise(entreprise.nom)
-        val relanceAdapter = RelanceAdapter(relances, dataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked, this::onEditRelanceClicked)
-
+        val relances = relanceDataRepository.loadRelancesForEntreprise(entreprise.nom)
+        val relanceAdapter = RelanceAdapter(relances, relanceDataRepository, candidatureDataRepository, this::onRelanceClicked, this::onDeleteRelanceClicked, this::onEditRelanceClicked)
         findViewById<RecyclerView>(R.id.rvRelances).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = relanceAdapter
         }
     }
-
     private fun setupCandidatureRecyclerView() {
-        val candidatures = dataRepository.loadCandidaturesForEntreprise(entreprise.nom)
-        val candidaturesAdapter = CandidatureAdapter(candidatures, dataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked, this::onEditCandidatureClicked)
-
+        val candidatures = candidatureDataRepository.findByCondition { it.entreprise == entreprise.nom }
+        val candidaturesAdapter = CandidatureAdapter(candidatures, candidatureDataRepository, entrepriseDataRepository, this::onCandidatureClicked, this::onDeleteCandidatureClicked, this::onEditCandidatureClicked)
         findViewById<RecyclerView>(R.id.rvCandidatures).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = candidaturesAdapter
         }
     }
+    private fun setupButtons() {
+        findViewById<Button>(R.id.btnAddContact).setOnClickListener {
+            startActivity(Intent(this, AddContactActivity::class.java).putExtra("ENTREPRISE_ID", entreprise.nom))
+        }
+        findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
+            startActivity(Intent(this, AddAppelActivity::class.java).putExtra("ENTREPRISE_ID", entreprise.nom))
+        }
+        findViewById<Button>(R.id.btnAddRelance).setOnClickListener {
+            startActivity(Intent(this, AddRelanceActivity::class.java).putExtra("ENTREPRISE_ID", entreprise.nom))
+        }
+        findViewById<Button>(R.id.btnAddEntretien).setOnClickListener {
+            startActivity(Intent(this, AddEntretienActivity::class.java).putExtra("ENTREPRISE_ID", entreprise.nom))
+        }
+    }
     private fun onContactClicked(contact: Contact) {
-        val intent = Intent(this, DetailsContactActivity::class.java).apply {
-            putExtra("CONTACT_ID", contact.id)
-        }
-        startActivity(intent)
+        startActivity(Intent(this, DetailsContactActivity::class.java).putExtra("CONTACT_ID", contact.id))
     }
-
     private fun onAppelClicked(appel: Appel) {
-        val intent = Intent(this, DetailsAppelActivity::class.java).apply {
-            putExtra("APPEL_ID", appel.id)
-        }
-        startActivity(intent)
+        startActivity(Intent(this, DetailsAppelActivity::class.java).putExtra("APPEL_ID", appel.id))
     }
-
     private fun onCandidatureClicked(candidature: Candidature) {
-        val intent = Intent(this, DetailsCandidatureActivity::class.java).apply {
-            putExtra("CANDIDATURE_ID", candidature.id)
-        }
-        startActivity(intent)
+        startActivity(Intent(this, DetailsCandidatureActivity::class.java).putExtra("CANDIDATURE_ID", candidature.id))
     }
-
     private fun onRelanceClicked(relance: Relance) {
-        val intent = Intent(this, DetailsRelanceActivity::class.java).apply {
-            putExtra("RELANCE_ID", relance.id)
-        }
-        startActivity(intent)
+        startActivity(Intent(this, DetailsRelanceActivity::class.java).putExtra("RELANCE_ID", relance.id))
     }
-
     private fun onEntretienClicked(entretien: Entretien) {
-        val intent = Intent(this, DetailsEntretienActivity::class.java).apply {
-            putExtra("ENTRETIEN_ID", entretien.id)
-        }
-        startActivity(intent)
+        startActivity(Intent(this, DetailsEntretienActivity::class.java).putExtra("ENTRETIEN_ID", entretien.id))
     }
 
     private fun onDeleteContactClicked(contactId: String) {
-        dataRepository.deleteContact(contactId)
-        Log.d("DetailsEntrepriseActivity", "onDeleteContactClicked")
-        Log.d("DetailsEntrepriseActivity", "contactId : $contactId")
-        contactsAdapter.updateContacts(dataRepository.loadContactsForEntreprise(entreprise.nom))
-        dataRepository.getEntreprises()
-        Log.d("DetailsEntrepriseActivity", "contactsAdapter updated")
+        contactDataRepository.deleteContact(contactId)
+        contactsAdapter.updateContacts(contactDataRepository.loadContactsForEntreprise(entreprise.nom))
     }
-
     private fun onDeleteAppelClicked(appelId: String) {
-        Log.d("onDeleteAppelClicked", "Delete appel clicked")
-        dataRepository.deleteAppel(appelId)
-        val updatedAppels = dataRepository.loadAppelsForEntreprise(entreprise.nom)
-        appelsAdapter.updateAppels(updatedAppels)
+        appelDataRepository.deleteAppel(appelId)
+        appelsAdapter.updateAppels(appelDataRepository.loadAppelsForEntreprise(entreprise.nom))
     }
-
     private fun onDeleteCandidatureClicked(candidatureId: String) {
-        dataRepository.deleteCandidature(candidatureId)
-        updateCandidaturesList()
+        candidatureDataRepository.deleteCandidature(candidatureId)
+        candidaturesAdapter.updateCandidatures(candidatureDataRepository.findByCondition { it.entreprise == entreprise.nom })
     }
     private fun onDeleteRelanceClicked(relanceId: String) {
-        dataRepository.deleteRelance(relanceId)
-        updateRelancesList()
+        relanceDataRepository.deleteRelance(relanceId)
+        relancesAdapter.updateRelances(relanceDataRepository.loadRelancesForEntreprise(entreprise.nom))
     }
-
     private fun onDeleteEntretienClicked(entretienId: String) {
-        dataRepository.deleteEntretien(entretienId)
-        updateEntretiensList()
+        entretienDataRepository.deleteEntretien(entretienId)
+        entretiensAdapter.updateEntretiens(entretienDataRepository.loadEntretiensForEntreprise(entreprise.nom))
     }
 
+    private fun onEditContactClicked(contactId: String) {
+        startActivity(Intent(this, EditContactActivity::class.java).apply {
+            putExtra("CONTACT_ID", contactId)
+            putExtra("ENTREPRISE_ID", entreprise.nom)
+        })
+    }
+
+    private fun onEditAppelClicked(appelId: String) {
+        startActivity(Intent(this, EditAppelActivity::class.java).apply {
+            putExtra("APPEL_ID", appelId)
+            putExtra("ENTREPRISE_ID", entreprise.nom)
+        })
+    }
 
     private fun updateContactList() {
         // TODO ici je suis sensé récupérer les contacts lié à l'entreprise
-        val contacts = dataRepository.loadContactsForEntreprise(entreprise.nom)
+        val contacts = contactDataRepository.loadContactsForEntreprise(entreprise.nom)
         if (contacts.isNotEmpty()) {
             contactsAdapter.updateContacts(contacts)
         } else {
@@ -205,16 +207,16 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
     }
 
     private fun updateCandidaturesList() {
-        val candidatures = dataRepository.loadCandidaturesForEntreprise(entreprise.nom)
+        val candidatures = candidatureDataRepository.loadRelatedItemsById2({ it.entreprise }, entreprise.nom)
         if (candidatures.isNotEmpty()) {
             candidaturesAdapter.updateCandidatures(candidatures)
         } else {
-            Log.d("DetailsEntrepriseActivity", "No candidature found for this entreprise.")
+            Log.d("DetailsEntrepriseActivity", "No candidatures found for thi entreprise.")
         }
     }
 
     private fun updateEntretiensList() {
-        val entretiens = dataRepository.loadEntretiensForEntreprise(entreprise.nom)
+        val entretiens = entretienDataRepository.loadEntretiensForEntreprise(entreprise.nom)
         if (entretiens.isNotEmpty()) {
             entretiensAdapter.updateEntretiens(entretiens)
         } else {
@@ -223,7 +225,7 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
     }
 
     private fun updateRelancesList() {
-        val relances = dataRepository.loadRelancesForEntreprise(entreprise.nom)
+        val relances = relanceDataRepository.loadRelancesForEntreprise(entreprise.nom)
         if (relances.isNotEmpty()) {
             relancesAdapter.updateRelances(relances)
         } else {
@@ -232,64 +234,12 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
     }
 
     private fun updateAppelsList() {
-        val appels = dataRepository.loadAppelsForEntreprise(entreprise.nom)
+        val appels = appelDataRepository.loadAppelsForEntreprise(entreprise.nom)
         if (appels.isNotEmpty()) {
             appelsAdapter.updateAppels(appels)
         } else {
             Log.d("DetailsEntrepriseActivity", "No appels found for this entreprise.")
         }
-    }
-
-    private fun setupAddContactButton() {
-        findViewById<Button>(R.id.btnAddContact).setOnClickListener {
-            val intent = Intent(this, AddContactActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", entreprise.nom)
-            }
-            startActivity(intent)
-        }
-    }
-
-    private fun setupAddAppelButton() {
-        findViewById<Button>(R.id.btnAddAppel).setOnClickListener {
-            val intent = Intent(this, AddAppelActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", entreprise.nom)
-            }
-            startActivity(intent)
-        }
-        updateAppelsList()
-    }
-
-    private fun setupAddRelanceButton() {
-        findViewById<Button>(R.id.btnAddRelance).setOnClickListener {
-            val intent = Intent(this, AddRelanceActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", entreprise.nom)
-            }
-            startActivity(intent)
-        }
-    }
-
-    private fun setupAddEntretienButton() {
-        findViewById<Button>(R.id.btnAddEntretien).setOnClickListener {
-            val intent = Intent(this, AddEntretienActivity::class.java).apply {
-                putExtra("ENTREPRISE_ID", entreprise.nom)
-            }
-            startActivity(intent)
-        }
-    }
-    private fun onEditContactClicked(contactId: String) {
-        val intent = Intent(this, EditContactActivity::class.java).apply {
-            putExtra("CONTACT_ID", contactId)
-            putExtra("ENTREPRISE_ID", entreprise.nom)
-        }
-        startActivity(intent)
-    }
-
-    private fun onEditAppelClicked(appelId: String) {
-        val intent = Intent(this, EditAppelActivity::class.java).apply {
-            putExtra("APPEL_ID", appelId)
-            putExtra("ENTREPRISE_ID", entreprise.nom)
-        }
-        startActivity(intent)
     }
 
     private fun onEditEntretienClicked(entretienId: String) {
@@ -316,7 +266,7 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        dataRepository.reloadEntreprises()
+        entrepriseDataRepository.reloadEntreprises()
         reloadAppelsAndContacts()
         reloadRelancesAndEntretiens()
         if (this::contactsAdapter.isInitialized) {
@@ -339,19 +289,19 @@ class DetailsEntrepriseActivity : AppCompatActivity() {
 
     private fun reloadAppelsAndContacts() {
         if (this::contactsAdapter.isInitialized && this::appelsAdapter.isInitialized) {
-            val contacts = dataRepository.loadContactsForEntreprise(entreprise.nom)
+            val contacts = contactDataRepository.loadContactsForEntreprise(entreprise.nom)
             contactsAdapter.updateContacts(contacts)
 
-            val appels = dataRepository.loadAppelsForEntreprise(entreprise.nom)
+            val appels = appelDataRepository.loadAppelsForEntreprise(entreprise.nom)
             appelsAdapter.updateAppels(appels)
         }
     }
     private fun reloadRelancesAndEntretiens() {
         if (this::relancesAdapter.isInitialized && this::entretiensAdapter.isInitialized) {
-            val relances = dataRepository.loadRelancesForEntreprise(entreprise.nom)
+            val relances = relanceDataRepository.loadRelancesForEntreprise(entreprise.nom)
             relancesAdapter.updateRelances(relances)
 
-            val entretiens = dataRepository.loadEntretiensForEntreprise(entreprise.nom)
+            val entretiens = entretienDataRepository.loadEntretiensForEntreprise(entreprise.nom)
             entretiensAdapter.updateEntretiens(entretiens)
         }
     }

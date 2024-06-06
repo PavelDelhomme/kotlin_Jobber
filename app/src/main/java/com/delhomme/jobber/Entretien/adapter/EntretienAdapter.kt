@@ -1,19 +1,21 @@
-package com.delhomme.jobber.Entretien.adapter
+package com.delhomme.jobber.Adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.DataRepository
-import com.delhomme.jobber.Entretien.model.Entretien
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
+import com.delhomme.jobber.Api.Repository.EntretienDataRepository
+import com.delhomme.jobber.Model.Entretien
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class EntretienAdapter(
     var entretiens: List<Entretien>,
-    private val dataRepository: DataRepository,
+    private val entretienDataRepository: EntretienDataRepository,
+    private val entrepriseDataRepository: EntrepriseDataRepository,
     private val itemClickListener: (Entretien) -> Unit,
     private val deleteClickListener: (String) -> Unit,
     private val editClickListener: (String) -> Unit
@@ -26,13 +28,13 @@ class EntretienAdapter(
 
         fun bind(
             entretien: Entretien,
-            dataRepository: DataRepository,
+            entrepriseDataRepository: EntrepriseDataRepository,
             clickListener: (Entretien) -> Unit,
             deleteListener: (String) -> Unit,
             editListener: (String) -> Unit
         ) {
-            val entrepriseName = dataRepository.getEntrepriseByNom(entretien.entrepriseNom)?.nom ?: "Entreprise inconnue"
-            dateEntretien.text = SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).format(entretien.date_entretien)
+            val entrepriseName = entrepriseDataRepository.findByCondition { it.nom == entretien.entrepriseNom }.firstOrNull()?.nom ?: "Entreprise inconnue"
+            dateEntretien.text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).format(entretien.date_entretien)
             entrepriseEntretien.text = entrepriseName
             typeEntretien.text = entretien.type
 
@@ -50,9 +52,8 @@ class EntretienAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(entretiens[position], dataRepository, itemClickListener, deleteClickListener, editClickListener)
+        holder.bind(entretiens[position], entrepriseDataRepository, itemClickListener, deleteClickListener, editClickListener)
     }
-
     override fun getItemCount() = entretiens.size
 
     fun updateEntretiens(newList: List<Entretien>) {

@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Notification
+package com.delhomme.jobber.Fragment
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -13,24 +13,22 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Adapter.NotificationAdapter
+import com.delhomme.jobber.Api.Repository.NotificationDataRepository
 import com.delhomme.jobber.Notification.adapter.NotificationAdapter
 import com.delhomme.jobber.R
 
 class FragmentNotifications : Fragment() {
     private lateinit var adapter: NotificationAdapter
-    private val dataRepository by lazy { DataRepository(requireContext()) }
+    private lateinit var notificationDataRepository: NotificationDataRepository
 
     private val updateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            adapter.updateNotifications(dataRepository.getNotifications())
+            adapter.updateNotifications(notificationDataRepository.getNotifications())
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_notifications, container, false)
     }
 
@@ -39,11 +37,13 @@ class FragmentNotifications : Fragment() {
 
         (activity as AppCompatActivity).supportActionBar?.title = "Notifications"
 
+        notificationDataRepository = NotificationDataRepository(requireContext())
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewNotifications)
         adapter = NotificationAdapter(
-            dataRepository.getNotifications(),
-            onDeleteClick = { notification -> dataRepository.deleteNotification(notification) },
-            onMarkAsReadClick = { notification -> dataRepository.markNotificationAsRead(notification) }
+            notificationDataRepository.getNotifications(),
+            onDeleteClick = { notification -> notificationDataRepository.deleteNotification(notification) },
+            onMarkAsReadClick = { notification -> notificationDataRepository.markNotificationAsRead(notification) }
         )
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -54,7 +54,7 @@ class FragmentNotifications : Fragment() {
     override fun onResume() {
         super.onResume()
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(updateReceiver, IntentFilter("com.jobber.NOTIFICATION_LIST_UPDATED"))
-        adapter.updateNotifications(dataRepository.getNotifications())
+        adapter.updateNotifications(notificationDataRepository.getNotifications())
     }
 
     override fun onPause() {

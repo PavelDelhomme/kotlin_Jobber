@@ -2,8 +2,8 @@ package com.delhomme.jobber.Utils
 
 import android.util.JsonReader
 import android.util.Log
-import com.delhomme.jobber.Model.Candidature
-import com.delhomme.jobber.Model.Contact
+import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.Contact.model.Contact
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
@@ -15,7 +15,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 import java.nio.charset.StandardCharsets
@@ -30,7 +29,7 @@ interface SyncableData {
     // Autres méthode communes a faire
 }
 
-val candidature : Candidature
+val candidature : Candidature = TODO()
 
 class HashBasedSyncro {
 }

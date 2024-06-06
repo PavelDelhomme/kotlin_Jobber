@@ -7,10 +7,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -19,50 +21,56 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import com.delhomme.jobber.Appel.AddAppelActivity
-import com.delhomme.jobber.Appel.FragmentAppels
-import com.delhomme.jobber.Calendrier.FragmentCalendrier
-import com.delhomme.jobber.Candidature.AddCandidatureActivity
-import com.delhomme.jobber.Candidature.FragmentCandidatures
-import com.delhomme.jobber.Contact.AddContactActivity
-import com.delhomme.jobber.Contact.FragmentContacts
-import com.delhomme.jobber.Entreprise.FragmentEntreprises
-import com.delhomme.jobber.Entretien.AddEntretienActivity
-import com.delhomme.jobber.Entretien.FragmentEntretiens
-import com.delhomme.jobber.Notification.FragmentNotifications
+import com.delhomme.jobber.Activity.Appel.AddAppelActivity
+import com.delhomme.jobber.Activity.Candidature.AddCandidatureActivity
+import com.delhomme.jobber.Activity.Contact.AddContactActivity
+import com.delhomme.jobber.Activity.Entretien.AddEntretienActivity
+import com.delhomme.jobber.Activity.SignUser.LoginActivity
+import com.delhomme.jobber.Api.DjangoApi.ApiResponse
+import com.delhomme.jobber.Api.DjangoApi.RetrofitClient
+import com.delhomme.jobber.Api.DjangoApi.TokenResponse
+import com.delhomme.jobber.Api.DjangoApi.TokenService
+import com.delhomme.jobber.Api.LocalApi.LocalStorageManager
+import com.delhomme.jobber.Api.Repository.SearchDataRepository
+import com.delhomme.jobber.Api.UserProfileApi
+import com.delhomme.jobber.Fragment.FragmentAppels
+import com.delhomme.jobber.Fragment.FragmentCalendrier
+import com.delhomme.jobber.Fragment.FragmentCandidatures
+import com.delhomme.jobber.Fragment.FragmentContacts
+import com.delhomme.jobber.Fragment.FragmentDashboard
+import com.delhomme.jobber.Fragment.FragmentEntreprises
+import com.delhomme.jobber.Fragment.FragmentEntretiens
+import com.delhomme.jobber.Fragment.FragmentNotifications
+import com.delhomme.jobber.Fragment.FragmentRelances
+import com.delhomme.jobber.Fragment.SearchResultsFragment
 import com.delhomme.jobber.Notification.NotificationReceiver
-import com.delhomme.jobber.Relance.FragmentRelances
-import com.delhomme.jobber.Search.SearchResultsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val REQUEST_NOTIFICATION_PERMISSION = 1001
 
-    private var searchJob: Job? = null
-    private val searchFlow = MutableStateFlow("")
-
-
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var dataRepository: DataRepository
+    private lateinit var searchDataRepository: SearchDataRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        dataRepository = DataRepository(this)
+
+        searchDataRepository = SearchDataRepository(this)
+
+        setupUI()
+        checkPermissionAndSetupNotifications()
+
+        LocalStorageManager.initialize(this)
+        syncDataWithServer()
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATION_PERMISSION)
@@ -70,19 +78,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // triggerTestNotification()
             configureNotificationAlarm()
         }
-
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navView = findViewById(R.id.nav_view)
-        navView.setNavigationItemSelectedListener(this)
-
-        toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
-        )
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
@@ -97,8 +92,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fabMenuJobber.setOnClickListener { view ->
             showPopupMenu(view)
         }
+    }
 
-        setupSearch()
+    private fun setupUI() {
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navView = findViewById(R.id.nav_view)
+        navView.setNavigationItemSelectedListener(this)
+        toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        if (savedInstanceState == null) {
+            replaceFragment(FragmentDashboard())
+        }
+        findViewById<FloatingActionButton>(R.id.fabMenuJobber).setOnClickListener { view ->
+            showPopupMenu(view)
+        }
+
+    }
+
+    private fun checkPermissionAndSetupNotifications() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATION_PERMISSION)
+        } else {
+            configureNotificationAlarm()
+        }
     }
 
     private fun showPopupMenu(view: View) {
@@ -130,105 +149,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun configureNotificationAlarm() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent = Intent(this, NotificationReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val alarmIntent = Intent(this, NotificationReceiver::class.java).let { intent -> PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         }
-
-        val calendar: Calendar = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
+        val calendar: Calendar = Calendar.getInstance().apply {timeInMillis = System.currentTimeMillis()
             set(Calendar.HOUR_OF_DAY, 18)  // Set the alarm time to 6 PM
             set(Calendar.MINUTE, 0)
         }
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            alarmIntent
-        )
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, AlarmManager.INTERVAL_DAY, alarmIntent)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                configureNotificationAlarm()
-            }
-        }
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_dashboard -> {
-                replaceFragment(FragmentDashboard())
-            }
-            R.id.nav_candidatures -> {
-                replaceFragment(FragmentCandidatures())
-            }
-            R.id.nav_contact_list -> {
-                replaceFragment(FragmentContacts())
-            }
-            R.id.nav_appel_list -> {
-                replaceFragment(FragmentAppels())
-            }
-            R.id.nav_relances -> {
-                replaceFragment(FragmentRelances())
-            }
-            R.id.nav_entretiens -> {
-                replaceFragment(FragmentEntretiens())
-            }
-            R.id.nav_entreprises -> {
-                replaceFragment(FragmentEntreprises())
-            }
-            R.id.nav_calendrier -> {
-                replaceFragment(FragmentCalendrier())
-            }
-            R.id.nav_notifications -> {
-                replaceFragment(FragmentNotifications())
-            }
-        }
-        drawerLayout.closeDrawer(navView)
-        return true
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        drawerLayout.openDrawer(navView)
-        return true
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        val searchItem = menu!!.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
+        (menu.findItem(R.id.action_search).actionView as SearchView).apply {
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    performSearch(query)
+                    return true
+                }
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                searchFlow.value = query ?: ""
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                searchFlow.value = newText ?: ""
-                return true
-            }
-        })
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    performSearch(newText)
+                    return true
+                }
+            })
+        }
         return true
     }
 
     private fun performSearch(query: String?) {
-        searchJob?.cancel()
-        searchJob = lifecycleScope.launch(Dispatchers.IO) {
-            if (!query.isNullOrEmpty()) {
-                val results = dataRepository.search(query)
-                withContext(Dispatchers.Main) {
-                    displayResults(results)
-                }
+        query?.let {
+            if (it.isNotEmpty()) {
+                val results = searchDataRepository.search(it)
+                displayResults(results)
             } else {
                 displayDefaultState()
             }
@@ -242,17 +194,92 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun displayDefaultState() {
         // Utiliser cette méthode pour afficher l'état par défaut de k'aookucatuib
-        //replaceFragment(FragmentDashboard())
+        replaceFragment(FragmentDashboard())
     }
-    private fun setupSearch() {
-        lifecycleScope.launch {
-            searchFlow
-                .debounce(200)
-                .filter { it.isNotEmpty() }
-                .distinctUntilChanged()
-                .collect { query ->
-                    performSearch(query)
-                }
+
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_dashboard -> replaceFragment(FragmentDashboard())
+            R.id.nav_candidatures -> replaceFragment(FragmentCandidatures())
+            R.id.nav_contact_list -> replaceFragment(FragmentContacts())
+            R.id.nav_appel_list -> replaceFragment(FragmentAppels())
+            R.id.nav_relances -> replaceFragment(FragmentRelances())
+            R.id.nav_entretiens -> replaceFragment(FragmentEntretiens())
+            R.id.nav_entreprises -> replaceFragment(FragmentEntreprises())
+            R.id.nav_calendrier -> replaceFragment(FragmentCalendrier())
+            R.id.nav_notifications -> replaceFragment(FragmentNotifications())
+        }
+        drawerLayout.closeDrawer(navView)
+        return true
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                configureNotificationAlarm()
+            }
         }
     }
+
+    override fun onSupportNavigateUp(): Boolean {
+        drawerLayout.openDrawer(navView)
+        return true
+    }
+
+    fun syncDataWithServer() {
+        val unsyncedData = LocalStorageManager.getData("unsynced_data_key")
+        unsyncedData?.let { data ->
+            val apiService = RetrofitClient.createService(UserProfileApi::class.java)
+            apiService.sendDataToServer(data).enqueue(object : Callback<ApiResponse> {
+                override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+                    if (response.isSuccessful) {
+                        LocalStorageManager.clearSpecificData("unsynced_data_key")
+                    } else if (response.code() == 401) {
+                        refreshTokenAndRetrySync(data)
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+                    Log.e("MainActivity", "synDataWithServer : error: ${t.message}")
+                    Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_LONG).show()
+                }
+            })
+        } ?: Log.d("MainActivity", "No unsynced data to send.")
+    }
+    private fun refreshTokenAndRetrySync(data: String) {
+        val refreshToken = LocalStorageManager.getRefreshToken()
+        refreshToken?.let {
+            val params = mapOf("refresh" to it)
+            val tokenService = RetrofitClient.createService(TokenService::class.java)
+            tokenService.refreshToken(params).enqueue(object : Callback<TokenResponse> {
+                override fun onResponse(call: Call<TokenResponse>, response: Response<TokenResponse>) {
+                    if (response.isSuccessful) {
+                        response.body()?.accessToken?.let { newToken ->
+                            LocalStorageManager.saveJWT(newToken)
+                            syncDataWithServer()
+                        }
+                    } else {
+                        redirectToLogin()
+                    }
+                }
+
+                override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
+                    redirectToLogin()
+                }
+            })
+        } ?: redirectToLogin()  // Si aucun refreshToken n'est trouvé, rediriger vers LoginActivity
+    }
+
+    private fun redirectToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Candidature
+package com.delhomme.jobber.Activity.Candidature
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -9,22 +9,23 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.delhomme.jobber.Calendrier.Evenement
-import com.delhomme.jobber.Calendrier.EventType
-import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.CandidatureState
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Entreprise.model.Entreprise
+import com.delhomme.jobber.Model.Candidature
+import com.delhomme.jobber.Model.Entreprise
 import com.delhomme.jobber.R
+import com.delhomme.jobber.Utils.CandidatureState
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import java.util.UUID
 
 class AddCandidatureActivity : AppCompatActivity() {
-    private lateinit var dataRepository: DataRepository
+    private lateinit var candidatureDataRepository: CandidatureDataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
     private lateinit var etDateCandidature: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,21 +33,34 @@ class AddCandidatureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_candidature)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        dataRepository = DataRepository(applicationContext)
+        candidatureDataRepository = CandidatureDataRepository(applicationContext)
+        entrepriseDataRepository = EntrepriseDataRepository(applicationContext)
         etDateCandidature = findViewById(R.id.editText_date_candidature)
+
         setupSpinners()
         setupDatePicker()
 
         findViewById<Button>(R.id.button_add_candidature).setOnClickListener {
-            addCandidature()
+            handleEntrepriseAndCandidature()
+        }
+        findViewById<Button>(R.id.button_cancel_candidature).setOnClickListener {
+            finish()
         }
     }
 
+    private fun handleEntrepriseAndCandidature() {
+        val nomEntreprise = findViewById<EditText>(R.id.editText_nom_entreprise).text.toString()
+        val entreprise = entrepriseDataRepository.getOrCreateEntreprise(nomEntreprise)
+
+        addCandidature(entreprise)
+    }
     private fun setupSpinners() {
-        val typePosteAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, dataRepository.getTypePosteOptions())
+        val typePosteOptions = resources.getStringArray(R.array.type_poste_options)
+        val typePosteAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, typePosteOptions)
         findViewById<Spinner>(R.id.spinner_type_poste).adapter = typePosteAdapter
 
-        val plateformeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, dataRepository.getPlateformeOptions())
+        val plateformeOptions = resources.getStringArray(R.array.plateforme_options)
+        val plateformeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, plateformeOptions)
         findViewById<Spinner>(R.id.spinner_plateforme).adapter = plateformeAdapter
     }
 
@@ -65,55 +79,29 @@ class AddCandidatureActivity : AppCompatActivity() {
         Log.d("AddCandidatureActivityDate", "etDateCandidature setupDatePicker : $etDateCandidature")
     }
 
-    private fun addCandidature() {
+    private fun addCandidature(entreprise: Entreprise) {
         Log.d("AddCandidatureActivityDate", "Attempting to add a new candidature")
         val titreOffre = findViewById<EditText>(R.id.editText_titre_offre).text.toString()
-        val nomEntreprise = findViewById<EditText>(R.id.editText_nom_entreprise).text.toString()
         val plateformeUtilisee = findViewById<Spinner>(R.id.spinner_plateforme).selectedItem.toString()
         val typePoste = findViewById<Spinner>(R.id.spinner_type_poste).selectedItem.toString()
         val dateCandidature = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateCandidature.text.toString())!!
         val notesCandidature = findViewById<EditText>(R.id.editText_notes).text.toString()
         val lieuPoste = findViewById<EditText>(R.id.editText_lieuPoste).text.toString()
 
-        val entreprise = dataRepository.getOrCreateEntreprise(nomEntreprise)
-
-        if (dataRepository.getCandidatures().any { it.titre_offre == titreOffre && it.entrepriseNom == entreprise.nom }) {
-            Toast.makeText(this, "Cette candidature existe déjà !", Toast.LENGTH_SHORT).show()
-            return
-        }
 
         val newCandidature = Candidature(
-            id = UUID.randomUUID().toString(),
             titre_offre = titreOffre,
-            entrepriseNom = entreprise.nom,
-            date_candidature = dateCandidature,
-            plateforme = plateformeUtilisee,
+            entreprise = entreprise.nom,
             type_poste = typePoste,
-            lieuPoste = lieuPoste,
+            plateforme = plateformeUtilisee,
+            lieu_poste = lieuPoste,
             state = CandidatureState.CANDIDATEE_ET_EN_ATTENTE,
             notes = notesCandidature,
+            date_candidature = dateCandidature
         )
 
-        dataRepository.saveCandidature(newCandidature)
-
-        Log.d("AddCandidatureActivity", "newCandidature : $newCandidature\n newCandidature.date ${newCandidature.date_candidature}")
-        Toast.makeText(this, "Candidature ajoutée avec succès", Toast.LENGTH_SHORT).show()
-
-        val evenement = Evenement(
-            id = UUID.randomUUID().toString(),
-            title = "Candidature : $titreOffre",
-            description = "Candidature pour $nomEntreprise à ${etDateCandidature.text}",
-            startTime = dateCandidature.time,
-            endTime = dateCandidature.time + 10 * 60 * 1000,
-            type = EventType.Candidature,
-            relatedId = newCandidature.id,
-            entrepriseId = entreprise.nom
-        )
-        dataRepository.saveEvent(evenement)
-
+        candidatureDataRepository.addOrUpdateCandidature(newCandidature)
         val intentEvent = Intent("com.jobber.EVENEMENT_LIST_UPDATED")
-
-
         val intentCandidature = Intent("com.jobber.CANDIDATURE_LIST_UPDATED")
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentCandidature)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentEvent)

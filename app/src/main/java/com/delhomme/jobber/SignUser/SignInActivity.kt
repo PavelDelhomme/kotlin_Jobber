@@ -1,55 +1,62 @@
-package com.delhomme.jobber.SignUser
+package com.delhomme.jobber.Activity.SignUser
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.delhomme.jobber.Api.LocalApi.LocalStorageManager
+import com.delhomme.jobber.Api.LoginResponse
+import com.delhomme.jobber.Api.Repository.UserRepository
 import com.delhomme.jobber.MainActivity
 import com.delhomme.jobber.R
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignInActivity : AppCompatActivity() {
+    private lateinit var userRepository: UserRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
+        userRepository = UserRepository(this)
 
-        val emailField = findViewById<EditText>(R.id.signup_email)
-        val passwordField = findViewById<EditText>(R.id.signup_password)
-        val confirmPasswordField = findViewById<EditText>(R.id.confirm_password)
-        val signUpButton = findViewById<Button>(R.id.signupButton)
-        val backButton = findViewById<Button>(R.id.backButton)
+        val buttonSignUp = findViewById<Button>(R.id.signInButton)
+        val usernameField = findViewById<EditText>(R.id.edit_text_email)
+        val passwordField = findViewById<EditText>(R.id.edit_text_password)
 
-        signUpButton.setOnClickListener {
-            val email = emailField.text.toString().trim()
-            val password = passwordField.text.toString().trim()
-            val confirmPassword = confirmPasswordField.text.toString().trim()
-
-            if (password == confirmPassword) {
-                signUpUser(email, password)
+        buttonSignUp.setOnClickListener {
+            val username = usernameField.text.toString()
+            val password = passwordField.text.toString()
+            if (username.isNotEmpty() && password.isNotEmpty()) {
+                registerUser(username, password)
+                Log.d("SignInActivity", "User registered : $username $password")
             } else {
-                Toast.makeText(this, "Passwords do not match!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Veuillez remplir tous les champs.", Toast.LENGTH_SHORT).show()
             }
         }
-
-        backButton.setOnClickListener {
-            finish()
-        }
     }
 
-    private fun signUpUser(email: String, password: String) {
-        // Mémoriser les données utilisateur en utilisant SharedPreferences
-        saveUserData(email, password)
-        Toast.makeText(this, "Inscription réussie!", Toast.LENGTH_SHORT).show()
-        startActivity(Intent(this, MainActivity::class.java))
-    }
+    private fun registerUser(username: String, password: String) {
+        userRepository.registerUser(username, password, object : Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.access?.let {
+                        LocalStorageManager.saveJWT(it)
+                        startActivity(Intent(this@SignInActivity, MainActivity::class.java))
+                        finish()
+                    } ?: Toast.makeText(this@SignInActivity, "Inscription réussie, mais aucun token reçu.", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this@SignInActivity, "Erreur lors de l'inscription : ${response.message()}", Toast.LENGTH_LONG).show()
+                }
+            }
 
-    private fun saveUserData(email: String, password: String) {
-        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("email", email)
-        editor.putString("password", password)
-        editor.apply()
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                Toast.makeText(this@SignInActivity, "Echec de la connexion : ${t.message}", Toast.LENGTH_LONG).show()
+            }
+        })
     }
 }
-

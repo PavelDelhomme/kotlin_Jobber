@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Candidature.adapter
+package com.delhomme.jobber.Adapter
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,20 +7,22 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.delhomme.jobber.Candidature.model.Candidature
+import com.delhomme.jobber.Api.Repository.CandidatureDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.CandidatureState
-import com.delhomme.jobber.DataRepository
+import com.delhomme.jobber.Model.Candidature
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class CandidatureAdapter(
     var candidatures: List<Candidature>,
-    private var dataRepository: DataRepository,
+    private var candidatureDataRepository: CandidatureDataRepository,
+    private var entrepriseDataRepository: EntrepriseDataRepository,
     private val itemClickListener: (Candidature) -> Unit,
     private val deleteClickListener: (String) -> Unit,
     private val editClickListener: (String) -> Unit
-    ) : RecyclerView.Adapter<CandidatureAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<CandidatureAdapter.ViewHolder>() {
 
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -32,10 +34,11 @@ class CandidatureAdapter(
         private val plateforme: TextView = view.findViewById(R.id.plateforme)
         private val notes: TextView = view.findViewById(R.id.tvNotesCandidature)
 
-        fun bind(candidature: Candidature, dataRepository: DataRepository, clickListener: (Candidature) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
+        fun bind(candidature: Candidature, candidatureDataRepository: CandidatureDataRepository, entrepriseDataRepository: EntrepriseDataRepository, clickListener: (Candidature) -> Unit, deleteListener: (String) -> Unit, editListener: (String) -> Unit) {
             val cardView: CardView = itemView.findViewById(R.id.cardView2)
             cardView.setBackgroundColor(itemView.context.resources.getColor(getStateColor(candidature.state), null))
-            val entrepriseNom = dataRepository.getEntrepriseByNom(candidature.entrepriseNom)?.nom ?: "Unknown Entreprise"
+
+            val entrepriseNom = entrepriseDataRepository.findByCondition { it.nom == candidature.entreprise }.firstOrNull()?.nom ?: "Unknown entreprise"
 
             nomPoste.text = candidature.titre_offre
             entreprise.text = entrepriseNom
@@ -55,6 +58,7 @@ class CandidatureAdapter(
                 CandidatureState.NON_RETENU_APRES_ENTRETIEN -> "❌️ Non retenue après entretien"
                 CandidatureState.NON_RETENU_SANS_ENTRETIEN -> "❌ Non retenue"
                 CandidatureState.ACCEPTEE -> "✅ Acceptée"
+                else -> "UNKNWON"
             }
 
             typePoste.text = candidature.type_poste
@@ -92,7 +96,7 @@ class CandidatureAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(candidatures[position],dataRepository, itemClickListener, deleteClickListener, editClickListener)
+        holder.bind(candidatures[position], candidatureDataRepository, entrepriseDataRepository, itemClickListener, deleteClickListener, editClickListener)
     }
 
     override fun getItemCount(): Int = candidatures.size

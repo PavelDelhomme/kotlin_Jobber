@@ -60,4 +60,10 @@
         android:layout_height="wrap_content"
         android:text="Ajouter Candidature"
         android:layout_gravity="center_horizontal" />
+    <Button
+        android:id="@+id/button_cancel_candidature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ajouter Candidature"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

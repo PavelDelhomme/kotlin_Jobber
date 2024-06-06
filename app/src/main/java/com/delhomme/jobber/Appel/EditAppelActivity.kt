@@ -1,4 +1,4 @@
-package com.delhomme.jobber.Appel
+package com.delhomme.jobber.Activity.Appel
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -11,8 +11,10 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.delhomme.jobber.Api.Repository.AppelDataRepository
+import com.delhomme.jobber.Api.Repository.ContactDataRepository
+import com.delhomme.jobber.Api.Repository.EntrepriseDataRepository
 import com.delhomme.jobber.Appel.model.Appel
-import com.delhomme.jobber.DataRepository
 import com.delhomme.jobber.R
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -25,7 +27,11 @@ class EditAppelActivity : AppCompatActivity() {
     private lateinit var etNotesAppel: EditText
     private lateinit var spContact: Spinner
     private lateinit var autoCompleteTextViewEntreprise: AutoCompleteTextView
-    private lateinit var dataRepository: DataRepository
+
+    private lateinit var appelDataRepository: AppelDataRepository
+    private lateinit var contactDataRepository: ContactDataRepository
+    private lateinit var entrepriseDataRepository: EntrepriseDataRepository
+
     private var appelId: String? = null
     private var entrepriseNom: String? = null
     private var contactId: String? = null
@@ -36,7 +42,10 @@ class EditAppelActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_appel)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        dataRepository = DataRepository(this)
+        appelDataRepository = AppelDataRepository(this)
+        contactDataRepository = ContactDataRepository(this)
+        entrepriseDataRepository = EntrepriseDataRepository(this)
+
         appelId = intent.getStringExtra("APPEL_ID")
         candidatureId = intent.getStringExtra("CANDIDATURE_ID")
         entrepriseNom = intent.getStringExtra("ENTREPRISE_ID")
@@ -45,9 +54,6 @@ class EditAppelActivity : AppCompatActivity() {
         setupUI()
         loadData()
 
-        findViewById<Button>(R.id.btnCancelAppelChanges).setOnClickListener {
-            cancelChanges()
-        }
     }
 
     private fun setupUI() {
@@ -63,6 +69,9 @@ class EditAppelActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnSaveAppelEdit).setOnClickListener {
             saveAppelChanges()
+        }
+        findViewById<Button>(R.id.btnCancelAppelChanges).setOnClickListener {
+            cancelChanges()
         }
     }
 
@@ -81,7 +90,11 @@ class EditAppelActivity : AppCompatActivity() {
     }
 
     private fun setupContactSpinner() {
-        val contacts = entrepriseNom?.let { dataRepository.loadContactsForEntreprise(it) } ?: dataRepository.getContacts()
+        val contacts = entrepriseNom?.let {
+            entrepriseDataRepository.findByCondition { it.nom == entrepriseNom }.flatMap {
+                contactDataRepository.findByCondition { contact -> contact.entreprise == it.nom }
+            }
+        } ?: contactDataRepository.getItems()
         val contactNames = contacts.map { it.getFullName() }.toMutableList()
         contactNames.add(0, "--") // Option par défaut pour aucun contact sélectionné
 
@@ -96,7 +109,7 @@ class EditAppelActivity : AppCompatActivity() {
 
     private fun setupEntrepriseField() {
         if (entrepriseNom != null) {
-            val entreprise = dataRepository.getEntrepriseByNom(entrepriseNom)
+            val entreprise = entrepriseDataRepository.findByCondition { it.nom == entrepriseNom }.firstOrNull()
             autoCompleteTextViewEntreprise.setText(entreprise?.nom)
         } else {
             autoCompleteTextViewEntreprise.isEnabled = true
@@ -105,7 +118,7 @@ class EditAppelActivity : AppCompatActivity() {
 
     private fun loadData() {
         appelId?.let {
-            val appel = dataRepository.getAppelById(it)
+            val appel = appelDataRepository.findByCondition { it.id == appelId }.firstOrNull()
             appel?.let {
                 val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH)
                 etDateAppel.setText(dateFormat.format(appel.date_appel))
@@ -120,28 +133,25 @@ class EditAppelActivity : AppCompatActivity() {
             val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRENCH).parse(etDateAppel.text.toString()) ?: Date()
             val objet = etObjetAppel.text.toString()
             val notes = etNotesAppel.text.toString()
-
             val selectedContactName = spContact.selectedItem.toString()
-            val contactId = if (selectedContactName != "--") {
-                dataRepository.getContacts().find { it.getFullName() == selectedContactName }?.id
-            } else null
+            val selectedContctId = if (selectedContactName != "--") contactDataRepository.findByCondition { it.getFullName() == selectedContactName }.firstOrNull()?.id else null
 
             appelId?.let {
                 val updatedAppel = Appel(
                     it,
-                    candidature_id = candidatureId,
-                    contact_id = contactId,
+                    candidature = candidatureId,
+                    contact = selectedContctId,
                     entrepriseNom = entrepriseNom,
                     date_appel = date,
                     objet = objet,
                     notes = notes
                 )
-                dataRepository.saveAppel(updatedAppel)
+                appelDataRepository.saveItem(updatedAppel)
                 Toast.makeText(this, "Appel mis à jour avec succès.", Toast.LENGTH_SHORT).show()
                 finish()
             }
         } catch (e: Exception) {
-            Toast.makeText(this, "Erreur lors de la mise à jour de l'appel: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Erreur lors de la mise à jour de l'Appel: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

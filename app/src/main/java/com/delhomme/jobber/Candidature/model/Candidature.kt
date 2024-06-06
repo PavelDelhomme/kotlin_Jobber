@@ -1,7 +1,6 @@
-package com.delhomme.jobber.Model
+package com.delhomme.jobber.Candidature.model
 
-import com.delhomme.jobber.Utils.CandidatureState
-import com.delhomme.jobber.Utils.SyncableData
+import com.delhomme.jobber.CandidatureState
 import java.util.Date
 import java.util.UUID
 
@@ -21,8 +20,5 @@ data class Candidature(
     val appels: MutableList<String> = mutableListOf(),
     var relances: MutableList<String> = mutableListOf(),
     var etat_manuel: Boolean = false,
-    var contacts: MutableList<String> = mutableListOf(),
-    var hash: String = ""
-) : SyncableData {
-    override fun getId() = id
-}
+    var contacts: MutableList<String> = mutableListOf()
+)

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".Entretien.AddEntretienActivity">
+    tools:context=".Activity.Entretien.AddEntretienActivity">
 
     <EditText
         android:id="@+id/dateEntretien"
@@ -21,14 +21,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nom de l'entreprise"
-        android:inputType="text"/>
+        android:inputType="text" />
 
     <AutoCompleteTextView
         android:id="@+id/autoCompleteTextViewContact"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nom du contact"
-        android:inputType="text"/>
+        android:inputType="text" />
 
     <Spinner
         android:id="@+id/spinner_type_entretien"
@@ -50,6 +50,12 @@
         android:id="@+id/button_add_entretien"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ajouter Entretien"
+        android:text="Ajouter"
         android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/btnCancelEntretienChanges"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Annuler" />
 </LinearLayout>
