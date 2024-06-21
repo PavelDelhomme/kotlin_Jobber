@@ -31,5 +31,5 @@ Pour installer Jobber, suivez ces étapes :
 
 ## Contact
 
-Lien du projet : [https://github.com/votreGitHub/jobber](https://github.com/votreGitHub/jobber)
+Lien du projet : [https://github.com/PavelDelhomme/jobber](https://github.com/PavelDelhomme/jobber)
 
